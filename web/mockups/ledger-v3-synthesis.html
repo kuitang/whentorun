@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>when to run &mdash; Central Park &middot; v3 synthesis</title>
+<link rel="stylesheet" href="../static/css/tokens.css">
+<style>
+/* ============ ledger-v3 — SYNTHESIS ============
+   Chassis: v2c figure-ledger register, one notch larger.
+   All type Spectral (Georgia/serif fallback); zero sans-serif, zero monospace.
+   Engraved SVG only: 1px hairline strokes in currentColor, 45-degree hatch
+   fills. Tier inks color categorical numerals; the word always sits beside. */
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 17px;                       /* v3: body a notch up from 16 */
+  line-height: var(--lh-body);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 var(--space-md); }
+a { color: var(--steel-text); }
+h1, h2 { margin: 0; }
+button, input, select, textarea { font-family: var(--font-serif); }
+svg text { font-family: var(--font-serif); }
+:focus-visible { outline: 2px solid var(--steel-text); outline-offset: 2px; }
+
+.overline {
+  font-family: var(--font-serif);
+  font-size: 13px;                       /* agate floor: nothing under 13px */
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* tier inks — categorical numerals only; the word always sits beside them */
+.tt0 { color: var(--tier-0); } .tt1 { color: var(--tier-1); }
+.tt2 { color: var(--tier-2); } .tt3 { color: var(--tier-3); }
+.tt4 { color: var(--tier-4); }
+.tt0, .tt1, .tt2, .tt3, .tt4 { font-weight: 500; }
+.st { color: var(--steel-text); }
+
+/* engraved glyphs */
+.g { width: 18px; height: 18px; vertical-align: -4px; color: var(--slate); }
+
+/* ---------- masthead ---------- */
+.masthead { padding-top: calc(var(--space-sm) + env(safe-area-inset-top)); }
+.mast-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); }
+.wordmark {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--size-screen-title);
+  line-height: var(--lh-title);
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+.ctls { display: flex; align-items: center; gap: var(--space-xs); }
+.ctl {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif);
+  font-size: var(--size-body);          /* >=16px control text */
+  font-weight: 500;
+  min-height: var(--hit-target);
+  min-width: var(--hit-target);
+  padding: 0 var(--space-sm);
+  background: none;
+  color: var(--ink);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-surface);
+  cursor: pointer;
+}
+.ctl:active { background: var(--ice); }
+/* the one unit toggle: active unit in ink, inactive receding */
+.unit-toggle .u-on  { color: var(--ink); font-weight: 500; }
+.unit-toggle .u-off { color: var(--secondary); font-weight: 400; }
+.unit-toggle .u-sep { color: var(--secondary); font-weight: 300; padding: 0 2px; }
+/* theme buttons: pure engraved glyphs, no words */
+.ctl-glyph { padding: 0; }
+.ctl-glyph svg { width: 20px; height: 20px; color: var(--slate); }
+.ctl-glyph[aria-pressed="true"] { background: var(--ice); border-color: var(--slate); }
+.ctl-glyph[aria-pressed="true"] svg { color: var(--ink); }
+.mast-rule { height: 2px; background: var(--ink); border: 0; margin: 2px 0 0; }
+
+/* ---------- route slider — 13.5-14px allowed here only ----------
+   Scroll affordance is graphical only: an aggressive edge fade (wider and
+   stronger than v2c's), an etched double-chevron, and the next chip half-cut. */
+.slider-wrap { position: relative; }
+.paths {
+  display: flex; gap: var(--space-xs);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-right: 84px;                  /* the next chip peeks, half-cut, under the fade */
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 112px), rgba(0,0,0,0.4) calc(100% - 52px), transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 112px), rgba(0,0,0,0.4) calc(100% - 52px), transparent 100%);
+}
+.paths::-webkit-scrollbar { display: none; }
+.paths a {
+  flex: 0 0 auto;
+  display: flex; align-items: center;
+  min-height: var(--hit-target);        /* >=44px tap target via padding */
+  padding: 0 var(--space-sm);
+  font-family: var(--font-serif);
+  font-size: 14px;                      /* slider-only exemption from the 16px floor */
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--steel-text);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.paths a[aria-current] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+  background: var(--ice);
+  border-radius: var(--radius-surface) var(--radius-surface) 0 0;
+}
+.paths a:active { color: var(--ink); }
+.scroll-hint {
+  position: absolute; right: 0; top: 50%;
+  transform: translateY(-50%);
+  display: flex; align-items: center;
+  color: var(--secondary);
+  pointer-events: none;
+}
+.scroll-hint svg { width: 22px; height: 22px; animation: hint-nudge 2.6s var(--ease-out) infinite; }
+@keyframes hint-nudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint svg { animation: none; }
+}
+
+/* ---------- alert — tier-3 ink + hairline; a banner, never a veto ---------- */
+.alert {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--hairline-strong);
+  border-left: 3px solid var(--tier-3);
+  border-radius: var(--radius-surface);
+  padding: var(--space-xs) var(--space-sm);
+  margin: 6px 0 0;
+}
+.alert .overline { color: var(--tier-3); }
+.alert .alert-note { margin: 0; font-size: 14px; line-height: 1.5; }
+
+/* ---------- lede: current panel as a grid ---------- */
+.lede { margin-top: 6px; }
+.current {
+  display: grid;
+  grid-template-columns: 100%;
+  row-gap: var(--space-xs);
+  background: var(--ice);
+  border-radius: var(--radius-surface);
+  padding: var(--space-sm) var(--space-md) 10px;
+}
+.current .overline { color: var(--slate); }
+.hero-label {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--ls-smallcaps);
+  color: var(--slate);
+}
+/* row 1 — WBGT hero, the biggest figure on the page */
+.wbgt-line { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
+.wbgt-line .g-big { width: 34px; height: 34px; color: var(--slate); flex: 0 0 auto; }
+.wbgt-num {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: 48px;
+  line-height: 1.05;
+  color: var(--tier-3);
+}
+.wbgt-num sup { font-size: 21px; font-weight: 300; }
+.wbgt-phrase { font-family: var(--font-serif); font-weight: 300; font-size: 21px; line-height: var(--lh-title); }
+.wbgt-what { border-top: 1px solid var(--hairline-strong); margin-top: 2px; }
+.wbgt-what summary {
+  display: flex; align-items: center;
+  min-height: var(--hit-target);        /* >=44px tap target */
+  font-family: var(--font-serif);
+  font-size: var(--size-body);          /* >=16px control text */
+  font-weight: 500;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--ls-smallcaps);
+  color: var(--slate);
+  cursor: pointer;
+  list-style: none;
+}
+.wbgt-what summary::-webkit-details-marker { display: none; }
+.wbgt-what summary::after { content: "+"; color: var(--secondary); margin-left: auto; font-weight: 400; }
+.wbgt-what[open] summary::after { content: "\2212"; }
+.wbgt-what p { margin: 0 0 var(--space-sm); font-size: var(--size-body); line-height: 1.55; color: var(--slate); }
+.wbgt-what .jump a { color: var(--steel-text); }
+/* row 2 — air | dew, two equal cells, neutral ink, hairline column rule */
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-xs);
+}
+.pair-cell + .pair-cell { border-left: 1px solid var(--hairline-strong); padding-left: var(--space-md); }
+.pair-cell:first-child { padding-right: var(--space-md); }
+.pair-num {
+  display: block;
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: 31px;                      /* second-biggest; visibly under the hero */
+  line-height: 1.15;
+  color: var(--ink);                    /* neutral: no tier ink on air or dew */
+}
+.pair-num sup { font-size: 15px; font-weight: 300; }
+.pair-note { display: block; font-size: 14px; font-style: italic; color: var(--slate); line-height: 1.4; }
+/* row 3 — the remaining metrics in one linear run + compass rose */
+.strip {
+  display: flex; align-items: center; gap: var(--space-sm);
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-xs);
+}
+.strip-text { min-width: 0; font-size: 14px; line-height: 1.6; color: var(--slate); }
+.compass { width: 56px; height: 56px; flex: 0 0 auto; color: var(--slate); }
+
+/* narrative + next bests */
+.window-line { padding: var(--space-xs) 0 var(--space-xs); border-bottom: 1px solid var(--hairline); }
+.narrative { margin: 0; font-style: italic; font-size: 17px; line-height: 1.55; }
+.nextbests { margin-top: var(--space-xs); font-size: var(--size-body); line-height: 1.5; }
+.nextbests .w-lab {
+  font-weight: 500;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  color: var(--slate);
+}
+.nextbests .sub { display: block; color: var(--secondary); font-size: 14px; line-height: 1.5; margin-top: 2px; }
+.nb { white-space: nowrap; }
+
+/* ---------- Fig. 1 — the signature merged temperature chart ----------
+   One shared &deg;F axis, three series: WBGT in tier ink (the only color),
+   air temp dashed, dew point dotted — both neutral. The y-axis column is
+   HTML, sticky at left over opaque paper, so numerals never collide with
+   the plot as it scrubs beneath. */
+.fig-sec, .hours-sec { margin-top: var(--space-md); }
+.stub-note { margin: var(--space-xs) 0 0; font-size: 14px; font-style: italic; color: var(--secondary); }
+.fig-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 var(--space-sm); }
+.fig-no {
+  font-family: var(--font-serif); font-weight: 500; font-size: 13px;
+  letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--ink);
+}
+.fig-title { font-style: italic; font-weight: 400; font-size: var(--size-body); color: var(--ink); }
+.fig-head .note { font-size: 14px; color: var(--secondary); white-space: nowrap; }
+.fig-wrap {
+  position: relative;
+  margin-top: var(--space-xs);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-surface);
+}
+.fig-scrub {
+  display: flex; align-items: flex-start;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  background: var(--paper);
+  /* aggressive both-edge fade: content dissolves before it is cut */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 130px), rgba(0,0,0,0.35) calc(100% - 54px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 130px), rgba(0,0,0,0.35) calc(100% - 54px), transparent 100%);
+}
+.fig-scrub::-webkit-scrollbar { display: none; }
+.fig-scrub svg { display: block; flex: 0 0 auto; }
+.fig-wrap .scroll-hint { right: 6px; }
+/* the fixed axis: sticky HTML column over opaque paper, above the plot */
+.fig-axis {
+  position: sticky; left: 0; z-index: 2;
+  flex: 0 0 46px; width: 46px; height: 316px;
+  background: var(--paper);
+  border-right: 1px solid var(--hairline-strong);
+}
+.fig-axis span {
+  position: absolute; right: 6px;
+  font-size: 13px; line-height: 1;
+  color: var(--secondary);
+}
+.fig-axis .ax-unit { font-style: italic; }
+/* fig svg — strokes, hatches, text */
+.lx-grid { stroke: var(--hairline); stroke-width: 1; }
+.lx-ax   { stroke: var(--hairline-strong); stroke-width: 1; }
+.lx-tick { stroke: var(--hairline-strong); stroke-width: 1; fill: none; }
+.lx-day  { stroke: var(--hairline-strong); stroke-width: 1; }
+.cw0 { stroke: var(--tier-0); } .cw1 { stroke: var(--tier-1); } .cw2 { stroke: var(--tier-2); }
+.cw3 { stroke: var(--tier-3); } .cw4 { stroke: var(--tier-4); }
+.cw0, .cw1, .cw2, .cw3, .cw4 { fill: none; stroke-width: 1.25; stroke-linejoin: round; stroke-linecap: round; }
+.ln-air { fill: none; stroke: var(--slate); stroke-width: 1; stroke-dasharray: 6 4; opacity: 0.8; }
+.ln-dew { fill: none; stroke: var(--slate); stroke-width: 1.2; stroke-dasharray: 0.2 4; stroke-linecap: round; opacity: 0.7; }
+.pv { stroke: var(--tier-4); stroke-width: 0.6; opacity: 0.4; }      /* dense veto hatch */
+.pw { stroke: var(--steel); stroke-width: 0.6; opacity: 0.4; }       /* sparse window hatch */
+.pr { stroke: var(--steel-text); stroke-width: 0.5; opacity: 0.55; } /* fine rain hatch */
+.win-ice   { fill: var(--ice); opacity: 0.6; }
+.win-hatch { fill: url(#hatchWin); }
+.veto-hatch { fill: url(#hatchVeto); }
+.rainbar { fill: url(#hatchRain); stroke: var(--steel-text); stroke-width: 0.6; }
+.sun-g  { color: var(--tier-1); }
+.bolt-g { color: var(--tier-4); }
+.lx-brk { fill: none; stroke-width: 1; }
+.b3 { stroke: var(--tier-3); } .b4 { stroke: var(--tier-4); }
+.f0 { fill: var(--tier-0); } .f1 { fill: var(--tier-1); } .f2 { fill: var(--tier-2); }
+.f3 { fill: var(--tier-3); } .f4 { fill: var(--tier-4); } .fst { fill: var(--steel-text); }
+.fd0 { fill: var(--tier-0); } .fd1 { fill: var(--tier-1); } .fd3 { fill: var(--tier-3); } .fd4 { fill: var(--tier-4); }
+.fx-hr  { font-size: 12px; fill: var(--secondary); }
+.fx-day { font-size: 12px; font-weight: 500; letter-spacing: 0.14em; fill: var(--ink); }
+.fx-sun { font-size: 12px; font-style: italic; fill: var(--tier-1); }
+.fx-ann { font-size: 12.5px; font-weight: 500; letter-spacing: 0.08em; }
+.fx-winlab { font-size: 14px; font-weight: 500; font-variant-caps: all-small-caps; letter-spacing: 0.14em; fill: var(--steel-text); }
+.fx-wint { font-size: 12.5px; font-style: italic; fill: var(--steel-text); }
+.fx-pt  { font-size: 12px; font-weight: 500; paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+/* engraved line-style legend — how dash and dot stay readable */
+.fig-legend {
+  margin: var(--space-xs) 0 0;
+  font-size: 14px;
+  color: var(--secondary);
+  line-height: 1.7;
+}
+.fig-legend .sw { font-weight: 600; letter-spacing: -0.05em; }
+.fig-legend .lg-samp { width: 30px; height: 10px; vertical-align: 1px; color: var(--slate); }
+.fig-cap {
+  margin: var(--space-xs) 0 0;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--slate);
+}
+.fig-cap .fig-no { font-style: normal; }
+
+/* ---------- explainers (stub this stage) ---------- */
+.explainers { margin-top: var(--space-lg); }
+
+/* ---------- footer ---------- */
+.foot {
+  margin-top: var(--space-xl);
+  padding: var(--space-md) 0 calc(var(--space-xl) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--hairline-strong);
+}
+.foot div { margin: 0 0 var(--space-xs); font-size: 14px; font-style: italic; color: var(--secondary); line-height: 1.6; }
+
+/* ---------- narrow phones: keep the masthead overline to one line ---------- */
+@media (max-width: 480px) {
+  .masthead .overline, .current .overline { font-size: 13px; letter-spacing: 0.03em; white-space: nowrap; }
+  .masthead .overline .g { display: none; }   /* buys the one-line overline its room */
+}
+
+/* ---------- desktop ---------- */
+@media (min-width: 960px) {
+  .wordmark { font-size: var(--size-display); }
+  .lede {
+    display: grid;
+    grid-template-columns: 11fr 9fr;
+    gap: var(--space-lg);
+    align-items: start;
+  }
+  .window-line { border-bottom: 0; border-left: 1px solid var(--hairline); padding: var(--space-sm) 0 var(--space-sm) var(--space-lg); }
+}
+</style>
+</head>
+<body>
+
+<svg class="defs" aria-hidden="true" focusable="false">
+<defs>
+<pattern id="hatchFine" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+  <line x1="0" y1="0" x2="0" y2="3" stroke="currentColor" stroke-width="0.5" opacity="0.35"/>
+</pattern>
+<symbol id="g-sun" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1"/>
+  <circle cx="12" cy="12" r="3.1" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <line x1="18.40" y1="12.00" x2="21.40" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="16.53" x2="18.65" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="18.40" x2="12.00" y2="21.40" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="16.53" x2="5.35" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="5.60" y1="12.00" x2="2.60" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="7.47" x2="5.35" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="5.60" x2="12.00" y2="2.60" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="7.47" x2="18.65" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="17.91" y1="14.45" x2="19.30" y2="15.02" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="14.45" y1="17.91" x2="15.02" y2="19.30" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="9.55" y1="17.91" x2="8.98" y2="19.30" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="6.09" y1="14.45" x2="4.70" y2="15.02" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="6.09" y1="9.55" x2="4.70" y2="8.98" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="9.55" y1="6.09" x2="8.98" y2="4.70" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="14.45" y1="6.09" x2="15.02" y2="4.70" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="17.91" y1="9.55" x2="19.30" y2="8.98" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+</symbol>
+<symbol id="g-sun-half" viewBox="0 0 24 24">
+  <!-- auto theme: half-shaded sun disc -->
+  <circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M12 7.4 A4.6 4.6 0 0 1 12 16.6 Z" fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.6"/>
+  <line x1="18.40" y1="12.00" x2="21.40" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="16.53" x2="18.65" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="18.40" x2="12.00" y2="21.40" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="16.53" x2="5.35" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="5.60" y1="12.00" x2="2.60" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="7.47" x2="5.35" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="5.60" x2="12.00" y2="2.60" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="7.47" x2="18.65" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/>
+</symbol>
+<symbol id="g-moon" viewBox="0 0 24 24">
+  <path d="M12 5.4 A6.6 6.6 0 1 0 12 18.6 A8.6 8.6 0 0 1 12 5.4 Z" fill="url(#hatchFine)"
+        stroke="currentColor" stroke-width="1"/>
+  <line x1="17.6" y1="6.2" x2="17.6" y2="8.6" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+  <line x1="16.4" y1="7.4" x2="18.8" y2="7.4" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+  <line x1="19.8" y1="12.4" x2="19.8" y2="14.2" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <line x1="18.9" y1="13.3" x2="20.7" y2="13.3" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+</symbol>
+<symbol id="g-gibbous" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="6.4" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M12 5.6 A6.4 6.4 0 0 0 12 18.4 A11.5 11.5 0 0 1 12 5.6 Z" fill="url(#hatchFine)"
+        stroke="currentColor" stroke-width="0.6" opacity="0.8"/>
+</symbol>
+<symbol id="g-cloud" viewBox="0 0 24 24">
+  <path d="M7.1 9.9 a4.7 4.7 0 0 1 8.6 -1.1" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <path d="M5.6 16.5 a3.1 3.1 0 0 1 0.9 -6.05 4.7 4.7 0 0 1 9.1 -1.1 3.5 3.5 0 0 1 3.2 5.5"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.4" y1="16.5" x2="19.6" y2="16.5" stroke="currentColor" stroke-width="1"/>
+  <line x1="6.6" y1="14.4" x2="16.2" y2="14.4" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+</symbol>
+<symbol id="g-rain" viewBox="0 0 24 24">
+  <path d="M5.8 13.4 a2.9 2.9 0 0 1 0.85 -5.7 4.4 4.4 0 0 1 8.5 -1.0 3.3 3.3 0 0 1 3.0 5.2"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.7" y1="13.4" x2="18.9" y2="13.4" stroke="currentColor" stroke-width="1"/>
+  <line x1="8.4" y1="15.6" x2="7.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.8"/>
+  <line x1="12.4" y1="15.6" x2="11.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.55"/>
+  <line x1="16.4" y1="15.6" x2="15.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.8"/>
+</symbol>
+<symbol id="g-storm" viewBox="0 0 24 24">
+  <path d="M5.8 11.4 a2.9 2.9 0 0 1 0.85 -5.7 4.4 4.4 0 0 1 8.5 -1.0 3.3 3.3 0 0 1 3.0 5.2"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.7" y1="11.4" x2="18.9" y2="11.4" stroke="currentColor" stroke-width="1"/>
+  <polygon points="13.2,12.6 9.2,17.6 11.9,17.6 9.9,22.2 15.6,16.4 12.9,16.4 15.3,12.6"
+        fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round"/>
+</symbol>
+<symbol id="g-bolt" viewBox="0 0 14 18">
+  <polygon points="8,0.8 3.4,7.6 6.3,7.6 4.2,15.4 11,7.0 8.0,7.0 10.7,0.8"
+        fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round"/>
+</symbol>
+<symbol id="g-sunrise" viewBox="0 0 24 24">
+  <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1"/>
+  <path d="M7.6 14 a4.4 4.4 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M9.4 14 a2.6 2.6 0 0 1 5.2 0" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.45"/>
+  <line x1="6.80" y1="11.00" x2="4.38" y2="9.60" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="9.00" y1="8.80" x2="7.60" y2="6.38" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="12.00" y1="8.00" x2="12.00" y2="5.20" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="15.00" y1="8.80" x2="16.40" y2="6.38" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="17.20" y1="11.00" x2="19.62" y2="9.60" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <line x1="6.2" y1="17.2" x2="17.8" y2="17.2" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+  <line x1="8.4" y1="19.6" x2="15.6" y2="19.6" stroke="currentColor" stroke-width="0.6" opacity="0.3"/>
+</symbol>
+<symbol id="g-sunset" viewBox="0 0 24 24">
+  <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1"/>
+  <path d="M7.6 14 a4.4 4.4 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M9.4 14 a2.6 2.6 0 0 1 5.2 0" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.45"/>
+  <line x1="12" y1="16.2" x2="12" y2="20.2" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <polyline points="9.8,18.2 12,20.6 14.2,18.2" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <line x1="6.2" y1="16.8" x2="8.6" y2="16.8" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+  <line x1="15.4" y1="16.8" x2="17.8" y2="16.8" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+</symbol>
+<symbol id="g-vane" viewBox="0 0 12 12">
+  <line x1="6" y1="10.2" x2="6" y2="2.6" stroke="currentColor" stroke-width="1"/>
+  <polyline points="3.9,4.9 6,2.4 8.1,4.9" fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.6" y1="10.2" x2="7.4" y2="10.2" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+</symbol>
+<symbol id="g-horizon" viewBox="0 0 24 24">
+  <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1"/>
+  <path d="M8.2 14 a3.8 3.8 0 0 1 7.6 0" fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="12" y1="9.4" x2="12" y2="7.2" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <line x1="8.6" y1="10.6" x2="7.2" y2="9.0" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
+  <line x1="15.4" y1="10.6" x2="16.8" y2="9.0" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
+</symbol>
+<symbol id="g-therm" viewBox="0 0 24 24">
+  <path d="M10.6 4.6 a1.4 1.4 0 0 1 2.8 0 V 14.9 a3.5 3.5 0 1 1 -2.8 0 Z"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <circle cx="12" cy="18.1" r="2.1" fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.7"/>
+  <line x1="12" y1="9.2" x2="12" y2="16.2" stroke="currentColor" stroke-width="1.2" opacity="0.55"/>
+  <line x1="14.6" y1="6.4" x2="16.6" y2="6.4" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+  <line x1="14.6" y1="9.2" x2="16.2" y2="9.2" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+  <line x1="14.6" y1="12.0" x2="16.6" y2="12.0" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+</symbol>
+<symbol id="g-drop" viewBox="0 0 24 24">
+  <path d="M12 4.2 C 9.6 8.2 7.3 11.2 7.3 14.1 a4.7 4.7 0 0 0 9.4 0 C 16.7 11.2 14.4 8.2 12 4.2 Z"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M9.5 14.4 a2.6 2.6 0 0 0 1.7 2.5" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.55"/>
+  <path d="M12 8.2 C 10.9 10 9.9 11.6 9.9 13" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.35"/>
+</symbol>
+<symbol id="g-wind" viewBox="0 0 24 24">
+  <path d="M3.5 9 h9.6 a2.1 2.1 0 1 0 -2.1 -2.1" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M3.5 13 h13.8 a2.3 2.3 0 1 1 -2.3 2.3" fill="none" stroke="currentColor" stroke-width="1" opacity="0.8"/>
+  <path d="M3.5 17 h7.6 a1.7 1.7 0 1 0 -1.7 -1.7" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+</symbol>
+<symbol id="g-haze" viewBox="0 0 24 24">
+  <path d="M4 8 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.9"/>
+  <path d="M4 11.4 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.55"/>
+  <path d="M4 14.8 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.75"/>
+  <path d="M4 18.2 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
+</symbol>
+<symbol id="g-chevrons" viewBox="0 0 24 24">
+  <!-- etched double chevron: the only scroll affordance mark on the page -->
+  <polyline points="5.5,6 12,12 5.5,18" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="12,6 18.5,12 12,18" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+</symbol>
+<symbol id="g-compass" viewBox="0 0 72 72">
+  <!-- rose engraved with a southerly needle; letters keep currentColor -->
+  <circle cx="36" cy="36" r="30" fill="none" stroke="currentColor" stroke-width="1"/>
+  <circle cx="36" cy="36" r="25" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
+  <line x1="36" y1="6" x2="36" y2="11" stroke="currentColor" stroke-width="1"/>
+  <line x1="66" y1="36" x2="61" y2="36" stroke="currentColor" stroke-width="1"/>
+  <line x1="36" y1="66" x2="36" y2="61" stroke="currentColor" stroke-width="1"/>
+  <line x1="6" y1="36" x2="11" y2="36" stroke="currentColor" stroke-width="1"/>
+  <line x1="14.79" y1="14.79" x2="18.32" y2="18.32" stroke="currentColor" stroke-width="0.6" opacity="0.55"/>
+  <line x1="57.21" y1="14.79" x2="53.68" y2="18.32" stroke="currentColor" stroke-width="0.6" opacity="0.55"/>
+  <line x1="57.21" y1="57.21" x2="53.68" y2="53.68" stroke="currentColor" stroke-width="0.6" opacity="0.55"/>
+  <line x1="14.79" y1="57.21" x2="18.32" y2="53.68" stroke="currentColor" stroke-width="0.6" opacity="0.55"/>
+  <text x="36" y="20.5" text-anchor="middle" font-size="8" fill="currentColor" opacity="0.65">N</text>
+  <text x="53" y="39" text-anchor="middle" font-size="8" fill="currentColor" opacity="0.65">E</text>
+  <text x="36" y="58" text-anchor="middle" font-size="8" fill="currentColor" opacity="0.65">S</text>
+  <text x="19" y="39" text-anchor="middle" font-size="8" fill="currentColor" opacity="0.65">W</text>
+  <line x1="36" y1="48.5" x2="36" y2="26" stroke="currentColor" stroke-width="1"/>
+  <polyline points="33,29.8 36,26 39,29.8" fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="33.6" y1="48.5" x2="38.4" y2="48.5" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+  <circle cx="36" cy="37.5" r="2.4" fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.7"/>
+</symbol>
+</defs>
+</svg>
+
+<header class="wrap masthead">
+  <span class="overline"><svg class="g" style="width:14px;height:14px;vertical-align:-2px" aria-hidden="true"><use href="#g-horizon"/></svg> NYC running conditions &middot; 48-hour outlook</span>
+  <div class="mast-row">
+    <h1 class="wordmark">when to run</h1>
+    <div class="ctls" role="group" aria-label="Units and theme">
+      <button class="ctl unit-toggle" type="button" data-unit-toggle aria-label="Units: Fahrenheit shown. Switch to Celsius.">
+        <span class="u-on">&deg;F</span><span class="u-sep">/</span><span class="u-off">&deg;C</span>
+      </button>
+      <button class="ctl ctl-glyph" type="button" data-theme-btn data-theme-value="" aria-label="Automatic" aria-pressed="true">
+        <svg aria-hidden="true" focusable="false"><use href="#g-sun-half"/></svg>
+      </button>
+      <button class="ctl ctl-glyph" type="button" data-theme-btn data-theme-value="light" aria-label="Light" aria-pressed="false">
+        <svg aria-hidden="true" focusable="false"><use href="#g-sun"/></svg>
+      </button>
+      <button class="ctl ctl-glyph" type="button" data-theme-btn data-theme-value="dark" aria-label="Dark" aria-pressed="false">
+        <svg aria-hidden="true" focusable="false"><use href="#g-moon"/></svg>
+      </button>
+    </div>
+  </div>
+  <hr class="mast-rule">
+  <div class="slider-wrap">
+    <nav class="paths" data-route-slider aria-label="Running paths">
+      <a href="#" aria-current="true">My Location</a>
+      <a href="#">Central Park</a>
+      <a href="#">Hudson Greenway</a>
+      <a href="#">East River</a>
+      <a href="#">Brooklyn</a>
+      <a href="#">Van Cortlandt</a>
+    </nav>
+    <span class="scroll-hint" aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <aside class="alert" role="status">
+    <span class="overline">Heat Advisory</span>
+    <div class="alert-note">until 8 PM tonight &mdash; caution, not a stop order.</div>
+  </aside>
+
+  <div class="lede">
+    <section class="current" aria-label="Current conditions">
+      <span class="overline">Now &middot; Central Park &middot; 2:30 PM ET</span>
+
+      <div data-metric="wbgt">
+        <span class="hero-label">Heat Stress &middot; WBGT</span>
+        <div class="wbgt-line">
+          <svg class="g-big" aria-hidden="true"><use href="#g-therm"/></svg>
+          <span class="wbgt-num">87<sup>&deg;F</sup></span>
+          <span class="wbgt-phrase tt3">High heat stress</span>
+        </div>
+        <details class="wbgt-what">
+          <summary>What is WBGT?</summary>
+          <p>Wet-bulb globe temperature folds air temperature, humidity, sun load, and wind into one number for how hard heat works a moving body. It is the standard the National Weather Service and OSHA use for outdoor exertion &mdash; watch it, not the plain air temperature. Two 75&deg; mornings can run worlds apart; WBGT tells them apart.</p>
+          <p class="jump"><a href="#explainers">See how every metric is read &darr;</a></p>
+        </details>
+      </div>
+
+      <div class="pair">
+        <div class="pair-cell">
+          <span class="hero-label" data-metric="temp">Air Temperature</span>
+          <span class="pair-num">88<sup>&deg;F</sup></span>
+          <span class="pair-note">in the shade</span>
+        </div>
+        <div class="pair-cell">
+          <span class="hero-label" data-metric="dew">Dew Point</span>
+          <span class="pair-num">73<sup>&deg;F</sup></span>
+          <span class="pair-note">oppressive at a jog</span>
+        </div>
+      </div>
+
+      <div class="strip">
+        <div class="strip-text">
+          <span data-metric="uv">UV <span class="tt3">9</span> very high</span> &middot;
+          <span data-metric="aqi">AQI <span class="tt1">62</span> moderate (PM2.5)</span> &middot;
+          <span data-metric="rh">humidity 61%</span> &middot;
+          <span data-metric="wind">wind S 6 g 12</span> &middot;
+          <span data-metric="rain">rain 15%</span>
+        </div>
+        <svg class="compass" data-glyph="compass" role="img" aria-label="Compass rose: wind out of the south at 6 miles per hour, gusting 12"><use href="#g-compass"/></svg>
+      </div>
+    </section>
+
+    <section class="window-line" aria-label="Verdict and next best windows">
+      <p class="narrative" data-narrative>Storms close this evening and the Heat Advisory holds until 8 &mdash; skip today. The front clears overnight; run before work tomorrow.</p>
+      <div class="nextbests">
+        <div><span class="w-lab">Before work:</span> <span class="nb">Wed 5&ndash;8 AM</span> &middot; <span class="w-lab">After work:</span> <span class="nb">Wed 7&ndash;9 PM</span></div>
+        <span class="sub">Dawn: <span class="tt1">74&ndash;78&deg;</span> elevated, UV <span class="tt0">0</span>, AQI <span class="tt0">48</span> good &middot; evening eases <span class="tt2">80&deg;</span> to <span class="tt1">76&deg;</span> &mdash; still warm at 7.</span>
+      </div>
+    </section>
+  </div>
+
+  <section class="fig-sec" aria-label="Figure 1: the next 48 hours, one temperature chart">
+    <div class="fig-head">
+      <h2><span class="fig-no">Fig. 1</span>&ensp;<span class="fig-title">The next 48 hours, three lines on one clock.</span></h2>
+      <span class="note">3 PM Tue &rarr; 2 PM Thu</span>
+    </div>
+    <!-- chart begins at now (2:30 PM); scrollLeft 0 = now on every viewport -->
+    <div class="fig-wrap">
+      <div class="fig-scrub" tabindex="0" role="group" aria-label="48-hour temperature chart; scrolls sideways toward Thursday">
+        <div class="fig-axis" data-y-axis aria-hidden="true">
+          <span class="ax-unit" style="top: 52px">&deg;F</span>
+          <span style="top: 78px">90</span>
+          <span style="top: 138px">80</span>
+          <span style="top: 198px">70</span>
+        </div>
+<svg width="1344" height="316" viewBox="0 0 1344 316" role="img" aria-labelledby="figtitle figdesc">
+<title id="figtitle">Figure 1: WBGT, air temperature and dew point for the next 48 hours on one shared Fahrenheit axis</title>
+<desc id="figdesc">Line chart from 3 PM Tuesday to 2 PM Thursday. WBGT is drawn in its heat-band ink, air temperature as a dashed neutral line, dew point dotted. Ice-tinted bands mark the best windows: Wednesday 5 to 8 AM before work, and Wednesday 7 to 9 PM after work. Tuesday 7 to 9 PM is cross-hatched and vetoed for thunderstorms. A Heat Advisory bracket spans 3 to 8 PM Tuesday. Hatched bars along the base count the chance of rain, with bolt marks at the 60 and 45 percent storm hours.</desc>
+<defs>
+<pattern id="hatchVeto" width="3.5" height="3.5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pv" x1="0" y1="0" x2="0" y2="3.5"/></pattern>
+<pattern id="hatchWin" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pw" x1="0" y1="0" x2="0" y2="9"/></pattern>
+<pattern id="hatchRain" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pr" x1="0" y1="0" x2="0" y2="3"/></pattern>
+</defs>
+<!-- best windows: ice tint + sparse hatch, full plot height -->
+<g data-window="best">
+  <rect class="win-ice" x="402" y="48" width="84" height="220"/>
+  <rect class="win-hatch" x="402" y="48" width="84" height="220"/>
+</g>
+<g data-window="best">
+  <rect class="win-ice" x="794" y="48" width="56" height="220"/>
+  <rect class="win-hatch" x="794" y="48" width="56" height="220"/>
+</g>
+<!-- vetoed span: Tue 7-9 PM, dense diagonal hatch -->
+<rect class="veto-hatch" x="122" y="48" width="56" height="220"/>
+<!-- gridlines at 70 / 80 / 90 -->
+<line class="lx-grid" x1="0" y1="84" x2="1344" y2="84"/>
+<line class="lx-grid" x1="0" y1="144" x2="1344" y2="144"/>
+<line class="lx-grid" x1="0" y1="204" x2="1344" y2="204"/>
+<!-- midnight rules -->
+<line class="lx-day" x1="262" y1="48" x2="262" y2="268"/>
+<line class="lx-day" x1="934" y1="48" x2="934" y2="268"/>
+<!-- top annotations: advisory bracket, veto reason, window names -->
+<text class="fx-ann f3" x="10" y="16">HEAT ADVISORY &#8212; UNTIL 8 PM</text>
+<path class="lx-brk b3" d="M 10 26 V 22 H 150 V 26"/>
+<text class="fx-ann f4" x="122" y="40">&#10005; VETOED &#8212; THUNDERSTORMS</text>
+<path class="lx-brk b4" d="M 122 44 V 48 M 122 44 H 178 M 178 44 V 48"/>
+<text class="fx-winlab" x="444" y="66" text-anchor="middle">before work</text>
+<text class="fx-wint" x="444" y="82" text-anchor="middle">Wed 5&#8211;8 AM</text>
+<text class="fx-winlab" x="822" y="66" text-anchor="middle">after work</text>
+<text class="fx-wint" x="822" y="82" text-anchor="middle">Wed 7&#8211;9 PM</text>
+<!-- x-axis: hour ticks, day rules, labels -->
+<line class="lx-ax" x1="0" y1="268" x2="1344" y2="268"/>
+<path class="lx-tick" d="M38 268v4M66 268v4M122 268v4M150 268v4M206 268v4M234 268v4M290 268v4M318 268v4M374 268v4M402 268v4M458 268v4M486 268v4M542 268v4M570 268v4M626 268v4M654 268v4M710 268v4M738 268v4M794 268v4M822 268v4M878 268v4M906 268v4M962 268v4M990 268v4M1046 268v4M1074 268v4M1130 268v4M1158 268v4M1214 268v4M1242 268v4M1298 268v4M1326 268v4"/>
+<path class="lx-tick" d="M10 268v7M94 268v7M178 268v7M346 268v7M430 268v7M514 268v7M598 268v7M682 268v7M766 268v7M850 268v7M1018 268v7M1102 268v7M1186 268v7M1270 268v7"/>
+<path class="lx-day" d="M262 268v12M934 268v12"/>
+<text class="fx-hr" x="10" y="288" text-anchor="middle">3P</text>
+<text class="fx-hr" x="94" y="288" text-anchor="middle">6P</text>
+<text class="fx-hr" x="178" y="288" text-anchor="middle">9P</text>
+<text class="fx-hr" x="262" y="288" text-anchor="middle">12A</text>
+<text class="fx-hr" x="346" y="288" text-anchor="middle">3A</text>
+<text class="fx-hr" x="430" y="288" text-anchor="middle">6A</text>
+<text class="fx-hr" x="514" y="288" text-anchor="middle">9A</text>
+<text class="fx-hr" x="598" y="288" text-anchor="middle">12P</text>
+<text class="fx-hr" x="682" y="288" text-anchor="middle">3P</text>
+<text class="fx-hr" x="766" y="288" text-anchor="middle">6P</text>
+<text class="fx-hr" x="850" y="288" text-anchor="middle">9P</text>
+<text class="fx-hr" x="934" y="288" text-anchor="middle">12A</text>
+<text class="fx-hr" x="1018" y="288" text-anchor="middle">3A</text>
+<text class="fx-hr" x="1102" y="288" text-anchor="middle">6A</text>
+<text class="fx-hr" x="1186" y="288" text-anchor="middle">9A</text>
+<text class="fx-hr" x="1270" y="288" text-anchor="middle">12P</text>
+<text class="fx-day" x="10" y="308">TUE JUL 28</text>
+<text class="fx-day" x="268" y="308">WED JUL 29</text>
+<text class="fx-day" x="940" y="308">THU JUL 30</text>
+<!-- sunrise / sunset at the exact minute, etched on the baseline -->
+<use href="#g-sunset" data-glyph="sunset" x="149" y="252" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="157" y="308" text-anchor="middle">sets 8:15</text>
+<use href="#g-sunrise" data-glyph="sunrise" x="416.9" y="252" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="424.9" y="308" text-anchor="middle">rises 5:49</text>
+<use href="#g-sunset" data-glyph="sunset" x="820.5" y="252" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="828.5" y="308" text-anchor="middle">sets 8:14</text>
+<use href="#g-sunrise" data-glyph="sunrise" x="1089.3" y="252" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="1097.3" y="308" text-anchor="middle">rises 5:50</text>
+<!-- precip / thunder strip along the base: fine hatched bars, bolts at the storm hours -->
+<rect class="rainbar" x="85"  y="261" width="18" height="6"/>
+<rect class="rainbar" x="113" y="244" width="18" height="23"/>
+<rect class="rainbar" x="141" y="250" width="18" height="17"/>
+<rect class="rainbar" x="169" y="257" width="18" height="10"/>
+<rect class="rainbar" x="197" y="261" width="18" height="6"/>
+<rect class="rainbar" x="225" y="263" width="18" height="4"/>
+<rect class="rainbar" x="253" y="265" width="18" height="2"/>
+<rect class="rainbar" x="701" y="263" width="18" height="4"/>
+<rect class="rainbar" x="729" y="259" width="18" height="8"/>
+<rect class="rainbar" x="757" y="259" width="18" height="8"/>
+<rect class="rainbar" x="785" y="261" width="18" height="6"/>
+<use href="#g-bolt" x="117" y="229" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="145" y="235" width="10" height="12.8" class="bolt-g"/>
+<text class="fx-pt f4" x="112" y="239" text-anchor="end">60%</text>
+<text class="fx-pt f4" x="160" y="245" text-anchor="start">45%</text>
+<!-- dew point: neutral ink, dotted -->
+<polyline class="ln-dew" points="10,186 38,186 66,186 94,186 122,180 150,180 178,180 206,186 234,186 262,192 290,192 318,198 346,198 374,204 402,204 430,204 458,204 486,204 514,198 542,198 570,198 598,198 626,204 654,204 682,204 710,210 738,210 766,216 794,216 822,216 850,222 878,228 906,228 934,234 962,234 990,234 1018,240 1046,240 1074,240 1102,240 1130,240 1158,234 1186,234 1214,228 1242,228 1270,228 1298,222 1326,222"/>
+<!-- air temperature: neutral ink, dashed -->
+<polyline class="ln-air" points="10,78 38,84 66,90 94,102 122,120 150,144 178,156 206,162 234,168 262,174 290,180 318,180 346,180 374,180 402,180 430,174 458,162 486,144 514,126 542,108 570,96 598,84 626,72 654,78 682,84 710,96 738,108 766,120 794,138 822,150 850,162 878,174 906,180 934,186 962,186 990,192 1018,192 1046,198 1074,198 1102,186 1130,174 1158,156 1186,138 1214,120 1242,108 1270,96 1298,90 1326,84"/>
+<!-- WBGT: the only colored line, tier ink by heat band -->
+<polyline class="cw4" points="10,96 38,96 66,102"/>
+<polyline class="cw3" points="66,102 94,114 122,132"/>
+<polyline class="cw2" points="122,132 150,150"/>
+<polyline class="cw1" points="150,150 178,162 206,168 234,174"/>
+<polyline class="cw0" points="234,174 262,174 290,180 318,180 346,180 374,180 402,180 430,180 458,168"/>
+<polyline class="cw1" points="458,168 486,156 514,138"/>
+<polyline class="cw2" points="514,138 542,126 570,114"/>
+<polyline class="cw3" points="570,114 598,102 626,90"/>
+<polyline class="cw4" points="626,90 654,96 682,102"/>
+<polyline class="cw3" points="682,102 710,114 738,126"/>
+<polyline class="cw2" points="738,126 766,138 794,144 822,156"/>
+<polyline class="cw1" points="822,156 850,168 878,174"/>
+<polyline class="cw0" points="878,174 906,180 934,186 962,186 990,192 1018,192 1046,198 1074,198 1102,192 1130,180 1158,168"/>
+<polyline class="cw1" points="1158,168 1186,150 1214,138"/>
+<polyline class="cw2" points="1214,138 1242,126 1270,114"/>
+<polyline class="cw3" points="1270,114 1298,108 1326,102"/>
+<!-- selective direct labels at the inflections -->
+<circle class="fd4" cx="10" cy="96" r="1.8"/>
+<text class="fx-pt f4" x="14" y="88" text-anchor="start">88&#176; extreme caution</text>
+<circle class="fd0" cx="430" cy="180" r="1.8"/>
+<text class="fx-pt f0" x="430" y="196" text-anchor="middle">74&#176; low</text>
+<circle class="fd4" cx="626" cy="90" r="1.8"/>
+<text class="fx-pt f4" x="618" y="80" text-anchor="end">89&#176; extreme caution</text>
+<circle class="fd1" cx="850" cy="168" r="1.8"/>
+<text class="fx-pt f1" x="850" y="184" text-anchor="middle">76&#176; elevated</text>
+<circle class="fd0" cx="1074" cy="198" r="1.8"/>
+<text class="fx-pt f0" x="1074" y="214" text-anchor="middle">71&#176; low</text>
+<circle class="fd3" cx="1326" cy="102" r="1.8"/>
+<text class="fx-pt f3" x="1322" y="94" text-anchor="end">87&#176; high</text>
+</svg>
+      </div>
+      <span class="scroll-hint" aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>
+    </div>
+    <div class="fig-legend">
+      <span class="lg-wbgt">WBGT takes its band&rsquo;s ink: <span class="sw tt0">&#9473;</span> low &middot; <span class="sw tt1">&#9473;</span> elevated &middot; <span class="sw tt2">&#9473;</span> caution &middot; <span class="sw tt3">&#9473;</span> high &middot; <span class="sw tt4">&#9473;</span> extreme</span><br>
+      <span class="lg-air"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="currentColor" stroke-width="1" stroke-dasharray="6 4"/></svg> air temperature</span> &middot;
+      <span class="lg-dew"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><line x1="2" y1="5" x2="29" y2="5" stroke="currentColor" stroke-width="1.2" stroke-dasharray="0.2 4" stroke-linecap="round"/></svg> dew point</span> &middot;
+      <span class="lg-rain"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><rect x="4" y="2" width="9" height="8" class="rainbar"/><use href="#g-bolt" x="18" y="0" width="8" height="10.2" class="bolt-g"/></svg> chance of rain, bolt marks thunder</span>
+    </div>
+    <div class="fig-cap"><span class="fig-no">Fig. 1.</span> Three lines, one clock. WBGT wears its heat band&rsquo;s ink; air temperature runs dashed above it by day and closes with it at night; dew point runs dotted underneath. Ice-tinted panels mark the hours worth lacing up for &mdash; before work Wednesday is the pick &mdash; and cross-hatch strikes the stormy ones out. Etched marks on the baseline set the sun&rsquo;s exact rises and sets.</div>
+  </section>
+
+  <!-- TABLE -->
+  <!-- Stage 3: hourly ledger. Tier colorbar tick on the time column
+       (v2a's tr border-left in true tier inks); narrative rows [data-narrative]
+       ("— storms pass by 9 PM —", "— heat rebuilds toward midday —",
+       "— clearing and drier after the front —"); best-window rows
+       [data-window-row]; sunrise/sunset divider rows [data-sun-row]. -->
+
+  <section id="explainers" class="explainers" aria-label="How every metric is read">
+    <span class="overline">How every metric is read</span>
+    <!-- Stage 4: full explainer expanders — WBGT, dew point & humidity, UV,
+         AQI, wind & gusts, rain & thunder — plus route note and clothing line. -->
+    <div class="stub-note">Full metric explainers land here in a later stage.</div>
+  </section>
+
+</main>
+
+<footer class="wrap foot">
+  <div>forecast &amp; alerts: National Weather Service, gridpoint OKX 34,45 &middot; forecast fetched 2:21 PM ET &middot; alerts fetched 2:29 PM ET</div>
+  <div>air quality now: EPA AirNow, worst nearby monitor (measured) &middot; fetched 2:05 PM ET &middot; UV + hourly AQI: Open-Meteo (modeled, CAMS) &middot; fetched 2:10 PM ET</div>
+  <div>no composite score is computed &mdash; read the words. &middot; mockup ledger-v3-synthesis &middot; whentorun</div>
+</footer>
+
+<script>
+/* mockup-only demos: theme buttons drive data-theme; unit toggle swaps ink */
+(function () {
+  var btns = Array.prototype.slice.call(document.querySelectorAll('[data-theme-btn]'));
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var v = b.getAttribute('data-theme-value');
+      if (v) { document.documentElement.setAttribute('data-theme', v); }
+      else { document.documentElement.removeAttribute('data-theme'); }
+      btns.forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+    });
+  });
+  var unit = document.querySelector('[data-unit-toggle]');
+  unit.addEventListener('click', function () {
+    var on = unit.querySelector('.u-on'), off = unit.querySelector('.u-off');
+    on.className = 'u-off'; off.className = 'u-on';
+    var fahrenheit = unit.querySelector('.u-on').textContent.indexOf('F') !== -1;
+    unit.setAttribute('aria-label', 'Units: ' + (fahrenheit ? 'Fahrenheit' : 'Celsius') +
+      ' shown. Switch to ' + (fahrenheit ? 'Celsius' : 'Fahrenheit') + '.');
+  });
+})();
+</script>
+</body>
+</html>

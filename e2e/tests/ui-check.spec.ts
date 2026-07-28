@@ -193,7 +193,7 @@ for (const variant of variants) {
         if (sized.length < 2) return { ok: false, why: 'fewer than two sized figures above fold' };
         const [first, second] = sized;
         const firstIsWbgt = /wbgt|heat stress/.test(first.ctx);
-        const secondIsTemp = /air temp|temperature/.test(second.ctx) && !/wbgt/.test(second.ctx.slice(0, 40));
+        const secondIsTemp = /\btemp\b|temperature/.test(second.ctx) && !/wbgt/.test(second.ctx.slice(0, 40));
         const below = second.top > first.top;
         const distinctSizes = first.fs > second.fs;
         return { ok: firstIsWbgt && secondIsTemp && below && distinctSizes, why: JSON.stringify({ first, second }) };
@@ -233,6 +233,92 @@ for (const variant of variants) {
       });
       expect(ok, 'engraved compass rose (data-glyph="compass") near current wind').toBe(true);
     });
+
+    if (variant.includes('v3')) {
+      test('v3: no scrub words — graphical affordance only', async ({ page }) => {
+        const hasWord = await page.evaluate(() => /scrub/i.test(document.body.innerText));
+        expect(hasWord, 'affordance must be arrows/gradient, never the word "scrub"').toBe(false);
+      });
+
+      test('v3: single unit toggle and glyph theme controls', async ({ page }) => {
+        const r = await page.evaluate(() => {
+          const unit = document.querySelectorAll('[data-unit-toggle]');
+          const theme = document.querySelectorAll('[data-theme-btn]');
+          const themeWordy = Array.from(theme).some((b) =>
+            /(auto|light|dark)/i.test((b.textContent || '').replace(/\s/g, '')),
+          );
+          return { units: unit.length, themes: theme.length, themeWordy };
+        });
+        expect(r.units, 'exactly one °F/°C toggle button (data-unit-toggle)').toBe(1);
+        expect(r.themes, 'three glyph theme buttons (data-theme-btn)').toBe(3);
+        expect(r.themeWordy, 'theme buttons are glyphs, not words (aria-label ok)').toBe(false);
+      });
+
+      test('v3: air temp and dew point side by side under WBGT, neutral ink', async ({ page }) => {
+        const r = await page.evaluate(() => {
+          const temp = document.querySelector<HTMLElement>('[data-metric="temp"]')?.closest<HTMLElement>('[class]');
+          const dew = document.querySelector<HTMLElement>('[data-metric="dew"]')?.closest<HTMLElement>('[class]');
+          const wbgt = document.querySelector<HTMLElement>('[data-metric="wbgt"]');
+          if (!temp || !dew || !wbgt) return { ok: false, why: 'missing metric nodes' };
+          const t = temp.getBoundingClientRect();
+          const d = dew.getBoundingClientRect();
+          const w = wbgt.getBoundingClientRect();
+          const sameRow = Math.abs(t.top - d.top) < 12;
+          const below = t.top > w.top;
+          return { ok: sameRow && below, why: JSON.stringify({ t: t.top, d: d.top, w: w.top }) };
+        });
+        expect(r.ok, `temp|dew share a row below WBGT: ${r.why}`).toBe(true);
+      });
+
+      test('v3: best windows shaded in chart and table, before and after work', async ({ page }) => {
+        const r = await page.evaluate(() => ({
+          chart: document.querySelectorAll('svg [data-window="best"], [data-window="best"]').length,
+          table: document.querySelectorAll('table [data-window-row], [data-window-row]').length,
+        }));
+        expect(r.chart, 'two shaded best windows in the graphic (before + after work)').toBeGreaterThanOrEqual(2);
+        expect(r.table, 'best-window shading/marking in table rows').toBeGreaterThanOrEqual(2);
+      });
+
+      test('v3: weather narratives above the fold and inside the table', async ({ page }) => {
+        const r = await page.evaluate(() => {
+          const narr = Array.from(document.querySelectorAll<HTMLElement>('[data-narrative]'));
+          const aboveFold = narr.some((n) => n.getBoundingClientRect().top < 700);
+          const inTable = narr.some((n) => !!n.closest('table'));
+          return { count: narr.length, aboveFold, inTable };
+        });
+        expect(r.aboveFold, 'a data-narrative line above the fold').toBe(true);
+        expect(r.inTable, 'data-narrative rows inside the hourly table').toBe(true);
+      });
+
+      test('v3: table temps ordered WBGT→air→dew, sticky headers on desktop', async ({ page }, testInfo) => {
+        const r = await page.evaluate(() => {
+          const head = document.querySelector<HTMLElement>('[data-sticky-head]');
+          const sticky = head ? getComputedStyle(head).position === 'sticky' : false;
+          const ths = Array.from(document.querySelectorAll('thead th')).map((t) =>
+            (t.textContent || '').toLowerCase(),
+          );
+          const iW = ths.findIndex((t) => /wbgt|heat/.test(t));
+          const iA = ths.findIndex((t) => /\btemp\b|temperature/.test(t) && !/wbgt/.test(t));
+          const iD = ths.findIndex((t) => /dew/.test(t));
+          const ordered = iW >= 0 && iA > iW && iD > iA;
+          return { sticky, ordered, ths: ths.join(',') };
+        });
+        if (testInfo.project.name === 'desktop') {
+          expect(r.sticky, 'desktop column headers locked via sticky [data-sticky-head]').toBe(true);
+          expect(r.ordered, `desktop column order WBGT, air, dew (got: ${r.ths})`).toBe(true);
+        }
+      });
+
+      test('v3: chart y-axis stays fixed while chart scrubs', async ({ page }) => {
+        const ok = await page.evaluate(() => {
+          const axis = document.querySelector<HTMLElement>('[data-y-axis]');
+          if (!axis) return false;
+          const cs = getComputedStyle(axis);
+          return cs.position === 'sticky' || cs.position === 'absolute' || cs.position === 'fixed';
+        });
+        expect(ok, 'labeled y-axis (data-y-axis) pinned via sticky/absolute positioning').toBe(true);
+      });
+    }
 
     test('default selected route is My Location', async ({ page }) => {
       const ok = await page.evaluate(() => {
