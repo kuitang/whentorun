@@ -91,6 +91,28 @@ func syntheticWeather(start time.Time, n int) openmeteo.WeatherData {
 	return openmeteo.WeatherData{Hours: hours, Days: days}
 }
 
+// syntheticForecast builds 12-hour narrative periods around start: one
+// fully-past period, five inside/overlapping the 48 h window, and two
+// beyond it, so merge's overlap filtering is exercised. Periods i=1..4
+// (Tonight .. Wednesday) overlap [start, start+48h).
+func syntheticForecast(start time.Time) *nws.TextForecast {
+	names := []string{"Yesterday", "Tonight", "Tuesday", "Tuesday Night", "Wednesday", "Beyond", "Far Beyond"}
+	tf := &nws.TextForecast{}
+	for i, name := range names {
+		s := start.Add(time.Duration(i-1) * 12 * time.Hour)
+		tf.Properties.Periods = append(tf.Properties.Periods, nws.ForecastPeriod{
+			Number:    i + 1,
+			Name:      name,
+			Start:     s,
+			End:       s.Add(12 * time.Hour),
+			IsDaytime: i%2 == 0,
+			Short:     "Chance Showers",
+			Detailed:  name + ": a chance of showers.",
+		})
+	}
+	return tf
+}
+
 func syntheticAir(start time.Time, n int) []openmeteo.AirQualityHour {
 	hours := make([]openmeteo.AirQualityHour, n)
 	for i := range hours {
@@ -116,6 +138,7 @@ func okIn[T any](data T, fetchedAt time.Time) merge.Input[T] {
 func allUp(start, fetched time.Time) merge.Sources {
 	return merge.Sources{
 		Grid:      okIn(syntheticGrid(start), fetched),
+		Forecast:  okIn(syntheticForecast(start), fetched),
 		Alerts:    okIn(syntheticAlerts, fetched),
 		AirNowObs: okIn(syntheticObs, fetched),
 		OMWeather: okIn(syntheticWeather(start, merge.Horizon), fetched),
@@ -203,6 +226,27 @@ func TestMergeFallbackMatrix(t *testing.T) {
 				}
 				if r.SunSource.Origin != domain.OriginOpenMeteo {
 					t.Errorf("SunSource.Origin = %s, want open-meteo", r.SunSource.Origin)
+				}
+				// Prose: only the synthetic periods overlapping the 48 h
+				// window ("Yesterday", "Beyond", "Far Beyond" filtered out).
+				wantProse := []string{"Tonight", "Tuesday", "Tuesday Night", "Wednesday"}
+				if len(r.Prose) != len(wantProse) {
+					t.Fatalf("Prose = %d periods, want %d", len(r.Prose), len(wantProse))
+				}
+				for i, name := range wantProse {
+					if r.Prose[i].Name != name {
+						t.Errorf("Prose[%d].Name = %q, want %q", i, r.Prose[i].Name, name)
+					}
+				}
+				p0 := r.Prose[0]
+				if p0.Short != "Chance Showers" || p0.Detailed != "Tonight: a chance of showers." {
+					t.Errorf("Prose[0] text = %q / %q", p0.Short, p0.Detailed)
+				}
+				if !p0.Start.Equal(start) || !p0.End.Equal(start.Add(12*time.Hour)) {
+					t.Errorf("Prose[0] span = %v..%v, want %v..%v", p0.Start, p0.End, start, start.Add(12*time.Hour))
+				}
+				if p0.Source.Origin != domain.OriginNWS || p0.Source.Stale {
+					t.Errorf("Prose[0].Source = %+v, want fresh nws", p0.Source)
 				}
 				for src, st := range r.Freshness {
 					if !st.Available || st.Stale {
@@ -318,6 +362,32 @@ func TestMergeFallbackMatrix(t *testing.T) {
 			},
 		},
 		{
+			name: "forecast feed down: no prose, everything else unaffected",
+			kill: func(s *merge.Sources) { s.Forecast.OK = false },
+			want: func(t *testing.T, r merge.Result) {
+				if len(r.Prose) != 0 {
+					t.Errorf("Prose = %+v, want empty with forecast feed down", r.Prose)
+				}
+				if st := r.Freshness[merge.SrcNWSForecast]; st.Available {
+					t.Error("freshness[nws-forecast].Available = true, want false")
+				}
+				// Numeric fields are untouched by the prose feed.
+				wantMetric(t, "WBGTF", r.Hours[0].WBGTF, 80.6, domain.OriginNWS, false, false)
+			},
+		},
+		{
+			name: "forecast with zero periods: treated as unavailable",
+			kill: func(s *merge.Sources) { s.Forecast.Data = &nws.TextForecast{} },
+			want: func(t *testing.T, r merge.Result) {
+				if len(r.Prose) != 0 {
+					t.Errorf("Prose = %+v, want empty for empty period list", r.Prose)
+				}
+				if st := r.Freshness[merge.SrcNWSForecast]; st.Available {
+					t.Error("freshness[nws-forecast].Available = true for zero periods")
+				}
+			},
+		},
+		{
 			name: "alert feed down: AlertFeedDown, never a false all-clear",
 			kill: func(s *merge.Sources) { s.Alerts.OK = false; s.Alerts.Data = nil },
 			want: func(t *testing.T, r merge.Result) {
@@ -336,6 +406,7 @@ func TestMergeFallbackMatrix(t *testing.T) {
 			name: "everything down: all metrics invalid, alert feed flagged",
 			kill: func(s *merge.Sources) {
 				s.Grid.OK = false
+				s.Forecast.OK = false
 				s.Alerts.OK = false
 				s.AirNowObs.OK = false
 				s.OMWeather.OK = false
@@ -355,6 +426,9 @@ func TestMergeFallbackMatrix(t *testing.T) {
 				}
 				if !r.AlertFeedDown {
 					t.Error("AlertFeedDown = false with every source down")
+				}
+				if len(r.Prose) != 0 {
+					t.Errorf("Prose = %+v, want empty with every source down", r.Prose)
 				}
 				for src, st := range r.Freshness {
 					if st.Available {
@@ -393,15 +467,31 @@ func TestMergeStaleTagsPropagate(t *testing.T) {
 	gridFetched := now.Add(-45 * time.Minute)
 	omFetched := now.Add(-2 * time.Hour)
 
+	fcFetched := now.Add(-90 * time.Minute)
+
 	src := allUp(start, now.Add(-time.Minute))
 	src.Grid.Stale = true
 	src.Grid.FetchedAt = gridFetched
 	src.OMWeather.Stale = true
 	src.OMWeather.FetchedAt = omFetched
+	src.Forecast.Stale = true
+	src.Forecast.FetchedAt = fcFetched
 	src.Grid.OK = true
 
 	r := merge.Merge(centralPark, now, src)
 	h := r.Hours[0]
+
+	// Stale prose is still served, labeled stale — same semantics as every
+	// other source past its fresh TTL.
+	if len(r.Prose) == 0 {
+		t.Fatal("Prose empty; stale forecast must still be served")
+	}
+	if tag := r.Prose[0].Source; tag.Origin != domain.OriginNWS || !tag.Stale || !tag.FetchedAt.Equal(fcFetched) {
+		t.Errorf("Prose[0].Source = %+v, want stale nws fetched %v", tag, fcFetched)
+	}
+	if st := r.Freshness[merge.SrcNWSForecast]; !st.Available || !st.Stale || !st.FetchedAt.Equal(fcFetched) {
+		t.Errorf("freshness[nws-forecast] = %+v, want available, stale, fetched %v", st, fcFetched)
+	}
 
 	if tag := h.TempF.Source; !tag.Stale || !tag.FetchedAt.Equal(gridFetched) {
 		t.Errorf("TempF tag = %+v, want Stale=true FetchedAt=%v", tag, gridFetched)
@@ -467,6 +557,14 @@ func loadFixtures(t *testing.T, fetched time.Time) merge.Sources {
 		t.Fatalf("ActiveAlerts over fixture: %v", err)
 	}
 
+	// NWS narrative forecast through the nws client.
+	fcSrv := fixtureServer(t, "testdata/forecast_okx_34_45.json")
+	fcClient := &nws.Client{BaseURL: fcSrv.URL, RetryWait: time.Millisecond}
+	fc, err := fcClient.Forecast(ctx, "OKX", 34, 45)
+	if err != nil {
+		t.Fatalf("Forecast over fixture: %v", err)
+	}
+
 	// Open-Meteo weather and air quality through the openmeteo client.
 	weatherSrv := fixtureServer(t, "testdata/weather_nyc.json")
 	airSrv := fixtureServer(t, "testdata/airquality_nyc.json")
@@ -497,6 +595,7 @@ func loadFixtures(t *testing.T, fetched time.Time) merge.Sources {
 
 	return merge.Sources{
 		Grid:      okIn(&gp, fetched),
+		Forecast:  okIn(fc, fetched),
 		Alerts:    okIn(alerts, fetched),
 		AirNowObs: okIn(obs, fetched),
 		OMWeather: okIn(omWeather, fetched),
@@ -548,7 +647,7 @@ func TestMergeOverRecordedFixtures(t *testing.T) {
 	}
 
 	// Every source healthy per /healthz.
-	for _, src := range []string{merge.SrcNWSGrid, merge.SrcNWSAlerts, merge.SrcAirNow, merge.SrcOMWeather, merge.SrcOMAir} {
+	for _, src := range []string{merge.SrcNWSGrid, merge.SrcNWSForecast, merge.SrcNWSAlerts, merge.SrcAirNow, merge.SrcOMWeather, merge.SrcOMAir} {
 		st, ok := r.Freshness[src]
 		if !ok || !st.Available || st.Stale || !st.FetchedAt.Equal(fetched) {
 			t.Errorf("freshness[%s] = %+v (present=%v), want available, fresh, fetched %v", src, st, ok, fetched)
@@ -620,6 +719,31 @@ func TestMergeOverRecordedFixtures(t *testing.T) {
 	h1 := r.Hours[1]
 	if !h1.AQI.Valid || h1.AQI.Source.Origin != domain.OriginOpenMeteo || !h1.AQI.Source.Modeled {
 		t.Errorf("AQI[1] = %+v, want valid from open-meteo, Modeled", h1.AQI)
+	}
+
+	// Narrative prose: the recorded forecast has 6 periods starting
+	// "Tonight" (07-27 20:00 ET); the 48 h window (ending 07-29 20:00 ET)
+	// overlaps the first 5 — "Thursday" (starts 07-30 06:00) is filtered.
+	wantProse := []string{"Tonight", "Tuesday", "Tuesday Night", "Wednesday", "Wednesday Night"}
+	if len(r.Prose) != len(wantProse) {
+		t.Fatalf("Prose = %d periods, want %d", len(r.Prose), len(wantProse))
+	}
+	for i, name := range wantProse {
+		if r.Prose[i].Name != name {
+			t.Errorf("Prose[%d].Name = %q, want %q", i, r.Prose[i].Name, name)
+		}
+		if r.Prose[i].Short == "" || r.Prose[i].Detailed == "" {
+			t.Errorf("Prose[%d] (%s): empty prose text", i, name)
+		}
+		if tag := r.Prose[i].Source; tag.Origin != domain.OriginNWS || tag.Stale {
+			t.Errorf("Prose[%d].Source = %+v, want fresh nws", i, tag)
+		}
+	}
+	if got := r.Prose[0].Short; got != "Partly Cloudy then Chance Showers And Thunderstorms" {
+		t.Errorf("Prose[0].Short = %q", got)
+	}
+	if !r.Prose[0].Start.Equal(wantStart) {
+		t.Errorf("Prose[0].Start = %v, want %v", r.Prose[0].Start, wantStart)
 	}
 
 	// The recorded alert fixture carries an active Flood Watch.

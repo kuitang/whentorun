@@ -1,0 +1,14 @@
+{{define "alerts"}}<div id="alert-live" hx-get="/fragment/alerts?path={{.Path.Slug}}" hx-trigger="every 120s" hx-swap="outerHTML">
+{{- if .AlertFeedDown}}
+  <aside class="alert" role="status">
+    <span class="overline">Alert feed unavailable</span>
+    <div class="alert-note">the National Weather Service alert feed cannot be reached &mdash; do not read this as all-clear.</div>
+  </aside>
+{{- end}}
+{{- range .Alerts}}
+  <aside class="alert" role="status">
+    <span class="overline">{{.Event}}</span>
+    <div class="alert-note">{{.Note}}</div>
+  </aside>
+{{- end}}
+</div>{{end}}

@@ -1,0 +1,328 @@
+{{define "page"}}<!DOCTYPE html>
+<html lang="en"{{with .Theme}} data-theme="{{.}}"{{end}}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>when to run &mdash; {{.Path.Name}}</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="{{asset "css/tokens.css"}}">
+<link rel="stylesheet" href="{{asset "css/app.css"}}">
+<script src="{{asset "js/htmx.min.js"}}" defer></script>
+</head>
+<body>
+
+<svg class="defs" aria-hidden="true" focusable="false">
+<defs>
+<pattern id="hatchFine" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+  <line x1="0" y1="0" x2="0" y2="3" stroke="currentColor" stroke-width="0.5" opacity="0.35"/>
+</pattern>
+<symbol id="g-sun" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1"/>
+  <circle cx="12" cy="12" r="3.1" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <line x1="18.40" y1="12.00" x2="21.40" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="16.53" x2="18.65" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="18.40" x2="12.00" y2="21.40" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="16.53" x2="5.35" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="5.60" y1="12.00" x2="2.60" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="7.47" x2="5.35" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="5.60" x2="12.00" y2="2.60" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="7.47" x2="18.65" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="17.91" y1="14.45" x2="19.30" y2="15.02" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="14.45" y1="17.91" x2="15.02" y2="19.30" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="9.55" y1="17.91" x2="8.98" y2="19.30" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="6.09" y1="14.45" x2="4.70" y2="15.02" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="6.09" y1="9.55" x2="4.70" y2="8.98" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="9.55" y1="6.09" x2="8.98" y2="4.70" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="14.45" y1="6.09" x2="15.02" y2="4.70" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="17.91" y1="9.55" x2="19.30" y2="8.98" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+</symbol>
+<symbol id="g-sun-half" viewBox="0 0 24 24">
+  <!-- auto theme: half-shaded sun disc -->
+  <circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M12 7.4 A4.6 4.6 0 0 1 12 16.6 Z" fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.6"/>
+  <line x1="18.40" y1="12.00" x2="21.40" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="16.53" x2="18.65" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="18.40" x2="12.00" y2="21.40" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="16.53" x2="5.35" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="5.60" y1="12.00" x2="2.60" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="7.47" x2="5.35" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="5.60" x2="12.00" y2="2.60" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="7.47" x2="18.65" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/>
+</symbol>
+<symbol id="g-moon" viewBox="0 0 24 24">
+  <path d="M12 5.4 A6.6 6.6 0 1 0 12 18.6 A8.6 8.6 0 0 1 12 5.4 Z" fill="url(#hatchFine)"
+        stroke="currentColor" stroke-width="1"/>
+  <line x1="17.6" y1="6.2" x2="17.6" y2="8.6" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+  <line x1="16.4" y1="7.4" x2="18.8" y2="7.4" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+  <line x1="19.8" y1="12.4" x2="19.8" y2="14.2" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <line x1="18.9" y1="13.3" x2="20.7" y2="13.3" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+</symbol>
+<symbol id="g-gibbous" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="6.4" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M12 5.6 A6.4 6.4 0 0 0 12 18.4 A11.5 11.5 0 0 1 12 5.6 Z" fill="url(#hatchFine)"
+        stroke="currentColor" stroke-width="0.6" opacity="0.8"/>
+</symbol>
+<symbol id="g-cloud" viewBox="0 0 24 24">
+  <path d="M7.1 9.9 a4.7 4.7 0 0 1 8.6 -1.1" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <path d="M5.6 16.5 a3.1 3.1 0 0 1 0.9 -6.05 4.7 4.7 0 0 1 9.1 -1.1 3.5 3.5 0 0 1 3.2 5.5"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.4" y1="16.5" x2="19.6" y2="16.5" stroke="currentColor" stroke-width="1"/>
+  <line x1="6.6" y1="14.4" x2="16.2" y2="14.4" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+</symbol>
+<symbol id="g-rain" viewBox="0 0 24 24">
+  <path d="M5.8 13.4 a2.9 2.9 0 0 1 0.85 -5.7 4.4 4.4 0 0 1 8.5 -1.0 3.3 3.3 0 0 1 3.0 5.2"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.7" y1="13.4" x2="18.9" y2="13.4" stroke="currentColor" stroke-width="1"/>
+  <line x1="8.4" y1="15.6" x2="7.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.8"/>
+  <line x1="12.4" y1="15.6" x2="11.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.55"/>
+  <line x1="16.4" y1="15.6" x2="15.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.8"/>
+</symbol>
+<symbol id="g-storm" viewBox="0 0 24 24">
+  <path d="M5.8 11.4 a2.9 2.9 0 0 1 0.85 -5.7 4.4 4.4 0 0 1 8.5 -1.0 3.3 3.3 0 0 1 3.0 5.2"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.7" y1="11.4" x2="18.9" y2="11.4" stroke="currentColor" stroke-width="1"/>
+  <polygon points="13.2,12.6 9.2,17.6 11.9,17.6 9.9,22.2 15.6,16.4 12.9,16.4 15.3,12.6"
+        fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round"/>
+</symbol>
+<symbol id="g-bolt" viewBox="0 0 14 18">
+  <polygon points="8,0.8 3.4,7.6 6.3,7.6 4.2,15.4 11,7.0 8.0,7.0 10.7,0.8"
+        fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round"/>
+</symbol>
+<symbol id="g-sunrise" viewBox="0 0 24 24">
+  <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1"/>
+  <path d="M7.6 14 a4.4 4.4 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M9.4 14 a2.6 2.6 0 0 1 5.2 0" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.45"/>
+  <line x1="6.80" y1="11.00" x2="4.38" y2="9.60" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="9.00" y1="8.80" x2="7.60" y2="6.38" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="12.00" y1="8.00" x2="12.00" y2="5.20" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="15.00" y1="8.80" x2="16.40" y2="6.38" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="17.20" y1="11.00" x2="19.62" y2="9.60" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <line x1="6.2" y1="17.2" x2="17.8" y2="17.2" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+  <line x1="8.4" y1="19.6" x2="15.6" y2="19.6" stroke="currentColor" stroke-width="0.6" opacity="0.3"/>
+</symbol>
+<symbol id="g-sunset" viewBox="0 0 24 24">
+  <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1"/>
+  <path d="M7.6 14 a4.4 4.4 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M9.4 14 a2.6 2.6 0 0 1 5.2 0" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.45"/>
+  <line x1="12" y1="16.2" x2="12" y2="20.2" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <polyline points="9.8,18.2 12,20.6 14.2,18.2" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <line x1="6.2" y1="16.8" x2="8.6" y2="16.8" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+  <line x1="15.4" y1="16.8" x2="17.8" y2="16.8" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+</symbol>
+<symbol id="g-vane" viewBox="0 0 12 12">
+  <line x1="6" y1="10.2" x2="6" y2="2.6" stroke="currentColor" stroke-width="1"/>
+  <polyline points="3.9,4.9 6,2.4 8.1,4.9" fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.6" y1="10.2" x2="7.4" y2="10.2" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+</symbol>
+<symbol id="g-horizon" viewBox="0 0 24 24">
+  <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1"/>
+  <path d="M8.2 14 a3.8 3.8 0 0 1 7.6 0" fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="12" y1="9.4" x2="12" y2="7.2" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <line x1="8.6" y1="10.6" x2="7.2" y2="9.0" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
+  <line x1="15.4" y1="10.6" x2="16.8" y2="9.0" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
+</symbol>
+<symbol id="g-therm" viewBox="0 0 24 24">
+  <path d="M10.6 4.6 a1.4 1.4 0 0 1 2.8 0 V 14.9 a3.5 3.5 0 1 1 -2.8 0 Z"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <circle cx="12" cy="18.1" r="2.1" fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.7"/>
+  <line x1="12" y1="9.2" x2="12" y2="16.2" stroke="currentColor" stroke-width="1.2" opacity="0.55"/>
+  <line x1="14.6" y1="6.4" x2="16.6" y2="6.4" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+  <line x1="14.6" y1="9.2" x2="16.2" y2="9.2" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+  <line x1="14.6" y1="12.0" x2="16.6" y2="12.0" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+</symbol>
+<symbol id="g-drop" viewBox="0 0 24 24">
+  <path d="M12 4.2 C 9.6 8.2 7.3 11.2 7.3 14.1 a4.7 4.7 0 0 0 9.4 0 C 16.7 11.2 14.4 8.2 12 4.2 Z"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M9.5 14.4 a2.6 2.6 0 0 0 1.7 2.5" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.55"/>
+  <path d="M12 8.2 C 10.9 10 9.9 11.6 9.9 13" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.35"/>
+</symbol>
+<symbol id="g-wind" viewBox="0 0 24 24">
+  <path d="M3.5 9 h9.6 a2.1 2.1 0 1 0 -2.1 -2.1" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M3.5 13 h13.8 a2.3 2.3 0 1 1 -2.3 2.3" fill="none" stroke="currentColor" stroke-width="1" opacity="0.8"/>
+  <path d="M3.5 17 h7.6 a1.7 1.7 0 1 0 -1.7 -1.7" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+</symbol>
+<symbol id="g-haze" viewBox="0 0 24 24">
+  <path d="M4 8 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.9"/>
+  <path d="M4 11.4 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.55"/>
+  <path d="M4 14.8 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.75"/>
+  <path d="M4 18.2 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
+</symbol>
+<symbol id="g-chevrons" viewBox="0 0 24 24">
+  <!-- etched double chevron: the only scroll affordance mark on the page -->
+  <polyline points="5.5,6 12,12 5.5,18" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="12,6 18.5,12 12,18" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+</symbol>
+</defs>
+</svg>
+
+<header class="wrap masthead">
+    <div class="mast-row">
+    <h1 class="wordmark">when to run</h1>
+    <div class="ctls" role="group" aria-label="Units and theme">
+      <form method="post" action="/prefs/units" hx-post="/prefs/units" hx-swap="none">
+        <button class="ctl unit-toggle" type="submit" data-unit-toggle aria-label="{{unitAria .Units}}">&deg;{{.Units}}</button>
+      </form>
+      <form method="post" action="/prefs/theme" hx-post="/prefs/theme" hx-swap="none">
+        <button class="ctl ctl-glyph" type="submit" data-theme-btn aria-label="{{themeAria .Theme}}">
+          <svg aria-hidden="true" focusable="false"><use href="#g-{{themeGlyph .Theme}}"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+  <hr class="mast-rule">
+  <div class="slider-wrap">
+    <nav class="paths" data-route-slider aria-label="Running paths">
+      <a href="#" data-geo>Use my location</a>
+      {{- range .Paths}}
+      <a href="/p/{{.Slug}}"{{if eq .Slug $.Path.Slug}} aria-current="true"{{end}}>{{pathShort .Slug}}</a>
+      {{- end}}
+    </nav>
+    <span class="scroll-hint" data-scrub-right aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>
+    <span class="scroll-hint scroll-hint-left" data-scrub-left hidden aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  {{template "alerts" .}}
+
+  <div class="lede">
+    {{template "current" .}}
+
+    {{template "windows" .}}
+  </div>
+
+{{- if .ChartSVG}}
+  <section class="fig-sec" aria-label="The next 48 hours, one temperature chart">
+    <div class="fig-head">
+      <h2><span class="fig-title">Next 48 hours</span></h2>
+      <span class="note">{{chartNote .}}</span>
+    </div>
+    <!-- chart begins at now; scrollLeft 0 = now on every viewport -->
+    <div class="fig-wrap">
+      <div class="fig-scrub" tabindex="0" role="group" aria-label="48-hour temperature chart; scrolls sideways">
+        <div class="fig-axis" data-y-axis aria-hidden="true">
+          <span class="ax-unit" style="top: 52px">&deg;{{.Units}}</span>
+          {{- range .ChartMeta.YLabels}}
+          <span style="top: {{.Y}}px">{{.Label}}</span>
+          {{- end}}
+          <div class="ax-rain" data-precip-axis>
+            {{- range .ChartMeta.PrecipLabels}}
+            <span style="top: {{.Y}}px">{{.Label}}</span>
+            {{- end}}
+          </div>
+        </div>
+{{.ChartSVG}}
+      </div>
+      <span class="date-lock" data-date-lock aria-hidden="true">{{dateLock .GeneratedAt}}</span>
+      <span class="scroll-hint" data-scrub-right aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>
+      <span class="scroll-hint scroll-hint-left" data-scrub-left hidden aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>
+    </div>
+    <div class="fig-legend">
+      <span class="lg-air"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="currentColor" stroke-width="1" stroke-dasharray="6 4"/></svg> temperature</span> &middot;
+      <span class="lg-dew"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><line x1="2" y1="5" x2="29" y2="5" stroke="currentColor" stroke-width="1.2" stroke-dasharray="0.2 4" stroke-linecap="round"/></svg> dew point</span> &middot;
+      <span class="lg-rain"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><rect x="4" y="2" width="9" height="8" class="rainbar"/><use href="#g-bolt" x="18" y="0" width="8" height="10.2" class="bolt-g"/></svg> chance of rain, bolt marks thunder</span>
+      <div class="fig-key2">every other numeral: <span class="q0"><span class="kdot" aria-hidden="true"></span> good</span> &middot; <span class="q1"><span class="kdot" aria-hidden="true"></span> fair</span> &middot; <span class="q2"><span class="kdot" aria-hidden="true"></span> poor</span></div>
+    </div>
+  </section>
+{{- end}}
+
+  {{template "hourly" .}}
+
+  {{- $fx := .Freshness}}
+  <section id="explainers" class="explainers" aria-label="How every metric is read">
+    <span class="overline">How every metric is read</span>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-therm"/></svg>WBGT &mdash; heat stress</summary>
+      <p>Wet-bulb globe temperature folds temperature, humidity, sun load, and wind into one heat-stress number &mdash; the standard for outdoor athletics. It omits your fitness, acclimatization, and pace. The words follow the National Weather Service bands: low, elevated, moderate, high, extreme &mdash; a veto at 90&deg;F and above.</p>
+      <p>These figures are estimated from the gridpoint forecast, not measured. A black-globe sensor on the course reads the real thing and can sit a few degrees higher in full sun on asphalt &mdash; treat a forecast 88&deg; as &ldquo;maybe 90&deg; on the asphalt.&rdquo;</p>
+      <div class="src">source: NWS gridpoint forecast (estimated, not a station measurement) &middot; fetched {{fetched (index $fx 0)}}</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-drop"/></svg>Dew point &mdash; humidity</summary>
+      <p>The absolute moisture in the air, which sets how well sweat can evaporate. Below 55&deg;F is comfortable; at 70&deg;F and above evaporation stalls and heart rate drifts up at any pace. It omits temperature itself; that is WBGT&rsquo;s job.</p>
+      <div class="src">source: NWS gridpoint forecast &middot; fetched {{fetched (index $fx 0)}}</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-cloud"/></svg>Relative humidity</summary>
+      <p>The same moisture as the dew point, read against the temperature &mdash; so it climbs toward dawn even while the absolute moisture holds steady. A high-RH dawn is not wetter air than a moderate-RH afternoon; it is cooler air holding the same water. Use dew point to judge sweat; use RH to expect fog and soaked grass at first light.</p>
+      <div class="src">source: NWS gridpoint forecast &middot; fetched {{fetched (index $fx 0)}}</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>UV index</summary>
+      <p>The EPA scale for sunburn speed on exposed skin &mdash; at UV 9, damage begins in about 15 minutes. It says nothing about heat: a dawn window can read UV 0&ndash;2 while the same day&rsquo;s noon hits 10. Shade, cover, and sunscreen change your exposure, not the index.</p>
+      <div class="src">source: Open-Meteo model (forecast) &middot; fetched {{fetched (index $fx 4)}}</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-haze"/></svg>AQI &mdash; air quality</summary>
+      <p>The EPA Air Quality Index, taken from the worst nearby monitor and its dominant pollutant &mdash; a protective reading, not an average. Moderate air is fine for most runners; unusually sensitive people may shorten hard sessions. 201 and above vetoes the hour.</p>
+      <div class="src">now: EPA AirNow monitor (measured) &middot; fetched {{fetched (index $fx 3)}} &middot; hourly forecast: CAMS model (modeled) &middot; fetched {{fetched (index $fx 5)}}</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-wind"/></svg>Wind &amp; gusts</summary>
+      <p>Sustained speed plus gusts, with the vane in the ledger showing where it blows from. In heat, wind helps &mdash; it moves saturated air off your skin. In cold it cuts; the wind-chill veto sits at &minus;10&deg;F. It omits direction changes along a loop; see the route note.</p>
+      <div class="src">source: NWS gridpoint forecast &middot; fetched {{fetched (index $fx 0)}}</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>Alerts, storms &amp; vetoes</summary>
+      <p>Advisories are cautions, not stop orders: an advisory banners the page but strikes nothing out. Vetoes are different &mdash; lightning at 30% thunder probability or more, WBGT at 90&deg;F and above, or AQI past 200 remove the hour from play with the reason named in the row, never averaged away. Rain alone rarely cancels a run.</p>
+      <div class="src">source: NWS alerts &middot; fetched {{fetched (index $fx 2)}} &middot; thunder: NWS probabilityOfThunder &middot; fetched {{fetched (index $fx 0)}}</div>
+    </details>
+  </section>
+
+  <aside class="route">
+    <span class="overline">Route context &middot; {{.Path.Name}}</span>
+    {{.Path.RouteNotes}}
+  </aside>
+
+  <p class="clothing"><span class="overline">Clothing</span>{{.Clothing}}</p>
+
+</main>
+
+<footer class="wrap foot">
+  <div>forecast &amp; alerts: National Weather Service, gridpoint {{.Path.GridID}} {{.Path.GridX}},{{.Path.GridY}} &middot; forecast fetched {{fetched (index $fx 0)}} &middot; alerts fetched {{fetched (index $fx 2)}}</div>
+  <div>air quality now: EPA AirNow, worst nearby monitor (measured) &middot; fetched {{fetched (index $fx 3)}} &middot; UV + hourly AQI: Open-Meteo (modeled, CAMS) &middot; fetched {{fetched (index $fx 4)}}</div>
+  <div>whentorun &middot; page generated {{fetched .GeneratedAt}}</div>
+</footer>
+
+<script>
+/* adaptive scrub arrows, the locked date chip, and the geolocation
+   affordance; units/theme post through their forms (HX-Refresh reloads) */
+(function () {
+  function scrubArrows(scroller) {
+    if (!scroller) return;
+    var wrap = scroller.parentElement;
+    var L = wrap.querySelector('[data-scrub-left]');
+    var R = wrap.querySelector('[data-scrub-right]');
+    function update() {
+      var max = scroller.scrollWidth - scroller.clientWidth;
+      if (L) { L.hidden = scroller.scrollLeft < 8; }
+      if (R) { R.hidden = scroller.scrollLeft > max - 8; }
+    }
+    scroller.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+  scrubArrows(document.querySelector('.paths'));
+  scrubArrows(document.querySelector('.fig-scrub'));
+
+  /* the date chip stays put while the plot scrubs beneath it; the day
+     labels come from the chart SVG's fx-day text marks */
+  var fig = document.querySelector('.fig-scrub');
+  var lock = document.querySelector('[data-date-lock]');
+  if (fig && lock) {
+    var marks = [];
+    fig.querySelectorAll('text.fx-day').forEach(function (el) {
+      marks.push({ x: parseFloat(el.getAttribute('x')), label: el.textContent });
+    });
+    marks.sort(function (a, b) { return a.x - b.x; });
+    function dateLock() {
+      var x = fig.scrollLeft, label = lock.textContent;
+      for (var i = 0; i < marks.length; i++) { if (x >= marks[i].x - 10) { label = marks[i].label; } }
+      lock.textContent = label;
+    }
+    if (marks.length) {
+      fig.addEventListener('scroll', dateLock, { passive: true });
+      dateLock();
+    }
+  }
+
+  /* "Use my location": geolocation only on tap, never auto-prompted */
+  var geo = document.querySelector('[data-geo]');
+  if (geo) {
+    geo.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        fetch('/api/nearest?lat=' + pos.coords.latitude + '&lon=' + pos.coords.longitude)
+          .then(function (r) { return r.json(); })
+          .then(function (n) {
+            if (!n.slug) return;
+            var fd = new FormData();
+            fd.append('path', n.slug);
+            fetch('/prefs/path', { method: 'POST', body: fd }).finally(function () {
+              window.location = '/p/' + n.slug;
+            });
+          });
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
+{{end}}

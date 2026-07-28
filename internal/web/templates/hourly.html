@@ -1,0 +1,25 @@
+{{define "hourly"}}<section class="hours-sec" aria-label="Hourly ledger" id="hourly">
+    <div class="hours-head">
+      <h2 class="overline">Hourly ledger &middot; 48 h</h2>
+    </div>
+    <table class="hours">
+      <caption class="sr">Hour-by-hour conditions for the next 48 hours at {{.Path.Name}}</caption>
+      <thead data-sticky-head>
+        <tr><th class="t" scope="col">Time</th><th class="c-wbgt" scope="col">WBGT</th><th scope="col">Temp</th><th scope="col">Dew point</th><th scope="col">RH</th><th scope="col">UV</th><th scope="col">AQI</th><th scope="col">Wind</th><th scope="col">Rain</th></tr>
+      </thead>
+      <tbody>
+{{- range .Days}}
+<tr class="day"><th class="t" scope="row">{{dayShort .Label}}</th><td colspan="8"><span class="dnm">{{.Label}}</span>{{with .SunLabel}}<span class="dsun"><svg class="g" aria-hidden="true"><use href="#g-horizon"/></svg>{{.}}</span>{{end}}</td></tr>
+{{- range .Rows}}
+{{- if eq .Kind "hour"}}
+<tr class="{{twclass .WBGT.Tier}}{{if .Veto}} veto{{end}}"{{if .Window}} data-window-row{{end}}><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="{{glyph .Glyph}}"/></svg>{{.TimeLabel}}{{with .Text}}<span class="w-ann">{{.}}</span>{{end}}</th><td class="c-wbgt"><span class="n{{ttclass .WBGT.Tier}}">{{deg .WBGT}}</span>{{with .Veto}} <span class="w-word vt">&#10005; {{.}}</span>{{end}}</td><td class="c-temp">{{deg .Temp}}</td><td class="c-dew">{{deg .Dew}}</td><td class="c-rh{{qclass .RH.Quality}}">{{.RH.Display}}</td><td class="c-uv{{qclass .UV.Quality}}">{{.UV.Display}}</td><td class="c-aqi{{qclass .AQI.Quality}}">{{.AQI.Display}}</td><td class="c-wind{{qclass .Wind.Quality}}">{{if .Wind.Valid}}<svg class="vane"{{vane .WindDeg}} aria-hidden="true"><use href="#g-vane"/></svg>{{end}}{{.Wind.Display}}</td><td class="c-rain{{qclass .Rain.Quality}}">{{.Rain.Display}}{{if .Thunder}} <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg>{{end}}</td></tr>
+{{- else if eq .Kind "sun"}}
+<tr data-sun-row><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="{{glyph .Glyph}}"/></svg></th><td colspan="8">&mdash; {{.Text}} &mdash;</td></tr>
+{{- else if eq .Kind "narrative"}}
+<tr data-narrative><td colspan="9">&mdash; {{.Text}} &mdash;</td></tr>
+{{- end}}
+{{- end}}
+{{- end}}
+      </tbody>
+    </table>
+  </section>{{end}}

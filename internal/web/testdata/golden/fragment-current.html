@@ -1,0 +1,40 @@
+<section class="current" aria-label="Current conditions" id="current" hx-get="/fragment/current?path=central-park" hx-trigger="every 120s" hx-swap="outerHTML">
+      <span class="overline">Now &middot; Central Park &middot; 8:30 PM ET</span>
+
+      <div data-metric="wbgt">
+        <span class="hero-label">Heat Stress &middot; WBGT</span>
+        <div class="wbgt-line">
+          <svg class="g-big" aria-hidden="true"><use href="#g-therm"/></svg>
+          <span class="wbgt-num tt0">73<sup>&deg;F</sup></span>
+          <span class="wbgt-phrase tt0">Low heat stress</span>
+        </div>
+        <details class="wbgt-what">
+          <summary>What is WBGT?</summary>
+          <p>Wet-bulb globe temperature folds temperature, humidity, sun load, and wind into one number for how hard heat works a moving body. It is the standard the National Weather Service and OSHA use for outdoor exertion &mdash; watch it, not the plain temperature. Two 75&deg; mornings can run worlds apart; WBGT tells them apart.</p>
+          <p class="jump"><a href="#explainers">See how every metric is read &darr;</a></p>
+        </details>
+      </div>
+
+      <div class="pair">
+        <div class="pair-cell">
+          <span class="hero-label" data-metric="temp">Temperature</span>
+          <span class="pair-num">78<sup>&deg;F</sup></span>
+          <span class="pair-note">in the shade</span>
+        </div>
+        <div class="pair-cell">
+          <span class="hero-label" data-metric="dew">Dew Point</span>
+          <span class="pair-num">66<sup>&deg;F</sup></span>
+          <span class="pair-note">humid at a jog</span>
+        </div>
+      </div>
+
+      <div class="strip">
+        <div class="strip-text">
+          <span data-metric="uv">UV <span class="q0">0</span> low</span> &middot;
+          <span data-metric="aqi">AQI <span class="q1">66</span> moderate (PM2.5)</span> &middot;
+          <span data-metric="rh">humidity <span class="q1">67%</span></span> &middot;
+          <span data-metric="wind"><svg class="vane" style="transform:rotate(350deg)" aria-hidden="true"><use href="#g-vane"/></svg>wind <span class="q1">S 3 g12</span></span> &middot;
+          <span data-metric="rain">rain <span class="q0">13%</span></span>
+        </div>
+      </div>
+    </section>

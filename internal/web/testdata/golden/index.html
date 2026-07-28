@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>when to run &mdash; Central Park</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/css/tokens-56ee9d672e.css">
+<link rel="stylesheet" href="/static/css/app-476fee3900.css">
+<script src="/static/js/htmx.min-e209dda5c8.js" defer></script>
+</head>
+<body>
+
+<svg class="defs" aria-hidden="true" focusable="false">
+<defs>
+<pattern id="hatchFine" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+  <line x1="0" y1="0" x2="0" y2="3" stroke="currentColor" stroke-width="0.5" opacity="0.35"/>
+</pattern>
+<symbol id="g-sun" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1"/>
+  <circle cx="12" cy="12" r="3.1" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <line x1="18.40" y1="12.00" x2="21.40" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="16.53" x2="18.65" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="18.40" x2="12.00" y2="21.40" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="16.53" x2="5.35" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="5.60" y1="12.00" x2="2.60" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="7.47" x2="5.35" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="5.60" x2="12.00" y2="2.60" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="7.47" x2="18.65" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="17.91" y1="14.45" x2="19.30" y2="15.02" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="14.45" y1="17.91" x2="15.02" y2="19.30" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="9.55" y1="17.91" x2="8.98" y2="19.30" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="6.09" y1="14.45" x2="4.70" y2="15.02" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="6.09" y1="9.55" x2="4.70" y2="8.98" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="9.55" y1="6.09" x2="8.98" y2="4.70" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="14.45" y1="6.09" x2="15.02" y2="4.70" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="17.91" y1="9.55" x2="19.30" y2="8.98" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+</symbol>
+<symbol id="g-sun-half" viewBox="0 0 24 24">
+  
+  <circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M12 7.4 A4.6 4.6 0 0 1 12 16.6 Z" fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.6"/>
+  <line x1="18.40" y1="12.00" x2="21.40" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="16.53" x2="18.65" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="18.40" x2="12.00" y2="21.40" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="16.53" x2="5.35" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="5.60" y1="12.00" x2="2.60" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="7.47" x2="5.35" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="5.60" x2="12.00" y2="2.60" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="7.47" x2="18.65" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/>
+</symbol>
+<symbol id="g-moon" viewBox="0 0 24 24">
+  <path d="M12 5.4 A6.6 6.6 0 1 0 12 18.6 A8.6 8.6 0 0 1 12 5.4 Z" fill="url(#hatchFine)"
+        stroke="currentColor" stroke-width="1"/>
+  <line x1="17.6" y1="6.2" x2="17.6" y2="8.6" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+  <line x1="16.4" y1="7.4" x2="18.8" y2="7.4" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+  <line x1="19.8" y1="12.4" x2="19.8" y2="14.2" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <line x1="18.9" y1="13.3" x2="20.7" y2="13.3" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+</symbol>
+<symbol id="g-gibbous" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="6.4" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M12 5.6 A6.4 6.4 0 0 0 12 18.4 A11.5 11.5 0 0 1 12 5.6 Z" fill="url(#hatchFine)"
+        stroke="currentColor" stroke-width="0.6" opacity="0.8"/>
+</symbol>
+<symbol id="g-cloud" viewBox="0 0 24 24">
+  <path d="M7.1 9.9 a4.7 4.7 0 0 1 8.6 -1.1" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <path d="M5.6 16.5 a3.1 3.1 0 0 1 0.9 -6.05 4.7 4.7 0 0 1 9.1 -1.1 3.5 3.5 0 0 1 3.2 5.5"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.4" y1="16.5" x2="19.6" y2="16.5" stroke="currentColor" stroke-width="1"/>
+  <line x1="6.6" y1="14.4" x2="16.2" y2="14.4" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+</symbol>
+<symbol id="g-rain" viewBox="0 0 24 24">
+  <path d="M5.8 13.4 a2.9 2.9 0 0 1 0.85 -5.7 4.4 4.4 0 0 1 8.5 -1.0 3.3 3.3 0 0 1 3.0 5.2"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.7" y1="13.4" x2="18.9" y2="13.4" stroke="currentColor" stroke-width="1"/>
+  <line x1="8.4" y1="15.6" x2="7.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.8"/>
+  <line x1="12.4" y1="15.6" x2="11.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.55"/>
+  <line x1="16.4" y1="15.6" x2="15.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.8"/>
+</symbol>
+<symbol id="g-storm" viewBox="0 0 24 24">
+  <path d="M5.8 11.4 a2.9 2.9 0 0 1 0.85 -5.7 4.4 4.4 0 0 1 8.5 -1.0 3.3 3.3 0 0 1 3.0 5.2"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.7" y1="11.4" x2="18.9" y2="11.4" stroke="currentColor" stroke-width="1"/>
+  <polygon points="13.2,12.6 9.2,17.6 11.9,17.6 9.9,22.2 15.6,16.4 12.9,16.4 15.3,12.6"
+        fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round"/>
+</symbol>
+<symbol id="g-bolt" viewBox="0 0 14 18">
+  <polygon points="8,0.8 3.4,7.6 6.3,7.6 4.2,15.4 11,7.0 8.0,7.0 10.7,0.8"
+        fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round"/>
+</symbol>
+<symbol id="g-sunrise" viewBox="0 0 24 24">
+  <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1"/>
+  <path d="M7.6 14 a4.4 4.4 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M9.4 14 a2.6 2.6 0 0 1 5.2 0" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.45"/>
+  <line x1="6.80" y1="11.00" x2="4.38" y2="9.60" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="9.00" y1="8.80" x2="7.60" y2="6.38" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="12.00" y1="8.00" x2="12.00" y2="5.20" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="15.00" y1="8.80" x2="16.40" y2="6.38" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="17.20" y1="11.00" x2="19.62" y2="9.60" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <line x1="6.2" y1="17.2" x2="17.8" y2="17.2" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+  <line x1="8.4" y1="19.6" x2="15.6" y2="19.6" stroke="currentColor" stroke-width="0.6" opacity="0.3"/>
+</symbol>
+<symbol id="g-sunset" viewBox="0 0 24 24">
+  <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1"/>
+  <path d="M7.6 14 a4.4 4.4 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M9.4 14 a2.6 2.6 0 0 1 5.2 0" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.45"/>
+  <line x1="12" y1="16.2" x2="12" y2="20.2" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <polyline points="9.8,18.2 12,20.6 14.2,18.2" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <line x1="6.2" y1="16.8" x2="8.6" y2="16.8" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+  <line x1="15.4" y1="16.8" x2="17.8" y2="16.8" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+</symbol>
+<symbol id="g-vane" viewBox="0 0 12 12">
+  <line x1="6" y1="10.2" x2="6" y2="2.6" stroke="currentColor" stroke-width="1"/>
+  <polyline points="3.9,4.9 6,2.4 8.1,4.9" fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.6" y1="10.2" x2="7.4" y2="10.2" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+</symbol>
+<symbol id="g-horizon" viewBox="0 0 24 24">
+  <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1"/>
+  <path d="M8.2 14 a3.8 3.8 0 0 1 7.6 0" fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="12" y1="9.4" x2="12" y2="7.2" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <line x1="8.6" y1="10.6" x2="7.2" y2="9.0" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
+  <line x1="15.4" y1="10.6" x2="16.8" y2="9.0" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
+</symbol>
+<symbol id="g-therm" viewBox="0 0 24 24">
+  <path d="M10.6 4.6 a1.4 1.4 0 0 1 2.8 0 V 14.9 a3.5 3.5 0 1 1 -2.8 0 Z"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <circle cx="12" cy="18.1" r="2.1" fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.7"/>
+  <line x1="12" y1="9.2" x2="12" y2="16.2" stroke="currentColor" stroke-width="1.2" opacity="0.55"/>
+  <line x1="14.6" y1="6.4" x2="16.6" y2="6.4" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+  <line x1="14.6" y1="9.2" x2="16.2" y2="9.2" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+  <line x1="14.6" y1="12.0" x2="16.6" y2="12.0" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+</symbol>
+<symbol id="g-drop" viewBox="0 0 24 24">
+  <path d="M12 4.2 C 9.6 8.2 7.3 11.2 7.3 14.1 a4.7 4.7 0 0 0 9.4 0 C 16.7 11.2 14.4 8.2 12 4.2 Z"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M9.5 14.4 a2.6 2.6 0 0 0 1.7 2.5" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.55"/>
+  <path d="M12 8.2 C 10.9 10 9.9 11.6 9.9 13" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.35"/>
+</symbol>
+<symbol id="g-wind" viewBox="0 0 24 24">
+  <path d="M3.5 9 h9.6 a2.1 2.1 0 1 0 -2.1 -2.1" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M3.5 13 h13.8 a2.3 2.3 0 1 1 -2.3 2.3" fill="none" stroke="currentColor" stroke-width="1" opacity="0.8"/>
+  <path d="M3.5 17 h7.6 a1.7 1.7 0 1 0 -1.7 -1.7" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+</symbol>
+<symbol id="g-haze" viewBox="0 0 24 24">
+  <path d="M4 8 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.9"/>
+  <path d="M4 11.4 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.55"/>
+  <path d="M4 14.8 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.75"/>
+  <path d="M4 18.2 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
+</symbol>
+<symbol id="g-chevrons" viewBox="0 0 24 24">
+  
+  <polyline points="5.5,6 12,12 5.5,18" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="12,6 18.5,12 12,18" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+</symbol>
+</defs>
+</svg>
+
+<header class="wrap masthead">
+    <div class="mast-row">
+    <h1 class="wordmark">when to run</h1>
+    <div class="ctls" role="group" aria-label="Units and theme">
+      <form method="post" action="/prefs/units" hx-post="/prefs/units" hx-swap="none">
+        <button class="ctl unit-toggle" type="submit" data-unit-toggle aria-label="Units: Fahrenheit shown. Switch to Celsius.">&deg;F</button>
+      </form>
+      <form method="post" action="/prefs/theme" hx-post="/prefs/theme" hx-swap="none">
+        <button class="ctl ctl-glyph" type="submit" data-theme-btn aria-label="Theme: automatic, follows your system. Switch to light.">
+          <svg aria-hidden="true" focusable="false"><use href="#g-sun-half"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+  <hr class="mast-rule">
+  <div class="slider-wrap">
+    <nav class="paths" data-route-slider aria-label="Running paths">
+      <a href="#" data-geo>Use my location</a>
+      <a href="/p/central-park" aria-current="true">Central Park</a>
+      <a href="/p/hudson-greenway">Hudson Greenway</a>
+      <a href="/p/east-river">East River</a>
+      <a href="/p/brooklyn">Brooklyn</a>
+      <a href="/p/van-cortlandt">Van Cortlandt</a>
+    </nav>
+    <span class="scroll-hint" data-scrub-right aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>
+    <span class="scroll-hint scroll-hint-left" data-scrub-left hidden aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div id="alert-live" hx-get="/fragment/alerts?path=central-park" hx-trigger="every 120s" hx-swap="outerHTML">
+  <aside class="alert" role="status">
+    <span class="overline">Flood Watch</span>
+    <div class="alert-note">until 8 AM Wed.</div>
+  </aside>
+</div>
+
+  <div class="lede">
+    <section class="current" aria-label="Current conditions" id="current" hx-get="/fragment/current?path=central-park" hx-trigger="every 120s" hx-swap="outerHTML">
+      <span class="overline">Now &middot; Central Park &middot; 8:30 PM ET</span>
+
+      <div data-metric="wbgt">
+        <span class="hero-label">Heat Stress &middot; WBGT</span>
+        <div class="wbgt-line">
+          <svg class="g-big" aria-hidden="true"><use href="#g-therm"/></svg>
+          <span class="wbgt-num tt0">73<sup>&deg;F</sup></span>
+          <span class="wbgt-phrase tt0">Low heat stress</span>
+        </div>
+        <details class="wbgt-what">
+          <summary>What is WBGT?</summary>
+          <p>Wet-bulb globe temperature folds temperature, humidity, sun load, and wind into one number for how hard heat works a moving body. It is the standard the National Weather Service and OSHA use for outdoor exertion &mdash; watch it, not the plain temperature. Two 75&deg; mornings can run worlds apart; WBGT tells them apart.</p>
+          <p class="jump"><a href="#explainers">See how every metric is read &darr;</a></p>
+        </details>
+      </div>
+
+      <div class="pair">
+        <div class="pair-cell">
+          <span class="hero-label" data-metric="temp">Temperature</span>
+          <span class="pair-num">78<sup>&deg;F</sup></span>
+          <span class="pair-note">in the shade</span>
+        </div>
+        <div class="pair-cell">
+          <span class="hero-label" data-metric="dew">Dew Point</span>
+          <span class="pair-num">66<sup>&deg;F</sup></span>
+          <span class="pair-note">humid at a jog</span>
+        </div>
+      </div>
+
+      <div class="strip">
+        <div class="strip-text">
+          <span data-metric="uv">UV <span class="q0">0</span> low</span> &middot;
+          <span data-metric="aqi">AQI <span class="q1">66</span> moderate (PM2.5)</span> &middot;
+          <span data-metric="rh">humidity <span class="q1">67%</span></span> &middot;
+          <span data-metric="wind"><svg class="vane" style="transform:rotate(350deg)" aria-hidden="true"><use href="#g-vane"/></svg>wind <span class="q1">S 3 g12</span></span> &middot;
+          <span data-metric="rain">rain <span class="q0">13%</span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="window-line" aria-label="Verdict and next best windows" id="windows" hx-get="/fragment/windows?path=central-park" hx-trigger="every 600s" hx-swap="outerHTML">
+      <p class="narrative" data-narrative>Dew point 71°F. That is the difference between a hard run and a miserable one. Nothing on the board for two days — check back when the forecast turns.</p>
+      <div class="nextbests">
+        <div><span class="nb"><span class="w-lab">Before work:</span> <s>Tue 5–9 AM</s></span> &middot; <span class="nb"><span class="w-lab">After work:</span> <s>Tue 4–8 PM</s></span>
+        </div>
+        <span class="sub">Dawn is out — thunderstorms in the forecast — Evening is out — thunderstorms in the forecast</span>
+      </div>
+    </section>
+  </div>
+  <section class="fig-sec" aria-label="The next 48 hours, one temperature chart">
+    <div class="fig-head">
+      <h2><span class="fig-title">Next 48 hours</span></h2>
+      <span class="note">8 PM Mon → 7 PM Wed</span>
+    </div>
+    
+    <div class="fig-wrap">
+      <div class="fig-scrub" tabindex="0" role="group" aria-label="48-hour temperature chart; scrolls sideways">
+        <div class="fig-axis" data-y-axis aria-hidden="true">
+          <span class="ax-unit" style="top: 52px">&deg;F</span>
+          <span style="top: 64px">80</span>
+          <span style="top: 174px">70</span>
+          <div class="ax-rain" data-precip-axis>
+            <span style="top: 222px">100%</span>
+            <span style="top: 242px">50%</span>
+          </div>
+        </div>
+<svg width="1344" height="316" viewBox="0 0 1344 316" role="img" aria-labelledby="figtitle figdesc">
+<title id="figtitle">WBGT, temperature and dew point for the next 48 hours on one shared Fahrenheit axis</title>
+<desc id="figdesc">Line chart from 8 PM Monday to 7 PM Wednesday. WBGT is drawn in its heat-band ink, temperature as a dashed neutral line, dew point dotted. Hatched bars along the base count the chance of rain, with bolt marks at thunder hours.</desc>
+<defs>
+<pattern id="hatchVeto" width="3.5" height="3.5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pv" x1="0" y1="0" x2="0" y2="3.5"/></pattern>
+<pattern id="hatchWin" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pw" x1="0" y1="0" x2="0" y2="9"/></pattern>
+<pattern id="hatchRain" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pr" x1="0" y1="0" x2="0" y2="3"/></pattern>
+</defs>
+<rect class="veto-hatch" x="178" y="48" width="840" height="220"/>
+<rect class="veto-hatch" x="1102" y="48" width="252" height="220"/>
+<line class="lx-grid" x1="0" y1="70" x2="1344" y2="70"/>
+<line class="lx-grid" x1="0" y1="180" x2="1344" y2="180"/>
+<line class="lx-day" x1="122" y1="48" x2="122" y2="268"/>
+<line class="lx-day" x1="794" y1="48" x2="794" y2="268"/>
+<text class="fx-ann f3" x="346" y="16">FLOOD WATCH — UNTIL 8 AM</text>
+<path class="lx-brk b3" d="M 346 26 V 22 H 1018 V 26"/>
+<text class="fx-ann f4" x="178" y="40">&#10005; THUNDERSTORMS</text>
+<path class="lx-brk b4" d="M 178 44 V 48 M 178 44 H 1018 M 1018 44 V 48"/>
+<text class="fx-ann f4" x="1102" y="40">&#10005; THUNDERSTORMS</text>
+<path class="lx-brk b4" d="M 1102 44 V 48 M 1102 44 H 1354 M 1354 44 V 48"/>
+<line class="lx-ax" x1="0" y1="268" x2="1344" y2="268"/>
+<path class="lx-tick" d="M10 268v4M66 268v4M94 268v4M150 268v4M178 268v4M234 268v4M262 268v4M318 268v4M346 268v4M402 268v4M430 268v4M486 268v4M514 268v4M570 268v4M598 268v4M654 268v4M682 268v4M738 268v4M766 268v4M822 268v4M850 268v4M906 268v4M934 268v4M990 268v4M1018 268v4M1074 268v4M1102 268v4M1158 268v4M1186 268v4M1242 268v4M1270 268v4M1326 268v4"/>
+<path class="lx-tick" d="M38 268v7M206 268v7M290 268v7M374 268v7M458 268v7M542 268v7M626 268v7M710 268v7M878 268v7M962 268v7M1046 268v7M1130 268v7M1214 268v7M1298 268v7"/>
+<path class="lx-day" d="M122 268v12M794 268v12"/>
+<text class="fx-hr" x="38" y="288" text-anchor="middle">9P</text>
+<text class="fx-hr" x="122" y="288" text-anchor="middle">12A</text>
+<text class="fx-hr" x="206" y="288" text-anchor="middle">3A</text>
+<text class="fx-hr" x="290" y="288" text-anchor="middle">6A</text>
+<text class="fx-hr" x="374" y="288" text-anchor="middle">9A</text>
+<text class="fx-hr" x="458" y="288" text-anchor="middle">12P</text>
+<text class="fx-hr" x="542" y="288" text-anchor="middle">3P</text>
+<text class="fx-hr" x="626" y="288" text-anchor="middle">6P</text>
+<text class="fx-hr" x="710" y="288" text-anchor="middle">9P</text>
+<text class="fx-hr" x="794" y="288" text-anchor="middle">12A</text>
+<text class="fx-hr" x="878" y="288" text-anchor="middle">3A</text>
+<text class="fx-hr" x="962" y="288" text-anchor="middle">6A</text>
+<text class="fx-hr" x="1046" y="288" text-anchor="middle">9A</text>
+<text class="fx-hr" x="1130" y="288" text-anchor="middle">12P</text>
+<text class="fx-hr" x="1214" y="288" text-anchor="middle">3P</text>
+<text class="fx-hr" x="1298" y="288" text-anchor="middle">6P</text>
+<text class="fx-day" x="10" y="308">MON JUL 27</text>
+<text class="fx-day" x="128" y="308">TUE JUL 28</text>
+<text class="fx-day" x="800" y="308">WED JUL 29</text>
+<use href="#g-sunset" data-glyph="sunset" x="9.47" y="252" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="17.47" y="308" text-anchor="middle">sets 8:16</text>
+<use href="#g-sunrise" data-glyph="sunrise" x="276.4" y="252" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="284.4" y="308" text-anchor="middle">rises 5:48</text>
+<use href="#g-sunset" data-glyph="sunset" x="681" y="252" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="689" y="308" text-anchor="middle">sets 8:15</text>
+<use href="#g-sunrise" data-glyph="sunrise" x="948.87" y="252" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="956.87" y="308" text-anchor="middle">rises 5:49</text>
+<rect class="rainbar" x="1" y="262" width="18" height="5"/>
+<rect class="rainbar" x="29" y="262" width="18" height="5"/>
+<rect class="rainbar" x="57" y="262" width="18" height="5"/>
+<rect class="rainbar" x="169" y="259" width="18" height="8"/>
+<rect class="rainbar" x="197" y="259" width="18" height="8"/>
+<rect class="rainbar" x="225" y="259" width="18" height="8"/>
+<rect class="rainbar" x="253" y="256" width="18" height="11"/>
+<rect class="rainbar" x="281" y="256" width="18" height="11"/>
+<rect class="rainbar" x="309" y="256" width="18" height="11"/>
+<rect class="rainbar" x="337" y="252" width="18" height="15"/>
+<rect class="rainbar" x="365" y="252" width="18" height="15"/>
+<rect class="rainbar" x="393" y="252" width="18" height="15"/>
+<rect class="rainbar" x="421" y="247" width="18" height="20"/>
+<rect class="rainbar" x="449" y="247" width="18" height="20"/>
+<rect class="rainbar" x="477" y="247" width="18" height="20"/>
+<rect class="rainbar" x="505" y="242" width="18" height="25"/>
+<rect class="rainbar" x="533" y="242" width="18" height="25"/>
+<rect class="rainbar" x="561" y="242" width="18" height="25"/>
+<rect class="rainbar" x="589" y="235" width="18" height="32"/>
+<rect class="rainbar" x="617" y="235" width="18" height="32"/>
+<rect class="rainbar" x="645" y="235" width="18" height="32"/>
+<rect class="rainbar" x="673" y="233" width="18" height="34"/>
+<rect class="rainbar" x="701" y="233" width="18" height="34"/>
+<rect class="rainbar" x="729" y="233" width="18" height="34"/>
+<rect class="rainbar" x="757" y="230" width="18" height="37"/>
+<rect class="rainbar" x="785" y="230" width="18" height="37"/>
+<rect class="rainbar" x="813" y="230" width="18" height="37"/>
+<rect class="rainbar" x="841" y="241" width="18" height="26"/>
+<rect class="rainbar" x="869" y="241" width="18" height="26"/>
+<rect class="rainbar" x="897" y="241" width="18" height="26"/>
+<rect class="rainbar" x="925" y="241" width="18" height="26"/>
+<rect class="rainbar" x="953" y="241" width="18" height="26"/>
+<rect class="rainbar" x="981" y="241" width="18" height="26"/>
+<rect class="rainbar" x="1009" y="246" width="18" height="21"/>
+<rect class="rainbar" x="1037" y="246" width="18" height="21"/>
+<rect class="rainbar" x="1065" y="246" width="18" height="21"/>
+<rect class="rainbar" x="1093" y="246" width="18" height="21"/>
+<rect class="rainbar" x="1121" y="246" width="18" height="21"/>
+<rect class="rainbar" x="1149" y="246" width="18" height="21"/>
+<rect class="rainbar" x="1177" y="237" width="18" height="30"/>
+<rect class="rainbar" x="1205" y="237" width="18" height="30"/>
+<rect class="rainbar" x="1233" y="237" width="18" height="30"/>
+<rect class="rainbar" x="1261" y="237" width="18" height="30"/>
+<rect class="rainbar" x="1289" y="237" width="18" height="30"/>
+<rect class="rainbar" x="1317" y="237" width="18" height="30"/>
+<use href="#g-bolt" x="173" y="244" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="201" y="244" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="229" y="244" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="257" y="241" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="285" y="241" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="313" y="241" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="341" y="237" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="369" y="237" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="397" y="237" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="425" y="232" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="453" y="232" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="481" y="232" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="509" y="227" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="537" y="227" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="565" y="227" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="593" y="220" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="621" y="220" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="649" y="220" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="677" y="218" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="705" y="218" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="733" y="218" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="761" y="215" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="789" y="215" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="817" y="215" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="845" y="226" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="873" y="226" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="901" y="226" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="929" y="226" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="957" y="226" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="985" y="226" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="1097" y="231" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="1125" y="231" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="1153" y="231" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="1181" y="222" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="1209" y="222" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="1237" y="222" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="1265" y="222" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="1293" y="222" width="10" height="12.8" class="bolt-g"/>
+<use href="#g-bolt" x="1321" y="222" width="10" height="12.8" class="bolt-g"/>
+<text class="fx-pt fst" data-precip-tag x="10" y="256" text-anchor="middle">13%</text>
+<text class="fx-pt f4" data-precip-tag x="168" y="254" text-anchor="end">20%</text>
+<text class="fx-pt f4" data-precip-tag x="216" y="254" text-anchor="start">20%</text>
+<text class="fx-pt f4" data-precip-tag x="244" y="254" text-anchor="start">20%</text>
+<text class="fx-pt f4" data-precip-tag x="272" y="251" text-anchor="start">27%</text>
+<text class="fx-pt f4" data-precip-tag x="300" y="251" text-anchor="start">27%</text>
+<text class="fx-pt f4" data-precip-tag x="328" y="251" text-anchor="start">27%</text>
+<text class="fx-pt f4" data-precip-tag x="356" y="247" text-anchor="start">39%</text>
+<text class="fx-pt f4" data-precip-tag x="384" y="247" text-anchor="start">39%</text>
+<text class="fx-pt f4" data-precip-tag x="412" y="247" text-anchor="start">39%</text>
+<text class="fx-pt f4" data-precip-tag x="440" y="242" text-anchor="start">50%</text>
+<text class="fx-pt f4" data-precip-tag x="468" y="242" text-anchor="start">50%</text>
+<text class="fx-pt f4" data-precip-tag x="496" y="242" text-anchor="start">50%</text>
+<text class="fx-pt f4" data-precip-tag x="524" y="237" text-anchor="start">63%</text>
+<text class="fx-pt f4" data-precip-tag x="552" y="237" text-anchor="start">63%</text>
+<text class="fx-pt f4" data-precip-tag x="580" y="237" text-anchor="start">63%</text>
+<text class="fx-pt f4" data-precip-tag x="608" y="230" text-anchor="start">83%</text>
+<text class="fx-pt f4" data-precip-tag x="636" y="230" text-anchor="start">83%</text>
+<text class="fx-pt f4" data-precip-tag x="664" y="230" text-anchor="start">83%</text>
+<text class="fx-pt f4" data-precip-tag x="692" y="228" text-anchor="start">88%</text>
+<text class="fx-pt f4" data-precip-tag x="720" y="228" text-anchor="start">88%</text>
+<text class="fx-pt f4" data-precip-tag x="748" y="228" text-anchor="start">88%</text>
+<text class="fx-pt f4" data-precip-tag x="776" y="225" text-anchor="start">94%</text>
+<text class="fx-pt f4" data-precip-tag x="804" y="225" text-anchor="start">94%</text>
+<text class="fx-pt f4" data-precip-tag x="832" y="225" text-anchor="start">94%</text>
+<text class="fx-pt f4" data-precip-tag x="860" y="236" text-anchor="start">66%</text>
+<text class="fx-pt f4" data-precip-tag x="888" y="236" text-anchor="start">66%</text>
+<text class="fx-pt f4" data-precip-tag x="916" y="236" text-anchor="start">66%</text>
+<text class="fx-pt f4" data-precip-tag x="944" y="236" text-anchor="start">67%</text>
+<text class="fx-pt f4" data-precip-tag x="972" y="236" text-anchor="start">67%</text>
+<text class="fx-pt f4" data-precip-tag x="1000" y="236" text-anchor="start">67%</text>
+<text class="fx-pt f4" data-precip-tag x="1092" y="241" text-anchor="end">55%</text>
+<text class="fx-pt f4" data-precip-tag x="1140" y="241" text-anchor="start">55%</text>
+<text class="fx-pt f4" data-precip-tag x="1168" y="241" text-anchor="start">55%</text>
+<text class="fx-pt f4" data-precip-tag x="1196" y="232" text-anchor="start">76%</text>
+<text class="fx-pt f4" data-precip-tag x="1224" y="232" text-anchor="start">76%</text>
+<text class="fx-pt f4" data-precip-tag x="1252" y="232" text-anchor="start">76%</text>
+<text class="fx-pt f4" data-precip-tag x="1280" y="232" text-anchor="start">76%</text>
+<text class="fx-pt f4" data-precip-tag x="1308" y="232" text-anchor="start">76%</text>
+<text class="fx-pt f4" data-precip-tag x="1336" y="232" text-anchor="start">76%</text>
+<polyline class="ln-dew" points="10,224 38,224 66,213 94,213 122,213 150,202 178,202 206,202 234,202 262,202 290,202 318,191 346,202 374,202 402,202 430,191 458,191 486,191 514,180 542,169 570,169 598,169 626,180 654,180 682,191 710,191 738,180 766,180 794,180 822,180 850,191 878,180 906,191 934,191 962,191 990,191 1018,191 1046,191 1074,191 1102,191 1130,191 1158,180 1186,180 1214,180 1242,180 1270,180 1298,191 1326,202"/>
+<polyline class="ln-air" points="10,92 38,103 66,114 94,125 122,125 150,136 178,147 206,147 234,158 262,158 290,169 318,158 346,136 374,125 402,92 430,92 458,92 486,92 514,103 542,103 570,114 598,125 626,125 654,136 682,147 710,147 738,158 766,147 794,158 822,158 850,158 878,158 906,169 934,169 962,180 990,169 1018,158 1046,147 1074,136 1102,114 1130,103 1158,92 1186,92 1214,92 1242,92 1270,103 1298,114 1326,125"/>
+<polyline class="cw0" points="10,147 38,158 66,158 94,169 122,169 150,169 178,169 206,169 234,180 262,180 290,180 318,169 346,158 374,147 402,125 430,125 458,114 486,125 514,125 542,125 570,136 598,147 626,147 654,158 682,169 710,169 738,169 766,169 794,169 822,169 850,180 878,169 906,180 934,180 962,191 990,180 1018,169 1046,158 1074,147 1102,125 1130,114 1158,103 1186,114 1214,114 1242,125 1270,136 1298,147 1326,158"/>
+<circle class="fd0" cx="290" cy="180" r="1.8"/>
+<text class="fx-pt f0" x="290" y="196" text-anchor="middle">70&#176; low</text>
+<circle class="fd0" cx="458" cy="114" r="1.8"/>
+<text class="fx-pt f0" x="450" y="104" text-anchor="end">76&#176; low</text>
+<circle class="fd0" cx="850" cy="180" r="1.8"/>
+<text class="fx-pt f0" x="850" y="196" text-anchor="middle">70&#176; low</text>
+<circle class="fd0" cx="962" cy="191" r="1.8"/>
+<text class="fx-pt f0" x="962" y="207" text-anchor="middle">69&#176; low</text>
+<circle class="fd0" cx="1158" cy="103" r="1.8"/>
+<text class="fx-pt f0" x="1150" y="93" text-anchor="end">77&#176; low</text>
+<circle class="fd0" cx="1326" cy="158" r="1.8"/>
+<text class="fx-pt f0" x="1326" y="174" text-anchor="middle">72&#176; low</text>
+</svg>
+      </div>
+      <span class="date-lock" data-date-lock aria-hidden="true">MON JUL 27</span>
+      <span class="scroll-hint" data-scrub-right aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>
+      <span class="scroll-hint scroll-hint-left" data-scrub-left hidden aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>
+    </div>
+    <div class="fig-legend">
+      <span class="lg-air"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="currentColor" stroke-width="1" stroke-dasharray="6 4"/></svg> temperature</span> &middot;
+      <span class="lg-dew"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><line x1="2" y1="5" x2="29" y2="5" stroke="currentColor" stroke-width="1.2" stroke-dasharray="0.2 4" stroke-linecap="round"/></svg> dew point</span> &middot;
+      <span class="lg-rain"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><rect x="4" y="2" width="9" height="8" class="rainbar"/><use href="#g-bolt" x="18" y="0" width="8" height="10.2" class="bolt-g"/></svg> chance of rain, bolt marks thunder</span>
+      <div class="fig-key2">every other numeral: <span class="q0"><span class="kdot" aria-hidden="true"></span> good</span> &middot; <span class="q1"><span class="kdot" aria-hidden="true"></span> fair</span> &middot; <span class="q2"><span class="kdot" aria-hidden="true"></span> poor</span></div>
+    </div>
+  </section>
+
+  <section class="hours-sec" aria-label="Hourly ledger" id="hourly">
+    <div class="hours-head">
+      <h2 class="overline">Hourly ledger &middot; 48 h</h2>
+    </div>
+    <table class="hours">
+      <caption class="sr">Hour-by-hour conditions for the next 48 hours at Central Park</caption>
+      <thead data-sticky-head>
+        <tr><th class="t" scope="col">Time</th><th class="c-wbgt" scope="col">WBGT</th><th scope="col">Temp</th><th scope="col">Dew point</th><th scope="col">RH</th><th scope="col">UV</th><th scope="col">AQI</th><th scope="col">Wind</th><th scope="col">Rain</th></tr>
+      </thead>
+      <tbody>
+<tr class="day"><th class="t" scope="row">MON</th><td colspan="8"><span class="dnm">Monday July 27 · today</span><span class="dsun"><svg class="g" aria-hidden="true"><use href="#g-horizon"/></svg>rises 5:47 · sets 8:16</span></td></tr>
+<tr class="tw0"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>8 PM</th><td class="c-wbgt"><span class="n tt0">73&deg;</span></td><td class="c-temp">78&deg;</td><td class="c-dew">66&deg;</td><td class="c-rh q1">67%</td><td class="c-uv q0">0</td><td class="c-aqi q1">66</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(350deg)" aria-hidden="true"><use href="#g-vane"/></svg>S 3 g12</td><td class="c-rain q0">13%</td></tr>
+<tr data-sun-row><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sunset"/></svg></th><td colspan="8">&mdash; sunset 8:16 &mdash;</td></tr>
+<tr class="tw0"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>9 PM</th><td class="c-wbgt"><span class="n tt0">72&deg;</span></td><td class="c-temp">77&deg;</td><td class="c-dew">66&deg;</td><td class="c-rh q1">69%</td><td class="c-uv q0">0</td><td class="c-aqi q2">128</td><td class="c-wind q1"><svg class="vane" aria-hidden="true"><use href="#g-vane"/></svg>S 3</td><td class="c-rain q0">13%</td></tr>
+<tr class="tw0"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>10 PM</th><td class="c-wbgt"><span class="n tt0">72&deg;</span></td><td class="c-temp">76&deg;</td><td class="c-dew">67&deg;</td><td class="c-rh q1">74%</td><td class="c-uv q0">0</td><td class="c-aqi q2">109</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(20deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSW 3</td><td class="c-rain q0">13%</td></tr>
+<tr class="tw0"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>11 PM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span></td><td class="c-temp">75&deg;</td><td class="c-dew">67&deg;</td><td class="c-rh q1">76%</td><td class="c-uv q0">0</td><td class="c-aqi q1">86</td><td class="c-wind q0"><svg class="vane" style="transform:rotate(30deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSW 3</td><td class="c-rain q0">4%</td></tr>
+<tr class="day"><th class="t" scope="row">TUE</th><td colspan="8"><span class="dnm">Tuesday July 28</span><span class="dsun"><svg class="g" aria-hidden="true"><use href="#g-horizon"/></svg>rises 5:48 · sets 8:15</span></td></tr>
+<tr class="tw0"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>12 AM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span></td><td class="c-temp">75&deg;</td><td class="c-dew">67&deg;</td><td class="c-rh q1">76%</td><td class="c-uv q0">0</td><td class="c-aqi q1">77</td><td class="c-wind q0"><svg class="vane" style="transform:rotate(30deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSW 3</td><td class="c-rain q0">4%</td></tr>
+<tr class="tw0"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>1 AM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span></td><td class="c-temp">74&deg;</td><td class="c-dew">68&deg;</td><td class="c-rh q2">82%</td><td class="c-uv q0">0</td><td class="c-aqi q1">78</td><td class="c-wind q0"><svg class="vane" style="transform:rotate(20deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSW 5</td><td class="c-rain q0">4%</td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>2 AM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">73&deg;</td><td class="c-dew">68&deg;</td><td class="c-rh q2">84%</td><td class="c-uv q0">0</td><td class="c-aqi q1">78</td><td class="c-wind q0"><svg class="vane" style="transform:rotate(10deg)" aria-hidden="true"><use href="#g-vane"/></svg>S 5</td><td class="c-rain q0">20% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>3 AM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">73&deg;</td><td class="c-dew">68&deg;</td><td class="c-rh q2">84%</td><td class="c-uv q0">0</td><td class="c-aqi q1">79</td><td class="c-wind q0"><svg class="vane" style="transform:rotate(10deg)" aria-hidden="true"><use href="#g-vane"/></svg>S 5</td><td class="c-rain q0">20% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>4 AM</th><td class="c-wbgt"><span class="n tt0">70&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">72&deg;</td><td class="c-dew">68&deg;</td><td class="c-rh q2">87%</td><td class="c-uv q0">0</td><td class="c-aqi q1">79</td><td class="c-wind q0"><svg class="vane" aria-hidden="true"><use href="#g-vane"/></svg>S 5</td><td class="c-rain q0">20% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>5 AM</th><td class="c-wbgt"><span class="n tt0">70&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">72&deg;</td><td class="c-dew">68&deg;</td><td class="c-rh q2">87%</td><td class="c-uv q0">0</td><td class="c-aqi q1">79</td><td class="c-wind q0"><svg class="vane" aria-hidden="true"><use href="#g-vane"/></svg>S 5</td><td class="c-rain q1">27% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr data-sun-row><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sunrise"/></svg></th><td colspan="8">&mdash; sunrise 5:48 &mdash;</td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>6 AM</th><td class="c-wbgt"><span class="n tt0">70&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">71&deg;</td><td class="c-dew">68&deg;</td><td class="c-rh q2">90%</td><td class="c-uv q0">0</td><td class="c-aqi q1">78</td><td class="c-wind q1"><svg class="vane" aria-hidden="true"><use href="#g-vane"/></svg>S 5</td><td class="c-rain q1">27% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>7 AM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">72&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q2">90%</td><td class="c-uv q0">0</td><td class="c-aqi q1">77</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(10deg)" aria-hidden="true"><use href="#g-vane"/></svg>S 6</td><td class="c-rain q1">27% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>8 AM</th><td class="c-wbgt"><span class="n tt0">72&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">74&deg;</td><td class="c-dew">68&deg;</td><td class="c-rh q2">82%</td><td class="c-uv q0">1</td><td class="c-aqi q1">76</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(10deg)" aria-hidden="true"><use href="#g-vane"/></svg>S 6</td><td class="c-rain q1">39% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>9 AM</th><td class="c-wbgt"><span class="n tt0">73&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">75&deg;</td><td class="c-dew">68&deg;</td><td class="c-rh q1">79%</td><td class="c-uv q0">2</td><td class="c-aqi q1">76</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(10deg)" aria-hidden="true"><use href="#g-vane"/></svg>S 6 g15</td><td class="c-rain q1">39% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>10 AM</th><td class="c-wbgt"><span class="n tt0">75&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">78&deg;</td><td class="c-dew">68&deg;</td><td class="c-rh q1">71%</td><td class="c-uv q1">3</td><td class="c-aqi q1">75</td><td class="c-wind q1"><svg class="vane" aria-hidden="true"><use href="#g-vane"/></svg>S 7 g17</td><td class="c-rain q1">39% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>11 AM</th><td class="c-wbgt"><span class="n tt0">75&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">78&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q1">74%</td><td class="c-uv q1">4</td><td class="c-aqi q1">75</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(350deg)" aria-hidden="true"><use href="#g-vane"/></svg>S 8 g20</td><td class="c-rain q1">50% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>12 PM</th><td class="c-wbgt"><span class="n tt0">76&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">78&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q1">74%</td><td class="c-uv q1">3</td><td class="c-aqi q1">75</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(350deg)" aria-hidden="true"><use href="#g-vane"/></svg>S 9 g22</td><td class="c-rain q1">50% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>1 PM</th><td class="c-wbgt"><span class="n tt0">75&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">78&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q1">74%</td><td class="c-uv q0">1</td><td class="c-aqi q1">74</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(340deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 12 g24</td><td class="c-rain q1">50% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>2 PM</th><td class="c-wbgt"><span class="n tt0">75&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">77&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q1">79%</td><td class="c-uv q0">1</td><td class="c-aqi q1">74</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(340deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 13 g26</td><td class="c-rain q2">63% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>3 PM</th><td class="c-wbgt"><span class="n tt0">75&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">77&deg;</td><td class="c-dew">71&deg;</td><td class="c-rh q2">82%</td><td class="c-uv q0">0</td><td class="c-aqi q1">74</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(340deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 13 g26</td><td class="c-rain q2">63% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr data-narrative><td colspan="9">&mdash; everything stops for thunder at 4 PM &mdash;</td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>4 PM</th><td class="c-wbgt"><span class="n tt0">74&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">76&deg;</td><td class="c-dew">71&deg;</td><td class="c-rh q2">85%</td><td class="c-uv q0">1</td><td class="c-aqi q1">74</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(350deg)" aria-hidden="true"><use href="#g-vane"/></svg>S 13 g28</td><td class="c-rain q2">63% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>5 PM</th><td class="c-wbgt"><span class="n tt0">73&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">75&deg;</td><td class="c-dew">71&deg;</td><td class="c-rh q2">87%</td><td class="c-uv q0">0</td><td class="c-aqi q1">74</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(350deg)" aria-hidden="true"><use href="#g-vane"/></svg>S 13 g28</td><td class="c-rain q2">83% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>6 PM</th><td class="c-wbgt"><span class="n tt0">73&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">75&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q2">84%</td><td class="c-uv q0">0</td><td class="c-aqi q1">74</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(350deg)" aria-hidden="true"><use href="#g-vane"/></svg>S 13 g28</td><td class="c-rain q2">83% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>7 PM</th><td class="c-wbgt"><span class="n tt0">72&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">74&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q2">87%</td><td class="c-uv q0">0</td><td class="c-aqi q1">73</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(340deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 12 g28</td><td class="c-rain q2">83% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>8 PM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">73&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q2">87%</td><td class="c-uv q0">0</td><td class="c-aqi q1">73</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(330deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 12 g28</td><td class="c-rain q2">88% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr data-sun-row><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sunset"/></svg></th><td colspan="8">&mdash; sunset 8:15 &mdash;</td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>9 PM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">73&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q2">87%</td><td class="c-uv q0">0</td><td class="c-aqi q1">72</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(330deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 10 g26</td><td class="c-rain q2">88% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr data-narrative><td colspan="9">&mdash; the sky opens back up after 10 PM &mdash;</td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>10 PM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">72&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q2">93%</td><td class="c-uv q0">0</td><td class="c-aqi q1">70</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(340deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 10 g26</td><td class="c-rain q2">88% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>11 PM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">73&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q2">90%</td><td class="c-uv q0">0</td><td class="c-aqi q1">69</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(340deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 9 g25</td><td class="c-rain q2">94% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="day"><th class="t" scope="row">WED</th><td colspan="8"><span class="dnm">Wednesday July 29</span><span class="dsun"><svg class="g" aria-hidden="true"><use href="#g-horizon"/></svg>rises 5:49 · sets 8:14</span></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>12 AM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">72&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q2">93%</td><td class="c-uv q0">0</td><td class="c-aqi q1">68</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(340deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 8 g22</td><td class="c-rain q2">94% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>1 AM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">72&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q2">93%</td><td class="c-uv q0">0</td><td class="c-aqi q1">66</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(330deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 8 g20</td><td class="c-rain q2">94% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>2 AM</th><td class="c-wbgt"><span class="n tt0">70&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">72&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q2">90%</td><td class="c-uv q0">0</td><td class="c-aqi q1">64</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(320deg)" aria-hidden="true"><use href="#g-vane"/></svg>SE 7 g16</td><td class="c-rain q2">66% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>3 AM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">72&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q2">93%</td><td class="c-uv q0">0</td><td class="c-aqi q1">63</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(320deg)" aria-hidden="true"><use href="#g-vane"/></svg>SE 7 g15</td><td class="c-rain q2">66% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>4 AM</th><td class="c-wbgt"><span class="n tt0">70&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">71&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q2">93%</td><td class="c-uv q0">0</td><td class="c-aqi q1">62</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(330deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 6 g15</td><td class="c-rain q2">66% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>5 AM</th><td class="c-wbgt"><span class="n tt0">70&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">71&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q2">93%</td><td class="c-uv q0">0</td><td class="c-aqi q1">61</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(330deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 6 g14</td><td class="c-rain q2">67% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr data-sun-row><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sunrise"/></svg></th><td colspan="8">&mdash; sunrise 5:49 &mdash;</td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>6 AM</th><td class="c-wbgt"><span class="n tt0">69&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">70&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q2">97%</td><td class="c-uv q0">0</td><td class="c-aqi q1">60</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(330deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 6</td><td class="c-rain q2">67% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>7 AM</th><td class="c-wbgt"><span class="n tt0">70&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">71&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q2">93%</td><td class="c-uv q0">0</td><td class="c-aqi q1">59</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(330deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 6</td><td class="c-rain q2">67% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-rain"/></svg>8 AM</th><td class="c-wbgt"><span class="n tt0">71&deg;</span></td><td class="c-temp">72&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q2">90%</td><td class="c-uv q0">1</td><td class="c-aqi q1">59</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(330deg)" aria-hidden="true"><use href="#g-vane"/></svg>SSE 6</td><td class="c-rain q2">55%</td></tr>
+<tr class="tw0"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-rain"/></svg>9 AM</th><td class="c-wbgt"><span class="n tt0">72&deg;</span></td><td class="c-temp">73&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q2">87%</td><td class="c-uv q1">3</td><td class="c-aqi q1">58</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(300deg)" aria-hidden="true"><use href="#g-vane"/></svg>ESE 6</td><td class="c-rain q2">55%</td></tr>
+<tr class="tw0"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-rain"/></svg>10 AM</th><td class="c-wbgt"><span class="n tt0">73&deg;</span></td><td class="c-temp">74&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q2">84%</td><td class="c-uv q1">4</td><td class="c-aqi q1">58</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(230deg)" aria-hidden="true"><use href="#g-vane"/></svg>NE 6</td><td class="c-rain q2">55%</td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>11 AM</th><td class="c-wbgt"><span class="n tt0">75&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">76&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q1">79%</td><td class="c-uv q1">6</td><td class="c-aqi q1">57</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(190deg)" aria-hidden="true"><use href="#g-vane"/></svg>N 6 g14</td><td class="c-rain q2">55% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>12 PM</th><td class="c-wbgt"><span class="n tt0">76&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">77&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q1">76%</td><td class="c-uv q1">7</td><td class="c-aqi q1">56</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(180deg)" aria-hidden="true"><use href="#g-vane"/></svg>N 6 g14</td><td class="c-rain q2">55% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>1 PM</th><td class="c-wbgt"><span class="n tt0">77&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">78&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q1">76%</td><td class="c-uv q1">7</td><td class="c-aqi q1">55</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(150deg)" aria-hidden="true"><use href="#g-vane"/></svg>NNW 6 g15</td><td class="c-rain q2">55% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>2 PM</th><td class="c-wbgt"><span class="n tt0">76&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">78&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q1">76%</td><td class="c-uv q1">8</td><td class="c-aqi q1">55</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(140deg)" aria-hidden="true"><use href="#g-vane"/></svg>NW 6 g15</td><td class="c-rain q2">76% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>3 PM</th><td class="c-wbgt"><span class="n tt0">76&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">78&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q1">76%</td><td class="c-uv q1">4</td><td class="c-aqi q1">54</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(140deg)" aria-hidden="true"><use href="#g-vane"/></svg>NW 6 g15</td><td class="c-rain q2">76% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>4 PM</th><td class="c-wbgt"><span class="n tt0">75&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">78&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q1">76%</td><td class="c-uv q1">6</td><td class="c-aqi q1">55</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(150deg)" aria-hidden="true"><use href="#g-vane"/></svg>NNW 6 g15</td><td class="c-rain q2">76% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>5 PM</th><td class="c-wbgt"><span class="n tt0">74&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">77&deg;</td><td class="c-dew">70&deg;</td><td class="c-rh q1">79%</td><td class="c-uv q1">4</td><td class="c-aqi q1">67</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(150deg)" aria-hidden="true"><use href="#g-vane"/></svg>NNW 6 g15</td><td class="c-rain q2">76% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>6 PM</th><td class="c-wbgt"><span class="n tt0">73&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">76&deg;</td><td class="c-dew">69&deg;</td><td class="c-rh q1">79%</td><td class="c-uv q1">2</td><td class="c-aqi q1">71</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(150deg)" aria-hidden="true"><use href="#g-vane"/></svg>NNW 6 g15</td><td class="c-rain q2">76% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw0 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>7 PM</th><td class="c-wbgt"><span class="n tt0">72&deg;</span> <span class="w-word vt">&#10005; thunderstorms in the forecast</span></td><td class="c-temp">75&deg;</td><td class="c-dew">68&deg;</td><td class="c-rh q1">79%</td><td class="c-uv q0">1</td><td class="c-aqi q1">68</td><td class="c-wind q1"><svg class="vane" style="transform:rotate(160deg)" aria-hidden="true"><use href="#g-vane"/></svg>NNW 5 g14</td><td class="c-rain q2">76% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="explainers" class="explainers" aria-label="How every metric is read">
+    <span class="overline">How every metric is read</span>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-therm"/></svg>WBGT &mdash; heat stress</summary>
+      <p>Wet-bulb globe temperature folds temperature, humidity, sun load, and wind into one heat-stress number &mdash; the standard for outdoor athletics. It omits your fitness, acclimatization, and pace. The words follow the National Weather Service bands: low, elevated, moderate, high, extreme &mdash; a veto at 90&deg;F and above.</p>
+      <p>These figures are estimated from the gridpoint forecast, not measured. A black-globe sensor on the course reads the real thing and can sit a few degrees higher in full sun on asphalt &mdash; treat a forecast 88&deg; as &ldquo;maybe 90&deg; on the asphalt.&rdquo;</p>
+      <div class="src">source: NWS gridpoint forecast (estimated, not a station measurement) &middot; fetched 8:28 PM ET</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-drop"/></svg>Dew point &mdash; humidity</summary>
+      <p>The absolute moisture in the air, which sets how well sweat can evaporate. Below 55&deg;F is comfortable; at 70&deg;F and above evaporation stalls and heart rate drifts up at any pace. It omits temperature itself; that is WBGT&rsquo;s job.</p>
+      <div class="src">source: NWS gridpoint forecast &middot; fetched 8:28 PM ET</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-cloud"/></svg>Relative humidity</summary>
+      <p>The same moisture as the dew point, read against the temperature &mdash; so it climbs toward dawn even while the absolute moisture holds steady. A high-RH dawn is not wetter air than a moderate-RH afternoon; it is cooler air holding the same water. Use dew point to judge sweat; use RH to expect fog and soaked grass at first light.</p>
+      <div class="src">source: NWS gridpoint forecast &middot; fetched 8:28 PM ET</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>UV index</summary>
+      <p>The EPA scale for sunburn speed on exposed skin &mdash; at UV 9, damage begins in about 15 minutes. It says nothing about heat: a dawn window can read UV 0&ndash;2 while the same day&rsquo;s noon hits 10. Shade, cover, and sunscreen change your exposure, not the index.</p>
+      <div class="src">source: Open-Meteo model (forecast) &middot; fetched 8:28 PM ET</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-haze"/></svg>AQI &mdash; air quality</summary>
+      <p>The EPA Air Quality Index, taken from the worst nearby monitor and its dominant pollutant &mdash; a protective reading, not an average. Moderate air is fine for most runners; unusually sensitive people may shorten hard sessions. 201 and above vetoes the hour.</p>
+      <div class="src">now: EPA AirNow monitor (measured) &middot; fetched 8:28 PM ET &middot; hourly forecast: CAMS model (modeled) &middot; fetched 8:28 PM ET</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-wind"/></svg>Wind &amp; gusts</summary>
+      <p>Sustained speed plus gusts, with the vane in the ledger showing where it blows from. In heat, wind helps &mdash; it moves saturated air off your skin. In cold it cuts; the wind-chill veto sits at &minus;10&deg;F. It omits direction changes along a loop; see the route note.</p>
+      <div class="src">source: NWS gridpoint forecast &middot; fetched 8:28 PM ET</div>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>Alerts, storms &amp; vetoes</summary>
+      <p>Advisories are cautions, not stop orders: an advisory banners the page but strikes nothing out. Vetoes are different &mdash; lightning at 30% thunder probability or more, WBGT at 90&deg;F and above, or AQI past 200 remove the hour from play with the reason named in the row, never averaged away. Rain alone rarely cancels a run.</p>
+      <div class="src">source: NWS alerts &middot; fetched 8:28 PM ET &middot; thunder: NWS probabilityOfThunder &middot; fetched 8:28 PM ET</div>
+    </details>
+  </section>
+
+  <aside class="route">
+    <span class="overline">Route context &middot; Central Park</span>
+    Good tree shade on the loop&#39;s east and north sides; the reservoir path is exposed. Hills concentrate at the north end. Drains well after rain.
+  </aside>
+
+  <p class="clothing"><span class="overline">Clothing</span>Ordinary kit: shorts and a light shirt cover it.</p>
+
+</main>
+
+<footer class="wrap foot">
+  <div>forecast &amp; alerts: National Weather Service, gridpoint OKX 34,45 &middot; forecast fetched 8:28 PM ET &middot; alerts fetched 8:28 PM ET</div>
+  <div>air quality now: EPA AirNow, worst nearby monitor (measured) &middot; fetched 8:28 PM ET &middot; UV + hourly AQI: Open-Meteo (modeled, CAMS) &middot; fetched 8:28 PM ET</div>
+  <div>whentorun &middot; page generated 8:30 PM ET</div>
+</footer>
+
+<script>
+
+
+(function () {
+  function scrubArrows(scroller) {
+    if (!scroller) return;
+    var wrap = scroller.parentElement;
+    var L = wrap.querySelector('[data-scrub-left]');
+    var R = wrap.querySelector('[data-scrub-right]');
+    function update() {
+      var max = scroller.scrollWidth - scroller.clientWidth;
+      if (L) { L.hidden = scroller.scrollLeft < 8; }
+      if (R) { R.hidden = scroller.scrollLeft > max - 8; }
+    }
+    scroller.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+  scrubArrows(document.querySelector('.paths'));
+  scrubArrows(document.querySelector('.fig-scrub'));
+
+  
+
+  var fig = document.querySelector('.fig-scrub');
+  var lock = document.querySelector('[data-date-lock]');
+  if (fig && lock) {
+    var marks = [];
+    fig.querySelectorAll('text.fx-day').forEach(function (el) {
+      marks.push({ x: parseFloat(el.getAttribute('x')), label: el.textContent });
+    });
+    marks.sort(function (a, b) { return a.x - b.x; });
+    function dateLock() {
+      var x = fig.scrollLeft, label = lock.textContent;
+      for (var i = 0; i < marks.length; i++) { if (x >= marks[i].x - 10) { label = marks[i].label; } }
+      lock.textContent = label;
+    }
+    if (marks.length) {
+      fig.addEventListener('scroll', dateLock, { passive: true });
+      dateLock();
+    }
+  }
+
+   
+  var geo = document.querySelector('[data-geo]');
+  if (geo) {
+    geo.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        fetch('/api/nearest?lat=' + pos.coords.latitude + '&lon=' + pos.coords.longitude)
+          .then(function (r) { return r.json(); })
+          .then(function (n) {
+            if (!n.slug) return;
+            var fd = new FormData();
+            fd.append('path', n.slug);
+            fetch('/prefs/path', { method: 'POST', body: fd }).finally(function () {
+              window.location = '/p/' + n.slug;
+            });
+          });
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

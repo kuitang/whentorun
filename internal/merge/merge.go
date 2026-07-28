@@ -34,11 +34,12 @@ const Horizon = 48
 
 // Freshness map keys, one per upstream feed.
 const (
-	SrcNWSGrid   = "nws-grid"
-	SrcNWSAlerts = "nws-alerts"
-	SrcAirNow    = "airnow"
-	SrcOMWeather = "openmeteo-weather"
-	SrcOMAir     = "openmeteo-air"
+	SrcNWSGrid     = "nws-grid"
+	SrcNWSForecast = "nws-forecast"
+	SrcNWSAlerts   = "nws-alerts"
+	SrcAirNow      = "airnow"
+	SrcOMWeather   = "openmeteo-weather"
+	SrcOMAir       = "openmeteo-air"
 )
 
 // Input is one source's cached payload plus availability. OK=false means
@@ -57,8 +58,14 @@ func In[T any](v cache.Value[T], ok bool) Input[T] {
 }
 
 // Sources is every upstream payload merge needs for one path.
+//
+// Forecast (the narrative text forecast) has no cache-refresher wiring site
+// yet; when the server phase registers it, use TTL 1 h fresh / 6 h
+// serve-stale (the prose updates a few times a day, far slower than the
+// grid).
 type Sources struct {
 	Grid      Input[*nws.Gridpoint]             // NWS gridpoint for the path's cell
+	Forecast  Input[*nws.TextForecast]          // NWS narrative forecast for the path's cell
 	Alerts    Input[[]domain.Alert]             // NWS active alerts for the path's zone
 	AirNowObs Input[[]airnow.ObservationRecord] // AirNow current observations (city-wide)
 	OMWeather Input[openmeteo.WeatherData]      // Open-Meteo weather for the path
@@ -78,6 +85,17 @@ type SunTimes struct {
 	Sunset  time.Time
 }
 
+// Prose is one official NWS narrative forecast period, provenance-tagged
+// like every other merged value (Stale follows the feed's TTL state).
+type Prose struct {
+	Name     string // e.g. "Tonight", "Tuesday"
+	Short    string // shortForecast
+	Detailed string // detailedForecast
+	Start    time.Time
+	End      time.Time
+	Source   domain.SourceTag
+}
+
 // Result is the merged view for one path.
 type Result struct {
 	Hours  []domain.Hour  // Horizon hours starting at now truncated to the hour
@@ -88,7 +106,11 @@ type Result struct {
 	// Sun holds sunrise/sunset for each calendar day the Horizon window
 	// touches, in order (Open-Meteo daily table; empty when unavailable).
 	Sun       []SunTimes
-	SunSource domain.SourceTag        // provenance for Sun
+	SunSource domain.SourceTag // provenance for Sun
+	// Prose holds the official NWS narrative periods that overlap the
+	// Horizon window, in order (empty when the forecast feed is
+	// unavailable).
+	Prose     []Prose
 	Freshness map[string]SourceStatus // keyed by the Src* constants
 }
 
@@ -122,6 +144,24 @@ func Merge(path domain.Path, now time.Time, src Sources) Result {
 		}
 	}
 	res.Freshness[SrcNWSGrid] = status(src.Grid, gridOK)
+
+	// NWS narrative forecast: keep the periods that overlap the Horizon
+	// window. Like AirNow, the feed counts as available only when it yields
+	// usable prose — a payload with zero periods cannot serve any.
+	fcOK := src.Forecast.OK && src.Forecast.Data != nil && len(src.Forecast.Data.Properties.Periods) > 0
+	if fcOK {
+		fcTag := tag(domain.OriginNWS, src.Forecast)
+		end := start.Add(Horizon * time.Hour)
+		for _, p := range src.Forecast.Data.Properties.Periods {
+			if p.End.After(start) && p.Start.Before(end) {
+				res.Prose = append(res.Prose, Prose{
+					Name: p.Name, Short: p.Short, Detailed: p.Detailed,
+					Start: p.Start, End: p.End, Source: fcTag,
+				})
+			}
+		}
+	}
+	res.Freshness[SrcNWSForecast] = status(src.Forecast, fcOK)
 
 	omwOK := src.OMWeather.OK
 	omWeather := indexWeather(src.OMWeather.Data.Hours)

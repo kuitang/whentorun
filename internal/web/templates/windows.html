@@ -1,0 +1,14 @@
+{{define "windows"}}<section class="window-line" aria-label="Verdict and next best windows" id="windows" hx-get="/fragment/windows?path={{.Path.Slug}}" hx-trigger="every 600s" hx-swap="outerHTML">
+      <p class="narrative" data-narrative>{{.Narrative}}</p>
+      <div class="nextbests">
+        <div>
+          {{- with .Windows.BeforeWork}}{{if .Found}}<span class="nb"><span class="w-lab">{{.Label}}:</span> {{if .Vetoed}}<s>{{.Range}}</s>{{else}}{{.Range}}{{end}}</span>{{end}}{{end}}
+          {{- if and .Windows.BeforeWork.Found .Windows.AfterWork.Found}} &middot; {{end}}
+          {{- with .Windows.AfterWork}}{{if .Found}}<span class="nb"><span class="w-lab">{{.Label}}:</span> {{if .Vetoed}}<s>{{.Range}}</s>{{else}}{{.Range}}{{end}}</span>{{end}}{{end}}
+        </div>
+        {{- $sub := windowSub .Windows}}
+        {{- with $sub}}
+        <span class="sub">{{.}}</span>
+        {{- end}}
+      </div>
+    </section>{{end}}

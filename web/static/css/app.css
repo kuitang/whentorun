@@ -1,0 +1,609 @@
+/* ============ whentorun production stylesheet ============
+   Locked design: web/mockups/ledger-v3-synthesis.html (ledger v3 synthesis).
+   Chassis: v2c figure-ledger register, one notch larger.
+   All type Spectral (Georgia/serif fallback); zero sans-serif, zero monospace.
+   Engraved SVG only: 1px hairline strokes in currentColor, 45-degree hatch
+   fills. Tier inks color categorical numerals; the word always sits beside.
+   Tokens come from tokens.css. */
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 17px;                       /* body a notch up from 16 */
+  line-height: var(--lh-body);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 var(--space-md); }
+a { color: var(--steel-text); }
+h1, h2 { margin: 0; }
+button, input, select, textarea { font-family: var(--font-serif); }
+svg text { font-family: var(--font-serif); }
+:focus-visible { outline: 2px solid var(--steel-text); outline-offset: 2px; }
+
+.overline {
+  font-family: var(--font-serif);
+  font-size: 13px;                       /* agate floor: nothing under 13px */
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* tier inks — categorical numerals only; the word always sits beside them */
+.tt0 { color: var(--tier-0); } .tt1 { color: var(--tier-1); }
+.tt2 { color: var(--tier-2); } .tt3 { color: var(--tier-3); }
+.tt4 { color: var(--tier-4); }
+.tt0, .tt1, .tt2, .tt3, .tt4 { font-weight: 500; }
+.st { color: var(--steel-text); }
+
+/* engraved glyphs */
+.g { width: 18px; height: 18px; vertical-align: -4px; color: var(--slate); }
+
+/* ---------- masthead ---------- */
+.masthead { padding-top: calc(var(--space-sm) + env(safe-area-inset-top)); }
+.mast-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); }
+.wordmark {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--size-screen-title);
+  line-height: var(--lh-title);
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+.ctls { display: flex; align-items: center; gap: var(--space-xs); }
+.ctls form { display: contents; }        /* prefs buttons are real forms */
+.ctl {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif);
+  font-size: var(--size-body);          /* >=16px control text */
+  font-weight: 500;
+  min-height: var(--hit-target);
+  min-width: var(--hit-target);
+  padding: 0 var(--space-sm);
+  background: none;
+  color: var(--ink);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-surface);
+  cursor: pointer;
+}
+.ctl:active { background: var(--ice); }
+/* single cycling controls: the unit button shows the current unit only;
+   the theme button cycles auto -> light -> dark, glyph only, no words */
+.ctl-glyph { padding: 0; }
+.ctl-glyph svg { width: 20px; height: 20px; color: var(--slate); }
+.mast-rule { height: 2px; background: var(--ink); border: 0; margin: 2px 0 0; }
+
+/* ---------- route slider — 13.5-14px allowed here only ----------
+   Scroll affordance is graphical only: an aggressive edge fade, an etched
+   double-chevron, and the next chip half-cut. */
+.slider-wrap { position: relative; }
+.paths {
+  display: flex; gap: var(--space-xs);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-right: 84px;                  /* the next chip peeks, half-cut, under the fade */
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 112px), rgba(0,0,0,0.4) calc(100% - 52px), transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 112px), rgba(0,0,0,0.4) calc(100% - 52px), transparent 100%);
+}
+.paths::-webkit-scrollbar { display: none; }
+.paths a {
+  flex: 0 0 auto;
+  display: flex; align-items: center;
+  min-height: var(--hit-target);        /* >=44px tap target via padding */
+  padding: 0 var(--space-sm);
+  font-family: var(--font-serif);
+  font-size: 14px;                      /* slider-only exemption from the 16px floor */
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--steel-text);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.paths a[aria-current] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+  background: var(--ice);
+  border-radius: var(--radius-surface) var(--radius-surface) 0 0;
+}
+.paths a:active { color: var(--ink); }
+.scroll-hint {
+  position: absolute; right: 0; top: 50%;
+  transform: translateY(-50%);
+  display: flex; align-items: center;
+  color: var(--secondary);
+  pointer-events: none;
+  background: linear-gradient(270deg, var(--paper) 55%, transparent);
+  padding: 6px 2px 6px 12px;
+}
+.scroll-hint[hidden] { display: none; }
+.scroll-hint-left { right: auto; left: 0; transform: translateY(-50%) scaleX(-1); }
+.scroll-hint svg { width: 22px; height: 22px; animation: hint-nudge 2.6s var(--ease-out) infinite; }
+@keyframes hint-nudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint svg { animation: none; }
+}
+
+/* ---------- alert — tier-3 ink + hairline; a banner, never struck hours ---------- */
+.alert {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--hairline-strong);
+  border-left: 3px solid var(--tier-3);
+  border-radius: var(--radius-surface);
+  padding: var(--space-xs) var(--space-sm);
+  margin: 6px 0 0;
+}
+.alert .overline { color: var(--tier-3); }
+.alert .alert-note { margin: 0; font-size: 14px; line-height: 1.5; }
+
+/* ---------- lede: current panel as a grid ---------- */
+.lede { margin-top: 6px; }
+.current {
+  display: grid;
+  grid-template-columns: 100%;
+  row-gap: var(--space-xs);
+  background: var(--ice);
+  border-radius: var(--radius-surface);
+  padding: var(--space-sm) var(--space-md) 10px;
+}
+.current .overline { color: var(--slate); }
+.hero-label {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--ls-smallcaps);
+  color: var(--slate);
+}
+/* row 1 — WBGT hero, the biggest figure on the page.
+   Tier ink arrives via a tt* class on the numeral (data-driven);
+   .wbgt-num is declared after .tt* so its 300 weight wins. */
+.wbgt-line { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
+.wbgt-line .g-big { width: 34px; height: 34px; color: var(--slate); flex: 0 0 auto; }
+.wbgt-num {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: 48px;
+  line-height: 1.05;
+}
+.wbgt-num sup { font-size: 21px; font-weight: 300; }
+.wbgt-phrase { font-family: var(--font-serif); font-weight: 300; font-size: 21px; line-height: var(--lh-title); }
+.wbgt-what { border-top: 1px solid var(--hairline-strong); margin-top: 2px; }
+.wbgt-what summary {
+  display: flex; align-items: center;
+  min-height: var(--hit-target);        /* >=44px tap target */
+  font-family: var(--font-serif);
+  font-size: var(--size-body);          /* >=16px control text */
+  font-weight: 500;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--ls-smallcaps);
+  color: var(--slate);
+  cursor: pointer;
+  list-style: none;
+}
+.wbgt-what summary::-webkit-details-marker { display: none; }
+.wbgt-what summary::after { content: "+"; color: var(--secondary); margin-left: auto; font-weight: 400; }
+.wbgt-what[open] summary::after { content: "\2212"; }
+.wbgt-what p { margin: 0 0 var(--space-sm); font-size: var(--size-body); line-height: 1.55; color: var(--slate); }
+.wbgt-what .jump a { color: var(--steel-text); }
+/* row 2 — air | dew, two equal cells, neutral ink, hairline column rule */
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-xs);
+}
+.pair-cell + .pair-cell { border-left: 1px solid var(--hairline-strong); padding-left: var(--space-md); }
+.pair-cell:first-child { padding-right: var(--space-md); }
+.pair-num {
+  display: block;
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: 31px;                      /* second-biggest; visibly under the hero */
+  line-height: 1.15;
+  color: var(--ink);                    /* neutral: no tier ink on air or dew */
+}
+.pair-num sup { font-size: 15px; font-weight: 300; }
+.pair-note { display: block; font-size: 14px; font-style: italic; color: var(--slate); line-height: 1.4; }
+/* row 3 — the remaining metrics in one linear run */
+.strip {
+  display: flex; align-items: center; gap: var(--space-sm);
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-xs);
+}
+.strip-text { min-width: 0; font-size: 14px; line-height: 1.6; color: var(--slate); }
+
+/* narrative + next bests */
+.window-line { padding: var(--space-xs) 0 var(--space-xs); border-bottom: 1px solid var(--hairline); }
+.narrative { margin: 0; font-style: italic; font-size: 17px; line-height: 1.55; }
+.nextbests { margin-top: var(--space-xs); font-size: var(--size-body); line-height: 1.5; }
+.nextbests .w-lab {
+  font-weight: 500;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  color: var(--slate);
+}
+.nextbests .sub { display: block; color: var(--secondary); font-size: 14px; line-height: 1.5; margin-top: 2px; }
+.nb { white-space: nowrap; }
+
+/* ---------- the signature merged temperature chart ----------
+   One shared axis, three series: WBGT in tier ink (the only color),
+   air temp dashed, dew point dotted — both neutral. The y-axis column is
+   HTML, sticky at left over opaque paper, so numerals never collide with
+   the plot as it scrubs beneath. */
+.fig-sec, .hours-sec { margin-top: var(--space-md); }
+.fig-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 var(--space-sm); }
+.fig-title { font-style: italic; font-weight: 400; font-size: var(--size-body); color: var(--ink); }
+.fig-head .note { font-size: 14px; color: var(--secondary); white-space: nowrap; }
+.fig-wrap {
+  position: relative;
+  margin-top: var(--space-xs);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-surface);
+}
+.fig-scrub {
+  display: flex; align-items: flex-start;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  background: var(--paper);
+  /* aggressive both-edge fade: content dissolves before it is cut */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 130px), rgba(0,0,0,0.35) calc(100% - 54px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 130px), rgba(0,0,0,0.35) calc(100% - 54px), transparent 100%);
+}
+.fig-scrub::-webkit-scrollbar { display: none; }
+.fig-scrub svg { display: block; flex: 0 0 auto; }
+.fig-wrap .scroll-hint { right: 6px; }
+.fig-wrap .scroll-hint-left { right: auto; left: 52px; }
+/* the date chip: locked over the day-label row while the plot scrubs */
+.date-lock {
+  position: absolute; left: 47px; bottom: 1px; z-index: 3;
+  font-size: 13px; font-weight: 500; letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  background: var(--paper); color: var(--ink);
+  padding: 0 10px 2px 2px;
+  pointer-events: none;
+}
+/* the fixed axis: sticky HTML column over opaque paper, above the plot */
+.fig-axis {
+  position: sticky; left: 0; z-index: 2;
+  flex: 0 0 46px; width: 46px; height: 316px;
+  background: var(--paper);
+  border-right: 1px solid var(--hairline-strong);
+}
+.fig-axis span {
+  position: absolute; right: 6px;
+  font-size: 13px; line-height: 1;
+  color: var(--secondary);
+}
+.fig-axis .ax-unit { font-style: italic; }
+/* the rain axis rides the same sticky column, under the temperature range */
+.ax-rain { display: contents; }
+.ax-rain span { color: var(--steel-text); font-style: italic; }
+/* fig svg — strokes, hatches, text */
+.lx-grid { stroke: var(--hairline); stroke-width: 1; }
+.lx-ax   { stroke: var(--hairline-strong); stroke-width: 1; }
+.lx-tick { stroke: var(--hairline-strong); stroke-width: 1; fill: none; }
+.lx-day  { stroke: var(--hairline-strong); stroke-width: 1; }
+.cw0 { stroke: var(--tier-0); } .cw1 { stroke: var(--tier-1); } .cw2 { stroke: var(--tier-2); }
+.cw3 { stroke: var(--tier-3); } .cw4 { stroke: var(--tier-4); }
+.cw0, .cw1, .cw2, .cw3, .cw4 { fill: none; stroke-width: 1.25; stroke-linejoin: round; stroke-linecap: round; }
+.ln-air { fill: none; stroke: var(--slate); stroke-width: 1; stroke-dasharray: 6 4; opacity: 0.8; }
+.ln-dew { fill: none; stroke: var(--slate); stroke-width: 1.2; stroke-dasharray: 0.2 4; stroke-linecap: round; opacity: 0.7; }
+.pv { stroke: var(--tier-4); stroke-width: 0.6; opacity: 0.4; }      /* dense struck-span hatch */
+.pw { stroke: var(--steel); stroke-width: 0.6; opacity: 0.4; }       /* sparse window hatch */
+.pr { stroke: var(--steel-text); stroke-width: 0.5; opacity: 0.55; } /* fine rain hatch */
+.win-ice   { fill: var(--ice); opacity: 0.6; }
+.win-hatch { fill: url(#hatchWin); }
+.veto-hatch { fill: url(#hatchVeto); }
+.rainbar { fill: url(#hatchRain); stroke: var(--steel-text); stroke-width: 0.6; }
+.sun-g  { color: var(--tier-1); }
+.bolt-g { color: var(--tier-4); }
+.lx-brk { fill: none; stroke-width: 1; }
+.b3 { stroke: var(--tier-3); } .b4 { stroke: var(--tier-4); }
+.f0 { fill: var(--tier-0); } .f1 { fill: var(--tier-1); } .f2 { fill: var(--tier-2); }
+.f3 { fill: var(--tier-3); } .f4 { fill: var(--tier-4); } .fst { fill: var(--steel-text); }
+.fd0 { fill: var(--tier-0); } .fd1 { fill: var(--tier-1); } .fd2 { fill: var(--tier-2); }
+.fd3 { fill: var(--tier-3); } .fd4 { fill: var(--tier-4); }
+.fx-hr  { font-size: 13px; fill: var(--secondary); }
+.fx-day { font-size: 13px; font-weight: 500; letter-spacing: 0.14em; fill: var(--ink); }
+.fx-sun { font-size: 13px; font-style: italic; fill: var(--tier-1); }
+.fx-ann { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; }
+.fx-winlab { font-size: 14px; font-weight: 500; font-variant-caps: all-small-caps; letter-spacing: 0.14em; fill: var(--steel-text); }
+.fx-wint { font-size: 13px; font-style: italic; fill: var(--steel-text); }
+.fx-pt  { font-size: 13px; font-weight: 500; paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+/* engraved line-style legend — how dash and dot stay readable */
+.fig-legend {
+  margin: var(--space-xs) 0 0;
+  font-size: 14px;
+  color: var(--secondary);
+  line-height: 1.7;
+}
+.fig-legend .sw { font-weight: 600; letter-spacing: -0.05em; }
+.fig-legend .lg-samp { width: 30px; height: 10px; vertical-align: 1px; color: var(--slate); }
+.fig-cap {
+  margin: var(--space-xs) 0 0;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--slate);
+}
+/* 3-state quality inks for every numeral except the temperatures */
+.q0 { color: var(--tier-0); }
+.q1 { color: var(--tier-1); }
+.q2 { color: var(--tier-3); }
+.fig-key2 { font-size: 13px; color: var(--secondary); margin: 2px 0 0; }
+.fig-key2 .kdot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; margin-right: 2px; }
+
+/* ---------- hourly ledger — agate 14px (13px floor), no sparklines ----------
+   The tier colorbar tick ramp beside the time column: every hour's WBGT band
+   inks a 3px tick, so severity reads as a vertical ramp down the ledger's
+   left edge before a single numeral is read. */
+.hours-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm); }
+.hours {
+  border-collapse: separate; border-spacing: 0;   /* separate: borders travel with the sticky head */
+  width: 100%;
+  margin-top: var(--space-xs);
+  font-size: 16px;
+  line-height: 1.4;
+}
+.hours th, .hours td {
+  padding: 4px var(--space-sm);
+  text-align: right;
+  border-bottom: 1px solid var(--hairline);
+  font-weight: 400;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+/* locked column headers: sticky under the viewport top, opaque paper below */
+.hours thead[data-sticky-head] { position: sticky; top: 0; z-index: 2; }
+.hours thead th {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+  background: var(--paper);
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-bottom: 6px;
+  vertical-align: bottom;
+  white-space: normal;
+}
+/* time column + the tier colorbar tick */
+.hours .t { text-align: left; border-left: 3px solid transparent; padding-left: 9px; white-space: normal; }
+.hours .t .g { margin-right: 6px; }
+tr.tw0 > .t { border-left-color: var(--tier-0); }
+tr.tw1 > .t { border-left-color: var(--tier-1); }
+tr.tw2 > .t { border-left-color: var(--tier-2); }
+tr.tw3 > .t { border-left-color: var(--tier-3); }
+tr.tw4 > .t { border-left-color: var(--tier-4); }
+/* WBGT: the dominant column — wider, larger 500-weight tier-ink numeral,
+   the category word alongside; the ONLY tier-colored value in the ledger */
+.hours .c-wbgt { text-align: left; white-space: normal; width: 24%; }
+.hours .c-wbgt .n { font-size: 20px; font-weight: 500; }
+.hours .c-wbgt .w-word { font-size: 13px; color: var(--slate); }
+/* air temp + dew point: neutral ink, plainly labeled, visibly quieter */
+.hours .c-temp, .hours .c-dew { color: var(--ink); }
+/* the rest of the run recedes */
+.hours .c-rh, .hours .c-uv, .hours .c-aqi, .hours .c-wind, .hours .c-rain { color: var(--slate); }
+/* quality inks win over the column's slate */
+.hours td.q0 { color: var(--tier-0); }
+.hours td.q1 { color: var(--tier-1); }
+.hours td.q2 { color: var(--tier-3); }
+/* wind-direction vane ticks */
+.vane { width: 11px; height: 11px; vertical-align: -1px; margin-right: 3px; color: var(--secondary); }
+.bolt-td { width: 9px; height: 12px; vertical-align: -1px; }
+/* struck rows: italic with the reason named, never averaged away */
+tr.veto th, tr.veto td { font-style: italic; }
+tr.veto .g { color: var(--tier-4); }
+.vt { color: var(--tier-4); white-space: normal; }
+/* best-window rows: ice tint + a sparse-hatch strip on the left edge */
+tr[data-window-row] > th, tr[data-window-row] > td { background-color: var(--ice); }
+tr[data-window-row] > .t {
+  background-image: repeating-linear-gradient(45deg, var(--steel) 0 1px, transparent 1px 6px);
+  background-size: 6px 100%;
+  background-repeat: no-repeat;
+}
+.w-ann {
+  font-variant-caps: all-small-caps;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  color: var(--steel-text);
+  margin-left: 6px;
+  white-space: nowrap;
+}
+/* narrative divider rows: italic editorial beats across the full ledger */
+tr[data-narrative] td {
+  text-align: center;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--secondary);
+  padding: 5px var(--space-sm);
+}
+/* day heading rows */
+tr.day th.t, tr.day td {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--ink);
+  text-align: left;
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-top: var(--space-sm);
+  white-space: normal;
+}
+tr.day > .t { border-left-color: transparent; }
+tr.day .dsun { color: var(--secondary); margin-left: var(--space-md); letter-spacing: 0.08em; white-space: nowrap; }
+tr.day .g { width: 15px; height: 15px; vertical-align: -3px; margin-right: 2px; }
+/* condensed overnight / midday spans */
+tr.condense td, tr.condense th.t { color: var(--secondary); }
+tr.condense .w-word em { font-style: italic; }
+/* sunrise / sunset hairline divider rows */
+tr[data-sun-row] th.t, tr[data-sun-row] td {
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--tier-1);
+  text-align: left;
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-top: 2px; padding-bottom: 2px;
+}
+tr[data-sun-row] > .t { border-left-color: transparent; }
+tr[data-sun-row] .g { width: 15px; height: 15px; vertical-align: -3px; color: var(--tier-1); }
+
+/* narrow: the ledger folds to two decks per hour — zero horizontal scroll */
+@media (max-width: 767px) {
+  .hours { display: block; }
+  .hours tbody { display: block; }
+  .hours thead { display: none; }             /* deck cells carry their own labels */
+  .hours tr {
+    display: flex; flex-wrap: wrap; align-items: baseline;
+    column-gap: 8px; row-gap: 1px;
+    padding: 6px 0 7px 9px;
+    border-bottom: 1px solid var(--hairline);
+    border-left: 3px solid transparent;       /* the tier tick moves to the row edge */
+  }
+  .hours tr.tw0 { border-left-color: var(--tier-0); }
+  .hours tr.tw1 { border-left-color: var(--tier-1); }
+  .hours tr.tw2 { border-left-color: var(--tier-2); }
+  .hours tr.tw3 { border-left-color: var(--tier-3); }
+  .hours tr.tw4 { border-left-color: var(--tier-4); }
+  .hours th, .hours td {
+    display: block; border: 0; padding: 0;
+    text-align: left; background: none; width: auto;
+  }
+  /* deck 1 — THE TEMPERATURES: tick + time + WBGT + temp + dew; then break */
+  .hours .t, .hours .c-wbgt, .hours .c-temp, .hours .c-dew { order: -2; }
+  .hours tr:not(.day):not([data-sun-row]):not([data-narrative])::before {
+    content: ""; order: -1; flex-basis: 100%; height: 0;
+  }
+  .hours .t { white-space: nowrap; }
+  /* no column headers on narrow screens: every numeral carries its label */
+  .hours .c-wbgt { flex-shrink: 0; width: auto; }  /* release the 24% column; one line */
+  .hours .c-wbgt::before  { content: "wbgt "; font-size: 13px; color: var(--secondary); font-weight: 400; }
+  .hours .c-temp::before  { content: "temp "; font-size: 13px; color: var(--secondary); }
+  .hours .c-dew::before   { content: "dew ";  font-size: 13px; color: var(--secondary); }
+  /* deck 2 — EVERYTHING ELSE, labeled inline */
+  .hours .c-rh::before    { content: "rh ";   font-size: 13px; color: var(--secondary); }
+  .hours .c-uv::before    { content: "UV ";   font-size: 13px; color: var(--secondary); }
+  .hours .c-aqi::before   { content: "AQI ";  font-size: 13px; color: var(--secondary); }
+  .hours .c-rain::before  { content: "rain "; font-size: 13px; color: var(--secondary); }
+  /* window shading rides the whole row */
+  .hours tr[data-window-row] {
+    background-color: var(--ice);
+    background-image: repeating-linear-gradient(45deg, var(--steel) 0 1px, transparent 1px 6px);
+    background-size: 6px 100%;
+    background-repeat: no-repeat;
+  }
+  .hours tr[data-window-row] > th, .hours tr[data-window-row] > td { background: none; }
+  .hours tr[data-narrative] { border-left: 0; padding-left: 0; }
+  .hours tr[data-narrative] td { flex: 1 1 auto; text-align: center; }
+  /* the window annotation floats to the row's lower right corner */
+  .hours tr { position: relative; }
+  .hours .w-ann { position: absolute; right: 0; bottom: 7px; margin-left: 0; }
+  /* condensed spans and struck rows: the annotation takes the line */
+  .hours tr.condense .c-wbgt, .hours tr.veto .c-wbgt { flex: 1 1 240px; }
+  .hours tr.day { border-left: 0; padding-left: 0; }
+  .hours tr.day th.t { display: none; }       /* the spanning cell names the day */
+  .hours tr.day th.t, .hours tr.day td { border-bottom: 1px solid var(--hairline-strong); }
+  .hours tr.day td { flex: 1 1 auto; white-space: normal; min-width: 0; }
+  .hours tr.day .dsun { margin-left: var(--space-sm); white-space: normal; }
+  .hours tr[data-sun-row] { border-left: 0; padding-left: 9px; align-items: center; column-gap: 6px; }
+  .hours tr[data-sun-row] th.t, .hours tr[data-sun-row] td { border-bottom: 1px solid var(--hairline-strong); }
+  .hours tr[data-sun-row] td { flex: 1 1 auto; }
+  /* one tier tick per row: the row edge carries it; the time cell's goes */
+  .hours tr:not(.day) > .t { border-left: 0; padding-left: 0; }
+  /* a true grid when folded: the time column is absolutely placed and every
+     content line — deck 1, deck 2, and any wrapped continuation — shares the
+     same indent, so nothing ever lands back under the time column */
+  .hours tr:not(.day):not([data-sun-row]):not([data-narrative]) { padding-left: 113px; }
+  .hours tr:not(.day):not([data-sun-row]):not([data-narrative]) > .t {
+    position: absolute; left: 9px; top: 7px; width: 100px; flex: none;
+  }
+  /* the window annotation stacks under the time instead of floating */
+  .hours .w-ann { position: static; display: block; margin: 1px 0 0; }
+}
+
+/* ---------- explainers ---------- */
+.explainers { margin-top: var(--space-lg); border-bottom: 1px solid var(--hairline); }
+.explainers details { border-top: 1px solid var(--hairline); }
+.explainers summary {
+  display: flex; align-items: center; gap: var(--space-sm);
+  min-height: var(--hit-target);
+  font-family: var(--font-serif);
+  font-size: var(--size-body);            /* control: >=16px */
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+}
+.explainers summary .g { flex: 0 0 auto; }
+.explainers summary::-webkit-details-marker { display: none; }
+.explainers summary::after { content: "+"; color: var(--secondary); margin-left: auto; font-weight: 400; }
+.explainers details[open] summary::after { content: "\2212"; }
+.explainers summary:active { color: var(--steel-text); }
+.explainers p { margin: 0 0 var(--space-md); color: var(--slate); }
+.explainers .src {
+  margin: 0 0 var(--space-md);
+  font-size: 14px; color: var(--secondary);
+  font-style: italic;
+}
+
+/* ---------- route aside / clothing ---------- */
+.route {
+  margin: var(--space-lg) 0 0;
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--hairline-strong);
+  font-style: italic;
+  color: var(--slate);
+  font-size: var(--size-body);
+}
+.route .overline { display: block; font-style: normal; margin-bottom: 2px; }
+.clothing { margin-top: var(--space-md); }
+.clothing .overline { margin-right: var(--space-sm); }
+
+/* ---------- footer ---------- */
+.foot {
+  margin-top: var(--space-xl);
+  padding: var(--space-md) 0 calc(var(--space-xl) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--hairline-strong);
+}
+.foot div { margin: 0 0 var(--space-xs); font-size: 14px; font-style: italic; color: var(--secondary); line-height: 1.6; }
+
+/* ---------- narrow phones: keep the masthead overline to one line ---------- */
+@media (max-width: 480px) {
+  .masthead .overline, .current .overline { font-size: 13px; letter-spacing: 0.03em; white-space: nowrap; }
+  .masthead .overline .g { display: none; }   /* buys the one-line overline its room */
+  .masthead .overline .ovl-x { display: none; }
+}
+
+/* ---------- desktop ---------- */
+@media (min-width: 960px) {
+  .wordmark { font-size: var(--size-display); }
+  .lede {
+    display: grid;
+    grid-template-columns: 11fr 9fr;
+    gap: var(--space-lg);
+    align-items: start;
+  }
+  .window-line { border-bottom: 0; border-left: 1px solid var(--hairline); padding: var(--space-sm) 0 var(--space-sm) var(--space-lg); }
+  .explainers { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--space-xxl); border-bottom: 0; }
+  .explainers .overline { grid-column: 1 / -1; }
+  .explainers details:nth-last-child(-n+2) { border-bottom: 1px solid var(--hairline); }
+}

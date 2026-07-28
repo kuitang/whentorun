@@ -1,0 +1,44 @@
+{{define "current"}}<section class="current" aria-label="Current conditions" id="current" hx-get="/fragment/current?path={{.Path.Slug}}" hx-trigger="every 120s" hx-swap="outerHTML">
+      <span class="overline">Now &middot; {{.Path.Name}} &middot; {{.Now.TimeLabel}}</span>
+
+      <div data-metric="wbgt">
+        <span class="hero-label">Heat Stress &middot; WBGT</span>
+        <div class="wbgt-line">
+          <svg class="g-big" aria-hidden="true"><use href="#g-therm"/></svg>
+          <span class="wbgt-num{{ttclass .Now.WBGT.Tier}}">{{.Now.WBGT.Display}}<sup>&deg;{{.Units}}</sup></span>
+          {{- with .Now.WBGTPhrase}}
+          <span class="wbgt-phrase{{ttclass $.Now.WBGT.Tier}}">{{.}}</span>
+          {{- end}}
+        </div>
+        <details class="wbgt-what">
+          <summary>What is WBGT?</summary>
+          <p>Wet-bulb globe temperature folds temperature, humidity, sun load, and wind into one number for how hard heat works a moving body. It is the standard the National Weather Service and OSHA use for outdoor exertion &mdash; watch it, not the plain temperature. Two 75&deg; mornings can run worlds apart; WBGT tells them apart.</p>
+          <p class="jump"><a href="#explainers">See how every metric is read &darr;</a></p>
+        </details>
+      </div>
+
+      <div class="pair">
+        <div class="pair-cell">
+          <span class="hero-label" data-metric="temp">Temperature</span>
+          <span class="pair-num">{{.Now.Temp.Display}}<sup>&deg;{{.Units}}</sup></span>
+          <span class="pair-note">in the shade</span>
+        </div>
+        <div class="pair-cell">
+          <span class="hero-label" data-metric="dew">Dew Point</span>
+          <span class="pair-num">{{.Now.Dew.Display}}<sup>&deg;{{.Units}}</sup></span>
+          {{- with .Now.DewNote}}
+          <span class="pair-note">{{.}}</span>
+          {{- end}}
+        </div>
+      </div>
+
+      <div class="strip">
+        <div class="strip-text">
+          <span data-metric="uv">UV <span class="{{qspan .Now.UV.Quality}}">{{.Now.UV.Display}}</span>{{with .Now.UVWord}} {{.}}{{end}}</span> &middot;
+          <span data-metric="aqi">AQI <span class="{{qspan .Now.AQI.Quality}}">{{.Now.AQI.Display}}</span>{{with .Now.AQIWord}} {{.}}{{end}}{{with .Now.AQIPollutant}} ({{.}}){{end}}</span> &middot;
+          <span data-metric="rh">humidity <span class="{{qspan .Now.RH.Quality}}">{{.Now.RH.Display}}</span></span> &middot;
+          <span data-metric="wind"><svg class="vane"{{vane .Now.WindDeg}} aria-hidden="true"><use href="#g-vane"/></svg>wind <span class="{{qspan .Now.Wind.Quality}}">{{.Now.Wind.Display}}</span></span> &middot;
+          <span data-metric="rain">rain <span class="{{qspan .Now.Rain.Quality}}">{{.Now.Rain.Display}}</span></span>
+        </div>
+      </div>
+    </section>{{end}}

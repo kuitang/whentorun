@@ -56,6 +56,7 @@ func run() error {
 	// Fetch every source; a failed source becomes OK=false so the merge
 	// layer's fallback behavior is exercised exactly as in production.
 	grid, gridErr := nwsClient.Gridpoint(ctx, path.GridID, path.GridX, path.GridY)
+	forecast, forecastErr := nwsClient.Forecast(ctx, path.GridID, path.GridX, path.GridY)
 	alerts, alertsErr := nwsClient.ActiveAlerts(ctx, path.AlertZone)
 	var obs []airnow.ObservationRecord
 	obsErr := fmt.Errorf("skipped: no API key")
@@ -69,8 +70,8 @@ func run() error {
 		name string
 		err  error
 	}{
-		{"nws-grid", gridErr}, {"nws-alerts", alertsErr}, {"airnow", obsErr},
-		{"openmeteo-weather", omwErr}, {"openmeteo-air", omaErr},
+		{"nws-grid", gridErr}, {"nws-forecast", forecastErr}, {"nws-alerts", alertsErr},
+		{"airnow", obsErr}, {"openmeteo-weather", omwErr}, {"openmeteo-air", omaErr},
 	} {
 		if s.err != nil {
 			fmt.Fprintf(os.Stderr, "fetch %s: %v\n", s.name, s.err)
@@ -80,6 +81,7 @@ func run() error {
 	fetched := time.Now()
 	src := merge.Sources{
 		Grid:      merge.Input[*nws.Gridpoint]{Data: grid, FetchedAt: fetched, OK: gridErr == nil},
+		Forecast:  merge.Input[*nws.TextForecast]{Data: forecast, FetchedAt: fetched, OK: forecastErr == nil},
 		Alerts:    merge.Input[[]domain.Alert]{Data: alerts, FetchedAt: fetched, OK: alertsErr == nil},
 		AirNowObs: merge.Input[[]airnow.ObservationRecord]{Data: obs, FetchedAt: fetched, OK: obsErr == nil},
 		OMWeather: merge.Input[openmeteo.WeatherData]{Data: omw, FetchedAt: fetched, OK: omwErr == nil},
@@ -107,7 +109,7 @@ func print48h(path domain.Path, now time.Time, res merge.Result) {
 	fmt.Printf("generated %s (all times America/New_York)\n\n", now.In(nyLoc).Format("2006-01-02 15:04:05 MST"))
 
 	fmt.Println("PER-SOURCE FRESHNESS")
-	for _, key := range []string{merge.SrcNWSGrid, merge.SrcNWSAlerts, merge.SrcAirNow, merge.SrcOMWeather, merge.SrcOMAir} {
+	for _, key := range []string{merge.SrcNWSGrid, merge.SrcNWSForecast, merge.SrcNWSAlerts, merge.SrcAirNow, merge.SrcOMWeather, merge.SrcOMAir} {
 		s := res.Freshness[key]
 		state := "available"
 		if !s.Available {
@@ -130,6 +132,30 @@ func print48h(path domain.Path, now time.Time, res merge.Result) {
 			fmt.Printf("  [%s] %s\n    %s\n    onset %s  ends %s\n",
 				a.Severity, a.Event, a.Headline,
 				fmtTime(a.Onset), fmtTime(a.Ends))
+		}
+	}
+	fmt.Println()
+
+	fmt.Println("NWS NARRATIVE FORECAST")
+	if len(res.Prose) == 0 {
+		fmt.Println("  unavailable")
+	} else {
+		// The current period in full, then the rest as one line each.
+		printed := false
+		for _, p := range res.Prose {
+			cur := !now.Before(p.Start) && now.Before(p.End)
+			if cur && !printed {
+				fmt.Printf("  ▸ %s (%s–%s, %s) — %s\n    %s\n",
+					p.Name,
+					p.Start.In(nyLoc).Format("Mon 15:04"),
+					p.End.In(nyLoc).Format("Mon 15:04"),
+					srcLabel(p.Source),
+					p.Short,
+					p.Detailed)
+				printed = true
+				continue
+			}
+			fmt.Printf("    %s — %s\n", p.Name, p.Short)
 		}
 	}
 	fmt.Println()
