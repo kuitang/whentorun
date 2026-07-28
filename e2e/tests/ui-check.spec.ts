@@ -118,6 +118,31 @@ for (const variant of variants) {
       expect(result.jump, 'jump link to full explainers inside the expander').toBe(true);
     });
 
+    test('tables fold to viewport width — no sideways scroll on mobile', async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name !== 'mobile', 'mobile-only requirement');
+      const offenders = await page.evaluate(() => {
+        const bad: string[] = [];
+        for (const t of document.querySelectorAll<HTMLElement>('table')) {
+          const scroller = t.closest<HTMLElement>('[class]') || t;
+          // The table itself must fit; a wrapping scroll container counts as failure.
+          let el: HTMLElement | null = t;
+          while (el && el !== document.body) {
+            const cs = getComputedStyle(el);
+            if (/(auto|scroll)/.test(cs.overflowX) && el.scrollWidth > el.clientWidth + 4) {
+              bad.push(`table inside scrolling .${el.className.toString().slice(0, 40)}`);
+              break;
+            }
+            el = el.parentElement;
+          }
+          if (t.scrollWidth > document.documentElement.clientWidth + 4) {
+            bad.push(`table wider than viewport (${t.scrollWidth}px)`);
+          }
+        }
+        return bad;
+      });
+      expect(offenders, offenders.join('\n')).toEqual([]);
+    });
+
     test('horizontal scrollers are scrollable and carry a scrub affordance', async ({ page }) => {
       const report = await page.evaluate(() => {
         const out: { cls: string; scrollable: boolean; hasAffordance: boolean }[] = [];

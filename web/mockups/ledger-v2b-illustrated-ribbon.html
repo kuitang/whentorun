@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>when to run — Central Park · ledger v2b illustrated ribbon</title>
+<link rel="stylesheet" href="../static/css/tokens.css">
+<style>
+/* ============ ledger-v2b — illustrated-ribbon variant ============
+   Merritt engraved-almanac. ALL type is Spectral (no sans, no mono).
+   Labels: small-caps letterspaced Spectral 500. Figures: tabular-nums.
+   Art: inline SVG, 1px hairline strokes in currentColor; fills only as
+   fine 45-degree hatching or ice tint. Tier inks color metric numerals,
+   always beside the category word. No composite score anywhere. */
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  overflow-x: hidden;         /* the page itself never scrolls sideways */
+}
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 var(--space-md); }
+a { color: var(--steel-text); }
+h1, h2, h3, p { margin: 0; }
+
+/* small-caps label voice — Spectral 500, tracked */
+.lbl {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-variant-caps: small-caps;
+  letter-spacing: var(--ls-smallcaps);
+  font-size: var(--size-caption);
+  color: var(--secondary);
+}
+/* figures always tabular */
+.fig, .num { font-variant-numeric: tabular-nums; }
+
+/* tier inks — numeral color by category; word always alongside */
+.t0 { color: var(--tier-0); }
+.t1 { color: var(--tier-1); }
+.t2 { color: var(--tier-2); }
+.t3 { color: var(--tier-3); }
+.t4 { color: var(--tier-4); }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.glyph { width: 1.25em; height: 1.25em; vertical-align: -0.25em; }
+
+/* ---------- masthead ---------- */
+.masthead { padding-top: calc(var(--space-sm) + env(safe-area-inset-top)); }
+.mast-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); }
+.wordmark {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--size-screen-title);
+  line-height: var(--lh-title);
+  letter-spacing: 0.01em;
+}
+.ctls { display: flex; align-items: center; gap: var(--space-xs); }
+.ctl {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: var(--size-body);          /* control: >=16px */
+  font-variant-numeric: tabular-nums;
+  min-height: var(--hit-target);
+  min-width: var(--hit-target);
+  padding: 0 var(--space-sm);
+  background: none;
+  color: var(--ink);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-surface);
+  cursor: pointer;
+}
+.ctl[aria-pressed="true"] { background: var(--ice); }
+.ctl:active { background: var(--ice); }
+.mast-rule { height: 2px; background: var(--ink); border: 0; margin: var(--space-xs) 0 0; }
+
+/* ---------- route slider — engraved chip row ---------- */
+.route-slider { position: relative; margin-top: 2px; }
+.paths {
+  display: flex; gap: var(--space-xs);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-right: var(--space-xxl);      /* room so last chip peeks half-cut */
+  mask-image: linear-gradient(to right, black 82%, transparent 99%);
+  -webkit-mask-image: linear-gradient(to right, black 82%, transparent 99%);
+}
+.paths::-webkit-scrollbar { display: none; }
+.paths a {
+  flex: 0 0 auto;
+  display: flex; align-items: center;
+  min-height: var(--hit-target);
+  padding: 0 var(--space-sm);
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-variant-caps: small-caps;
+  letter-spacing: var(--ls-smallcaps);
+  font-size: 13.5px;                    /* route chips may run 13-14px */
+  text-decoration: none;
+  color: var(--steel-text);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.paths a[aria-current="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+.paths a:active { color: var(--ink); }
+.scroll-hint {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  pointer-events: none;
+  font-family: var(--font-serif);
+  font-size: var(--size-caption);
+  color: var(--secondary);
+}
+
+/* ---------- alert banner — tier-3 ink text, hairline border, no loud fill ---------- */
+.alert {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--space-sm);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-surface);
+  padding: var(--space-xs) var(--space-sm);
+  margin-top: var(--space-sm);
+  color: var(--tier-3);
+}
+.alert .lbl { color: var(--tier-3); }
+.alert p { font-size: var(--size-caption); line-height: 1.5; }
+.alert .glyph { width: 1.1em; height: 1.1em; }
+
+/* ---------- current panel ---------- */
+.current {
+  background: var(--ice);
+  border-radius: var(--radius-surface);
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  margin-top: var(--space-sm);
+}
+.current .lbl { color: var(--slate); }
+
+/* hero WBGT — the biggest figure on the page */
+.hero-line { display: flex; align-items: baseline; gap: var(--space-sm); flex-wrap: wrap; }
+.hero-num {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  font-size: 58px;
+  line-height: 1.05;
+}
+.hero-num sup { font-size: var(--size-card-title); font-weight: 300; }
+.hero-word { font-weight: 300; font-size: var(--size-card-title); line-height: var(--lh-title); color: var(--ink); }
+
+/* WBGT expander directly under the hero */
+.wbgt-what { border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); margin-top: var(--space-xs); }
+.wbgt-what summary {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: var(--hit-target);
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-variant-caps: small-caps;
+  letter-spacing: var(--ls-smallcaps);
+  font-size: var(--size-body);          /* control: >=16px */
+  cursor: pointer;
+  list-style: none;
+}
+.wbgt-what summary::-webkit-details-marker { display: none; }
+.wbgt-what summary::after { content: "+"; color: var(--secondary); }
+.wbgt-what[open] summary::after { content: "\2212"; }
+.wbgt-what p { font-size: var(--size-list); color: var(--slate); margin: 0 0 var(--space-sm); }
+
+/* air temperature — clearly second-biggest figure */
+.airtemp { display: flex; align-items: baseline; gap: var(--space-sm); margin-top: var(--space-sm); }
+.airtemp .num {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--size-display);       /* 32px: second to the 58px hero */
+  line-height: 1.1;
+}
+.airtemp .num sup { font-size: var(--size-list); font-weight: 300; }
+
+/* compact tier-colored metric strip */
+.strip {
+  display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-md);
+  margin-top: var(--space-sm);
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--hairline);
+  font-size: var(--size-list);
+}
+.strip .m { white-space: nowrap; }
+.strip .num { font-weight: 500; }
+.strip .word { color: var(--slate); font-style: italic; }
+.strip .glyph { width: 1.35em; height: 1.35em; color: var(--slate); }
+
+/* ---------- next-best window line ---------- */
+.window-line { padding: var(--space-sm) 0; border-bottom: 1px solid var(--hairline); }
+.window-line .lead { font-size: var(--size-list); font-weight: 500; }
+.window-line .sub { color: var(--secondary); font-size: var(--size-caption); line-height: 1.5; margin-top: 2px; }
+.window-line .glyph { color: var(--slate); }
+
+/* ---------- placeholder stubs (later stages) ---------- */
+.stub {
+  margin-top: var(--space-lg);
+  border: 1px dashed var(--hairline-strong);
+  border-radius: var(--radius-surface);
+  padding: var(--space-md);
+  color: var(--secondary);
+  font-style: italic;
+  font-size: var(--size-caption);
+}
+
+/* ---------- footer ---------- */
+.foot {
+  margin-top: var(--space-xl);
+  padding: var(--space-md) 0 calc(var(--space-xl) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--hairline-strong);
+}
+.foot p { margin: 0 0 var(--space-xs); font-size: var(--size-caption); color: var(--secondary); line-height: 1.6; font-variant-numeric: tabular-nums; }
+
+/* ---------- desktop adaptation ---------- */
+@media (min-width: 960px) {
+  .wordmark { font-size: var(--size-display); }
+  .lede { display: grid; grid-template-columns: 11fr 9fr; gap: var(--space-lg); align-items: start; }
+  .lede .current { margin-top: 0; }
+  .window-line { border-bottom: 0; border-left: 1px solid var(--hairline); padding: var(--space-sm) 0 var(--space-sm) var(--space-lg); }
+  .paths { mask-image: none; -webkit-mask-image: none; padding-right: 0; }
+  .scroll-hint { display: none; }
+}
+/* svg glyph strokes — 1px hairline, currentColor; fills only hatch or ice */
+.g-stroke { fill: none; stroke: currentColor; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.g-hatch { fill: url(#hatch45); stroke: currentColor; stroke-width: 1; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.g-ice { fill: var(--ice); stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.g-text { font-family: var(--font-serif); font-weight: 500; fill: currentColor; }
+</style>
+</head>
+<body>
+
+<!-- ============ hidden glyph library — etched almanac art ============
+     1px hairline strokes in currentColor; fills are 45-degree hatching
+     (pattern #hatch45) or ice tint only. Referenced via <use href="#g-..."> -->
+<svg aria-hidden="true" focusable="false" style="position:absolute; width:0; height:0; overflow:hidden">
+  <defs>
+    <pattern id="hatch45" width="2.4" height="2.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="2.4" stroke="currentColor" stroke-width="0.45"/>
+    </pattern>
+
+    <!-- etched sun: hatched disc, long cardinal rays, short diagonals -->
+    <symbol id="g-sun" viewBox="0 0 24 24">
+      <circle class="g-hatch" cx="12" cy="12" r="4.2"/>
+      <path class="g-stroke" d="M12 5.8V2.6M12 18.2v3.2M18.2 12h3.2M2.6 12h3.2"/>
+      <path class="g-stroke" d="M16.3 7.7l1.7-1.7M6 18l1.7-1.7M16.3 16.3L18 18M6 6l1.7 1.7"/>
+    </symbol>
+
+    <!-- cloud: single engraved outline, hatched body -->
+    <symbol id="g-cloud" viewBox="0 0 24 24">
+      <path class="g-hatch" d="M6.2 17.5h11.2a3.4 3.4 0 0 0 .9-6.7 5.1 5.1 0 0 0-9.9-1.2 3.7 3.7 0 0 0-2.2 7.9z"/>
+    </symbol>
+
+    <!-- cloud-sun: small etched sun peeking behind the cloud -->
+    <symbol id="g-cloud-sun" viewBox="0 0 24 24">
+      <circle class="g-hatch" cx="16.6" cy="7.4" r="2.7"/>
+      <path class="g-stroke" d="M16.6 3.6V2.2M20.4 7.4h1.4M19.3 4.7l1-1M19.3 10.1l1 1"/>
+      <path class="g-ice" d="M5.4 19h9.8a3 3 0 0 0 .8-5.9 4.5 4.5 0 0 0-8.7-1 3.2 3.2 0 0 0-1.9 6.9z"/>
+    </symbol>
+
+    <!-- thunderbolt: jagged strike, hatched -->
+    <symbol id="g-bolt" viewBox="0 0 24 24">
+      <polygon class="g-hatch" points="13.2,2.5 5.8,13.2 10.6,13.2 8.8,21.5 18.2,9.8 12.6,9.8"/>
+    </symbol>
+
+    <!-- rain-hatch: ice cloud shedding 45-degree hatch strokes -->
+    <symbol id="g-rain" viewBox="0 0 24 24">
+      <path class="g-ice" d="M6 14h11a3.1 3.1 0 0 0 .8-6.1 4.7 4.7 0 0 0-9.1-1.1A3.3 3.3 0 0 0 6 14z"/>
+      <path class="g-stroke" d="M8.4 16.4l-1.6 3M12.4 16.4l-1.6 3M16.4 16.4l-1.6 3"/>
+    </symbol>
+
+    <!-- moon: waxing crescent, hatched -->
+    <symbol id="g-moon" viewBox="0 0 24 24">
+      <path class="g-hatch" d="M13.8 3.2a9 9 0 1 0 0 17.6 8 8 0 1 1 0-17.6z"/>
+    </symbol>
+
+    <!-- sunrise: half sun lifting through the horizon, arrow up -->
+    <symbol id="g-sunrise" viewBox="0 0 24 24">
+      <path class="g-hatch" d="M8 16.5a4 4 0 0 1 8 0z"/>
+      <path class="g-stroke" d="M3 16.5h3.4M17.6 16.5H21M5.9 11.4l1.7 1.7M18.1 11.4l-1.7 1.7"/>
+      <path class="g-stroke" d="M12 9.6V4.4M9.9 6.5L12 4.4l2.1 2.1"/>
+    </symbol>
+
+    <!-- sunset: half sun sinking, arrow down -->
+    <symbol id="g-sunset" viewBox="0 0 24 24">
+      <path class="g-hatch" d="M8 16.5a4 4 0 0 1 8 0z"/>
+      <path class="g-stroke" d="M3 16.5h3.4M17.6 16.5H21M5.9 11.4l1.7 1.7M18.1 11.4l-1.7 1.7"/>
+      <path class="g-stroke" d="M12 4.4v5.2M9.9 7.5L12 9.6l2.1-2.1"/>
+    </symbol>
+
+    <!-- compass rose: ticked ring, cardinal letters, needle set from S -->
+    <symbol id="g-compass" viewBox="0 0 24 24">
+      <circle class="g-stroke" cx="12" cy="12" r="9.6"/>
+      <path class="g-stroke" d="M12 2.4v1.7M12 19.9v1.7M2.4 12h1.7M19.9 12h1.7"/>
+      <path class="g-stroke" d="M5.2 5.2l1.2 1.2M17.6 17.6l1.2 1.2M18.8 5.2l-1.2 1.2M6.4 17.6l-1.2 1.2"/>
+      <text class="g-text" x="12" y="6.9" font-size="4" text-anchor="middle" dominant-baseline="central">N</text>
+      <text class="g-text" x="12" y="17.4" font-size="4" text-anchor="middle" dominant-baseline="central">S</text>
+      <text class="g-text" x="17.3" y="12.1" font-size="4" text-anchor="middle" dominant-baseline="central">E</text>
+      <text class="g-text" x="6.7" y="12.1" font-size="4" text-anchor="middle" dominant-baseline="central">W</text>
+      <!-- needle: wind out of the south, head driving north -->
+      <polygon class="g-hatch" points="12,8.6 10.95,12.6 13.05,12.6"/>
+      <polygon class="g-stroke" points="10.95,12.6 13.05,12.6 12,15.6"/>
+      <circle class="g-ice" cx="12" cy="12.6" r="0.8"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="wrap masthead">
+  <span class="lbl">nyc running conditions &middot; 48-hour outlook</span>
+  <div class="mast-row">
+    <h1 class="wordmark">when to run</h1>
+    <div class="ctls" role="group" aria-label="Units and theme">
+      <button class="ctl" type="button" aria-pressed="true">&deg;F</button>
+      <button class="ctl" type="button" aria-pressed="false">&deg;C</button>
+      <button class="ctl" type="button" id="themeBtn" title="Theme (mockup demo)">Auto</button>
+    </div>
+  </div>
+  <hr class="mast-rule">
+  <nav class="route-slider" data-route-slider aria-label="Running paths">
+    <div class="paths">
+      <a href="#" aria-current="true">My Location</a>
+      <a href="#">Central Park</a>
+      <a href="#">Hudson River Greenway</a>
+      <a href="#">East River Esplanade</a>
+      <a href="#">Brooklyn &mdash; Prospect Park &amp; waterfront</a>
+      <a href="#">Van Cortlandt Park</a>
+    </div>
+    <span class="scroll-hint" aria-hidden="true">&rarr;</span>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <aside class="alert" role="status">
+    <svg class="glyph" aria-hidden="true"><use href="#g-sun"/></svg>
+    <span class="lbl">heat advisory</span>
+    <p>until 8 PM EDT Tuesday &mdash; advisory-level: caution, not a stop order.</p>
+  </aside>

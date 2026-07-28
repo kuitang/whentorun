@@ -31,7 +31,7 @@ svg { display: block; }
 /* labels: Spectral 500 uppercase, tracked — no sans anywhere */
 .overline {
   font-family: var(--font-serif);
-  font-size: var(--size-label);
+  font-size: 13px;                      /* audit floor: no rendered text under 13px */
   font-weight: 500;
   letter-spacing: var(--ls-label);
   text-transform: uppercase;
@@ -79,29 +79,51 @@ svg { display: block; }
 .ctl:active { background: var(--ice); }
 .mast-rule { height: 2px; background: var(--ink); border: 0; margin: var(--space-xs) 0 0; }
 
+/* route slider: compact chips (13.5px allowed here only), 44px tap via padding,
+   mask edge fade + scrub hint; next chip peeks half-cut at the container edge */
+.slider-wrap { display: flex; align-items: center; gap: var(--space-xs); }
 .paths {
+  flex: 1 1 auto; min-width: 0;
   display: flex; gap: var(--space-xs);
   overflow-x: auto; -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 40px), transparent 100%);
+  mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 40px), transparent 100%);
 }
 .paths::-webkit-scrollbar { display: none; }
 .paths a {
   flex: 0 0 auto;
   display: flex; align-items: center;
-  min-height: var(--hit-target);
+  min-height: var(--hit-target);        /* >=44px tap target kept via padding */
   padding: 0 var(--space-sm);
   font-family: var(--font-serif);
   font-weight: 500;
-  font-size: var(--size-body);          /* control: >=16px */
-  letter-spacing: 0.07em;
+  font-size: 13.5px;                    /* route slider exemption: 13-14px */
+  letter-spacing: 0.045em;              /* tighter tracking, slider only */
   text-transform: uppercase;
   text-decoration: none;
   color: var(--steel-text);
   border-bottom: 2px solid transparent;
   white-space: nowrap;
 }
-.paths a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+.paths a[aria-current="true"],
+.paths a[aria-current="page"] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+  background: var(--ice);
+  border-radius: var(--radius-surface) var(--radius-surface) 0 0;
+}
 .paths a:active { color: var(--ink); }
+.scroll-hint {
+  flex: 0 0 auto;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: var(--ls-smallcaps);
+  text-transform: uppercase;
+  color: var(--secondary);
+  white-space: nowrap;
+}
 
 /* ---------- alert banner — tier-3 ink + hairline tint, never a filled band ---------- */
 .alert {
@@ -114,7 +136,7 @@ svg { display: block; }
 }
 .alert .overline { color: var(--tier-3); }
 .alert .g-a { color: var(--tier-3); flex: 0 0 auto; }
-.alert p { margin: 0; font-size: var(--size-caption); line-height: 1.5; }
+.alert .alert-note { font-size: var(--size-caption); line-height: 1.5; }
 
 /* ---------- lede: current + next-best ---------- */
 .lede { margin-top: var(--space-sm); }
@@ -124,7 +146,7 @@ svg { display: block; }
   padding: var(--space-sm) var(--space-md) var(--space-md);
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-areas: "over over" "main art" "strip strip";
+  grid-template-areas: "over over" "main art" "strip strip" "expl expl";
   column-gap: var(--space-sm);
 }
 .current .overline { grid-area: over; color: var(--slate); }
@@ -141,7 +163,42 @@ svg { display: block; }
 }
 .wbgt-num sup { font-size: var(--size-card-title); font-weight: 300; }
 .wbgt-phrase { font-family: var(--font-serif); font-weight: 300; font-size: var(--size-card-title); line-height: var(--lh-title); color: var(--ink); }
-.wbgt-phrase .overline { letter-spacing: var(--ls-smallcaps); }
+.hero-lab { display: block; margin-top: 2px; color: var(--slate); }
+/* air temperature: second-biggest figure, directly below the WBGT hero */
+.temp-num {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  font-size: 30px;                      /* visibly smaller than WBGT, bigger than all else */
+  line-height: 1.15;
+  color: var(--ink);
+}
+.temp-num sup { font-size: 13px; font-weight: 400; }
+.temp-word { font-family: var(--font-serif); font-style: italic; font-size: var(--size-caption); color: var(--slate); margin-left: var(--space-xs); }
+.rose, .wdir, .sun-mark { display: inline-block; }
+.rose { vertical-align: -7px; margin-left: var(--space-xs); color: var(--slate); }
+/* above-the-fold WBGT expander — hairline-rule register */
+.wbgt-expl {
+  grid-area: expl;
+  margin-top: var(--space-xs);
+  border-top: 1px solid var(--hairline-strong);
+}
+.wbgt-expl summary {
+  display: flex; align-items: center;
+  min-height: var(--hit-target);        /* >=44px tap target */
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: var(--size-body);          /* control: >=16px */
+  letter-spacing: var(--ls-smallcaps);
+  text-transform: uppercase;
+  color: var(--slate);
+  cursor: pointer;
+  list-style: none;
+}
+.wbgt-expl summary::-webkit-details-marker { display: none; }
+.wbgt-expl summary::after { content: "+"; margin-left: auto; color: var(--secondary); }
+.wbgt-expl[open] summary::after { content: "\2212"; }
+.wbgt-expl p { margin: 0 0 var(--space-sm); font-size: var(--size-body); line-height: 1.55; color: var(--slate); }
 .mono-strip {
   grid-area: strip;
   margin: var(--space-xs) 0 0;
@@ -153,7 +210,7 @@ svg { display: block; }
 }
 .mono-strip .n { font-weight: 500; }
 .window-line { padding: var(--space-sm) 0; border-bottom: 1px solid var(--hairline); }
-.window-line p { margin: 0; font-size: var(--size-list); }
+.window-line .lead { margin: 0; font-size: var(--size-body); }
 .window-line .lead { font-weight: 500; }
 .window-line .g-w { color: var(--steel-text); vertical-align: -3px; margin-right: 2px; }
 .window-line .n { font-weight: 500; }
@@ -161,7 +218,7 @@ svg { display: block; }
 
 /* ---------- etched panel (hourly ledger figure) ---------- */
 .hours-sec { margin-top: var(--space-md); }
-.fig-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm); }
+.fig-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px var(--space-sm); }
 .fig-head .overline { white-space: nowrap; }
 .fig-head .note { font-family: var(--font-serif); font-variant-numeric: tabular-nums; font-size: var(--size-caption); color: var(--secondary); white-space: nowrap; }
 .fig-scroll {
@@ -170,6 +227,8 @@ svg { display: block; }
   border-radius: var(--radius-surface);
   background: var(--card);
   margin-top: var(--space-xs);
+  -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 44px), transparent 100%);
+  mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 44px), transparent 100%);
 }
 .fig-legend {
   margin: var(--space-xs) 0 0;
@@ -198,12 +257,16 @@ svg { display: block; }
 .fx-sep  { stroke: var(--hairline); }
 
 /* ---------- agate table ---------- */
-.agate-head { margin-top: var(--space-md); }
-.hours-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: var(--space-xs); }
+.agate-head { margin-top: var(--space-md); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px var(--space-sm); }
+.hours-scroll {
+  overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: var(--space-xs);
+  -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 44px), transparent 100%);
+  mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 44px), transparent 100%);
+}
 .hours {
   border-collapse: collapse;
   width: 100%;
-  min-width: 680px;
+  min-width: 760px;
   font-family: var(--font-serif);
   font-variant-numeric: tabular-nums;
   font-size: var(--size-caption);
@@ -218,7 +281,7 @@ svg { display: block; }
 .hours td.n { font-weight: 500; }
 .hours thead th {
   font-family: var(--font-serif);
-  font-size: var(--size-label);
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: var(--ls-label);
   text-transform: uppercase;
@@ -247,7 +310,7 @@ tr.tw4 .t { border-left-color: var(--tier-4); }
 tr.veto .reads { font-style: italic; color: var(--tier-4); }
 tr.day td, tr.day .t {
   font-family: var(--font-serif);
-  font-size: var(--size-label);
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: var(--ls-label);
   text-transform: uppercase;
@@ -257,6 +320,51 @@ tr.day td, tr.day .t {
   padding-top: var(--space-sm);
 }
 tr.condense .reads { font-style: italic; color: var(--secondary); }
+/* sunrise / sunset hairline divider rows */
+tr.sun-row td {
+  color: var(--secondary);
+  font-style: italic;
+  text-align: left;
+  letter-spacing: 0.06em;
+  padding-top: 2px; padding-bottom: 2px;
+  border-bottom: 1px solid var(--hairline-strong);
+}
+.sun-mark { vertical-align: -1px; margin-right: 3px; color: var(--tier-1); }
+/* per-hour wind-direction ticks (arrow points where the air is going) */
+.wdir { vertical-align: -1px; margin-right: 2px; color: var(--steel-text); opacity: 0.85; }
+.wdir.rSW { transform: rotate(45deg); }
+.wdir.rW  { transform: rotate(90deg); }
+
+/* 390px fold: the agate table restructures into two-deck rows — no sideways scroll */
+@media (max-width: 767px) {
+  .hours-scroll { overflow-x: visible; -webkit-mask-image: none; mask-image: none; }
+  .agate-head .scroll-hint { display: none; }
+  .hours { min-width: 0; }
+  .hours thead { display: none; }
+  .hours tr { display: block; padding: var(--space-xs) 0; border-bottom: 1px solid var(--hairline); }
+  .hours td, .hours th { display: inline; border-bottom: 0; padding: 0; white-space: normal; text-align: left; }
+  .hours .t { position: static; background: none; border-left: 0; border-right: 0; font-weight: 500; }
+  .hours tr[class*="tw"] { border-left: 3px solid transparent; padding-left: var(--space-sm); }
+  .hours tr.tw0 { border-left-color: var(--tier-0); }
+  .hours tr.tw1 { border-left-color: var(--tier-1); }
+  .hours tr.tw2 { border-left-color: var(--tier-2); }
+  .hours tr.tw3 { border-left-color: var(--tier-3); }
+  .hours tr.tw4 { border-left-color: var(--tier-4); }
+  /* deck 1: time + WBGT numeral + category word */
+  .hours tr[class*="tw"] > td:nth-child(2) { margin-left: var(--space-sm); }
+  .hours tr[class*="tw"] > td:nth-child(3) { margin-left: var(--space-xs); }
+  .hours tr[class*="tw"] > td:nth-child(3)::after { content: "\A"; white-space: pre; }
+  /* deck 2: compact inline run, labels engraved in via pseudo-content */
+  .hours tr[class*="tw"] > td:nth-child(4)::before { content: "dew "; color: var(--secondary); font-weight: 400; }
+  .hours tr[class*="tw"] > td:nth-child(5)::before { content: " \00b7  RH "; color: var(--secondary); font-weight: 400; }
+  .hours tr[class*="tw"] > td:nth-child(6)::before { content: " \00b7  UV "; color: var(--secondary); font-weight: 400; }
+  .hours tr[class*="tw"] > td:nth-child(7)::before { content: " \00b7  AQI "; color: var(--secondary); font-weight: 400; }
+  .hours tr[class*="tw"] > td:nth-child(8)::before { content: " \00b7  wind "; color: var(--secondary); font-weight: 400; }
+  .hours tr[class*="tw"] > td:nth-child(9)::before { content: " \00b7  rain "; color: var(--secondary); font-weight: 400; }
+  .hours tr.day { border-left: 0; border-bottom: 1px solid var(--hairline-strong); padding: var(--space-sm) 0 var(--space-xs); }
+  .hours tr.day td { padding-right: var(--space-sm); }
+  .hours tr.sun-row { border-left: 0; border-bottom: 1px solid var(--hairline-strong); padding: 2px 0 2px var(--space-sm); }
+}
 
 /* ---------- explainers ---------- */
 .explainers { margin-top: var(--space-lg); border-bottom: 1px solid var(--hairline); }
@@ -278,7 +386,7 @@ tr.condense .reads { font-style: italic; color: var(--secondary); }
 .explainers summary::after { content: "+"; color: var(--secondary); font-family: var(--font-serif); }
 .explainers details[open] summary::after { content: "\2212"; }
 .explainers summary:active { color: var(--steel-text); }
-.explainers p { margin: 0 0 var(--space-md); font-size: var(--size-list); color: var(--slate); }
+.explainers p { margin: 0 0 var(--space-md); font-size: var(--size-body); color: var(--slate); }
 .explainers .src { font-size: var(--size-caption); font-style: italic; color: var(--secondary); }
 
 /* ---------- route aside / clothing ---------- */
@@ -291,7 +399,7 @@ tr.condense .reads { font-style: italic; color: var(--secondary); }
   font-size: var(--size-list);
 }
 .route .overline { display: block; font-style: normal; margin-bottom: 2px; }
-.clothing { margin-top: var(--space-md); font-size: var(--size-list); }
+.clothing { margin-top: var(--space-md); font-size: var(--size-body); }
 .clothing .overline { margin-right: var(--space-sm); }
 
 /* ---------- footer ---------- */
@@ -300,11 +408,12 @@ tr.condense .reads { font-style: italic; color: var(--secondary); }
   padding: var(--space-md) 0 calc(var(--space-xl) + env(safe-area-inset-bottom));
   border-top: 1px solid var(--hairline-strong);
 }
-.foot p { margin: 0 0 var(--space-xs); font-size: var(--size-caption); font-variant-numeric: tabular-nums; color: var(--secondary); line-height: 1.6; }
+.foot .fine { margin: 0 0 var(--space-xs); font-size: var(--size-caption); font-variant-numeric: tabular-nums; color: var(--secondary); line-height: 1.6; }
 
 /* ---------- desktop adaptation ---------- */
 @media (min-width: 960px) {
   .wordmark { font-size: var(--size-display); }
+  .slider-wrap > .scroll-hint { display: none; }   /* chips fit; nothing to scrub */
   .lede {
     display: grid;
     grid-template-columns: 11fr 9fr;
@@ -317,6 +426,7 @@ tr.condense .reads { font-style: italic; color: var(--secondary); }
 }
 @media (max-width: 460px) {
   .wbgt-num { font-size: 44px; }
+  .temp-num { font-size: 28px; }        /* still second-biggest, protects the fold */
   .cur-art { width: 66px; height: 58px; }
   .m-hide { display: none; }
 }
@@ -457,6 +567,55 @@ tr.condense .reads { font-style: italic; color: var(--secondary); }
       <path d="M22.5 23 L17.5 32 h3 L19 38.5 L26 27.5 h-3.2 L24.8 23 Z"
             fill="url(#ph-ink)" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round"/>
     </symbol>
+
+    <!-- compass rose: double ring, cardinal + ordinal ticks, hatched needle
+         set for today's southerly (wind from S, flowing N) -->
+    <symbol id="g-compass" viewBox="0 0 36 36">
+      <g fill="none" stroke="currentColor" stroke-linecap="round">
+        <circle cx="18" cy="18" r="14.6" stroke-width="0.9"/>
+        <circle cx="18" cy="18" r="11.8" stroke-width="0.5" opacity="0.4"/>
+        <g stroke-width="0.8" opacity="0.85">
+          <line x1="18" y1="3.4" x2="18" y2="7.4"/>
+          <line x1="18" y1="28.6" x2="18" y2="32.6"/>
+          <line x1="3.4" y1="18" x2="7.4" y2="18"/>
+          <line x1="28.6" y1="18" x2="32.6" y2="18"/>
+        </g>
+        <g stroke-width="0.55" opacity="0.45">
+          <line x1="18" y1="3.4" x2="18" y2="6.2" transform="rotate(45 18 18)"/>
+          <line x1="18" y1="3.4" x2="18" y2="6.2" transform="rotate(135 18 18)"/>
+          <line x1="18" y1="3.4" x2="18" y2="6.2" transform="rotate(225 18 18)"/>
+          <line x1="18" y1="3.4" x2="18" y2="6.2" transform="rotate(315 18 18)"/>
+        </g>
+      </g>
+      <path d="M18 7 L15.9 18 L20.1 18 Z" fill="url(#ph-ink)" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round"/>
+      <path d="M18 29 L15.9 18 L20.1 18 Z" fill="none" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round" opacity="0.55"/>
+      <circle cx="18" cy="18" r="1.5" fill="none" stroke="currentColor" stroke-width="0.8"/>
+    </symbol>
+
+    <!-- sunrise: half-disc on the horizon hairline, rising arrow, short rays -->
+    <symbol id="g-sunrise" viewBox="0 0 24 14">
+      <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1.5" y1="11.6" x2="22.5" y2="11.6" stroke-width="0.8"/>
+        <path d="M7.4 11.6 a4.6 4.6 0 0 1 9.2 0" stroke-width="0.9"/>
+        <path d="M4.6 8.4 L3.2 7 M19.4 8.4 L20.8 7" stroke-width="0.6" opacity="0.7"/>
+        <path d="M12 5.4 V1.4 M10 3.2 L12 1.2 L14 3.2" stroke-width="0.7"/>
+      </g>
+    </symbol>
+
+    <!-- sunset: hatched half-disc sinking below the horizon, setting arrow -->
+    <symbol id="g-sunset" viewBox="0 0 24 14">
+      <path d="M7.4 11.6 a4.6 4.6 0 0 1 9.2 0 Z" fill="url(#ph-ink)" stroke="none"/>
+      <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1.5" y1="11.6" x2="22.5" y2="11.6" stroke-width="0.8"/>
+        <path d="M7.4 11.6 a4.6 4.6 0 0 1 9.2 0" stroke-width="0.9"/>
+        <path d="M12 1.2 V5.2 M10 3.4 L12 5.4 L14 3.4" stroke-width="0.7"/>
+      </g>
+    </symbol>
+
+    <!-- wind-direction tick: hairline arrow, rotated per hour by class -->
+    <symbol id="g-warrow" viewBox="0 0 12 12">
+      <path d="M6 10.6 V1.6 M3.7 3.9 L6 1.4 L8.3 3.9" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
   </defs>
 </svg>
 
@@ -474,13 +633,17 @@ tr.condense .reads { font-style: italic; color: var(--secondary); }
     </div>
   </div>
   <hr class="mast-rule">
-  <nav class="paths" aria-label="Running paths">
-    <a href="#" aria-current="page">Central Park</a>
-    <a href="#">Hudson Greenway</a>
-    <a href="#">East River</a>
-    <a href="#">Brooklyn</a>
-    <a href="#">Van Cortlandt</a>
-  </nav>
+  <div class="slider-wrap">
+    <nav class="paths" aria-label="Running paths" data-route-slider>
+      <a href="#" aria-current="true">My Location</a>
+      <a href="#">Central Park</a>
+      <a href="#">Hudson Greenway</a>
+      <a href="#">East River</a>
+      <a href="#">Brooklyn</a>
+      <a href="#">Van Cortlandt</a>
+    </nav>
+    <span class="scroll-hint" aria-hidden="true">scrub &#8594;</span>
+  </div>
 </header>
 
 <main class="wrap">
@@ -488,16 +651,23 @@ tr.condense .reads { font-style: italic; color: var(--secondary); }
   <aside class="alert" role="status">
     <svg class="g-a" width="15" height="24" aria-hidden="true"><use href="#g-thermo" width="15" height="24"/></svg>
     <span class="overline">Heat Advisory</span>
-    <p>until 8 PM EDT Tuesday &mdash; advisory-level: caution, not a stop order.</p>
+    <span class="alert-note">until 8 PM EDT Tuesday &mdash; advisory-level: caution, not a stop order.</span>
   </aside>
 
   <div class="lede">
     <section class="current" aria-label="Current conditions">
       <span class="overline">Now &middot; Central Park &middot;<span class="m-hide"> Tue Jul 28 &middot;</span> 2:30 PM ET</span>
       <div class="cur-main">
-        <div class="wbgt-line">
-          <span class="wbgt-num">87<sup>&deg;F</sup></span>
-          <span class="wbgt-phrase">High heat stress <span class="overline" style="letter-spacing:var(--ls-smallcaps)">WBGT</span></span>
+        <div class="hero-metric" data-metric="wbgt">
+          <span class="overline hero-lab">heat stress &middot; WBGT</span>
+          <div class="wbgt-line">
+            <span class="wbgt-num">87<sup>&deg;F</sup></span>
+            <span class="wbgt-phrase">High heat stress</span>
+          </div>
+        </div>
+        <div class="temp-metric">
+          <span class="overline hero-lab" data-metric="temp">air temperature</span>
+          <span class="temp-num">88<sup>&deg;F</sup></span><span class="temp-word">thermometer alone &mdash; the figure above folds in humidity &amp; sun</span>
         </div>
       </div>
       <svg class="cur-art" width="84" height="70" viewBox="0 0 84 70" aria-hidden="true">
@@ -508,19 +678,30 @@ tr.condense .reads { font-style: italic; color: var(--secondary); }
         </g>
         <use href="#g-thermo" x="54" y="4" width="27" height="49"/>
       </svg>
-      <p class="mono-strip">dew <span class="n c3">73&deg;</span> oppressive &middot; UV <span class="n c3">9</span> very high &middot; AQI <span class="n c1">62</span> moderate (PM2.5) &middot; wind S <span class="n cw">6</span> g <span class="n cw">12</span></p>
+      <div class="mono-strip">
+        <span data-metric="dew">dew <span class="n c3">73&deg;</span> oppressive</span> &middot;
+        <span data-metric="rh">RH <span class="n cw">61%</span></span> &middot;
+        <span data-metric="uv">UV <span class="n c3">9</span> very high</span> &middot;
+        <span data-metric="aqi">AQI <span class="n c1">62</span> moderate (PM2.5)</span> &middot;
+        <span data-metric="wind">wind S <span class="n cw">6</span> g <span class="n cw">12</span><svg class="rose" data-glyph="compass" width="26" height="26" viewBox="0 0 36 36" aria-hidden="true"><use href="#g-compass"/></svg></span>
+      </div>
+      <details class="wbgt-expl">
+        <summary>What is WBGT?</summary>
+        <p>WBGT &mdash; wet-bulb globe temperature &mdash; folds air temperature, humidity, sun load, and wind into one number for how much heat actually lands on a working body. Running makes you that working body, so WBGT &mdash; not the thermometer reading &mdash; is the figure a runner should watch; it is the heat-stress standard the National Weather Service and OSHA use for outdoor exertion.</p>
+        <p><a href="#explainers">See how every metric is read &darr;</a></p>
+      </details>
     </section>
 
     <section class="window-line" aria-label="Next best window">
       <p class="lead"><svg class="g-w" width="18" height="18" aria-hidden="true"><use href="#g-moon" width="18" height="18"/></svg><span class="overline">Next best</span>&ensp;Wed 5&ndash;8 AM &mdash; WBGT <span class="n c1">76&deg;</span> elevated &middot; dew <span class="n c3">70&deg;</span> very humid &middot; UV <span class="n c0">0&ndash;2</span> &middot; AQI <span class="n c0">48</span> good.</p>
-      <p class="sub">Tonight 7&ndash;8 PM is out &mdash; thunderstorms likely (<span class="n c4">60%</span>). Today&rsquo;s remaining daylight runs WBGT <span class="n c3">85&deg;+</span>.</p>
+      <div class="sub">Tonight 7&ndash;8 PM is out &mdash; thunderstorms likely (<span class="n c4">60%</span>). Today&rsquo;s remaining daylight runs WBGT <span class="n c3">85&deg;+</span>.</div>
     </section>
   </div>
 
   <section class="hours-sec" aria-label="Hourly ledger">
     <div class="fig-head">
       <h2 class="overline">Hourly ledger &middot; 48 h</h2>
-      <span class="note">3 PM Tue &rarr; 2 PM Thu &middot; scroll &rarr;</span>
+      <span class="note scroll-hint">3 PM Tue &rarr; 2 PM Thu &middot; scrub &rarr;</span>
     </div>
     <div class="fig-scroll" tabindex="0">
 <svg width="1384" height="500" viewBox="0 0 1384 500" role="img" aria-labelledby="figtitle" style="font-variant-numeric:tabular-nums">
@@ -658,29 +839,37 @@ tr.condense .reads { font-style: italic; color: var(--secondary); }
 <line x1="14" y1="244.8" x2="1330" y2="244.8" stroke="var(--hairline-strong)" stroke-width="0.5" stroke-dasharray="2 3"/>
 <text class="fx-thr" x="1334" y="247.3">70&#176;</text>
 <polyline points="14,230.4 42,230.4 70,230.4 98,230.4 126,225.6 154,225.6 182,225.6 210,230.4 238,230.4 266,235.2 294,235.2 322,240 350,240 378,244.8 406,244.8 434,244.8 462,244.8 490,244.8 518,244.8 546,240 574,240 602,240 630,240 658,235.2 686,235.2 714,235.2 742,235.2 770,235.2 798,240 826,240 854,244.8 882,244.8 910,244.8 938,249.6 966,249.6 994,254.4 1022,254.4 1050,254.4 1078,254.4 1106,254.4 1134,254.4 1162,249.6 1190,249.6 1218,244.8 1246,244.8 1274,240 1302,240 1330,240" fill="none" stroke="var(--ink)" stroke-width="1" opacity="0.75" stroke-linecap="round" stroke-linejoin="round"/>
-<text class="fx-num halo ft3" x="14" y="224.4" text-anchor="start">73&#176;<tspan class="fx-word" dx="4">oppressive</tspan></text>
+<text class="fx-num halo ft3" x="14" y="224.4" text-anchor="start">73&#176;<tspan class="fx-word" dx="4">oppressive &#183; RH 61%</tspan></text>
 <circle cx="14" cy="230.4" r="1.6" fill="var(--tier-3)"/>
-<text class="fx-num halo ft3" x="406" y="258.8" text-anchor="start">70&#176;<tspan class="fx-word" dx="4">very humid</tspan></text>
+<text class="fx-num halo ft3" x="406" y="258.8" text-anchor="start">70&#176;<tspan class="fx-word" dx="4">very humid &#183; RH 88%</tspan></text>
 <circle cx="406" cy="244.8" r="1.6" fill="var(--tier-3)"/>
-<text class="fx-num halo ft2" x="1022" y="267.4" text-anchor="middle">68&#176;<tspan class="fx-word" dx="4">muggy</tspan></text>
+<text class="fx-num halo ft2" x="1022" y="267.4" text-anchor="middle">68&#176;<tspan class="fx-word" dx="4">muggy &#183; RH 85%</tspan></text>
 <circle cx="1022" cy="254.4" r="1.6" fill="var(--tier-2)"/>
 <text class="fx-num halo ft3" x="1330" y="234" text-anchor="end">71&#176;<tspan class="fx-word" dx="4"></tspan></text>
 <circle cx="1330" cy="240" r="1.6" fill="var(--tier-3)"/>
 <line class="fx-sep" x1="14" y1="276" x2="1330" y2="276" stroke-width="1"/>
 <text class="fx-lane halo" x="16" y="281.5">SUN &amp; UV</text>
-<rect x="161" y="286" width="266.6" height="60" fill="url(#ph-night)"/>
-<rect x="832.4" y="286" width="267.4" height="60" fill="url(#ph-night)"/>
+<rect x="161" y="286" width="267.9" height="60" fill="url(#ph-night)"/>
+<rect x="832.4" y="286" width="268.9" height="60" fill="url(#ph-night)"/>
 <line x1="14" y1="346" x2="1330" y2="346" stroke="var(--hairline-strong)" stroke-width="1"/>
 <polyline points="14,300.6 21,301.8 28,303.2 35,304.6 42,306.2 49,307.9 56,309.7 63,311.6 70,313.6 77,315.7 84,317.9 91,320.2 98,322.6 105,325 112,327.5 119,330 126,332.6 133,335.3 140,337.9 147,340.6 154,343.3 161,346" fill="none" stroke="var(--tier-1)" stroke-width="1.1" stroke-linecap="round"/>
-<polyline points="427.6,346 434.6,343.3 441.6,340.6 448.6,337.9 455.6,335.2 462.6,332.6 469.6,330 476.6,327.4 483.6,325 490.6,322.5 497.6,320.2 504.6,317.9 511.6,315.7 518.6,313.6 525.6,311.5 532.6,309.6 539.6,307.8 546.6,306.1 553.6,304.5 560.6,303.1 567.6,301.8 574.6,300.6 581.6,299.5 588.6,298.6 595.6,297.8 602.6,297.1 609.6,296.6 616.6,296.3 623.6,296.1 630.6,296 637.6,296.1 644.6,296.3 651.6,296.7 658.6,297.2 665.6,297.9 672.6,298.7 679.6,299.7 686.6,300.7 693.6,302 700.6,303.3 707.6,304.8 714.6,306.4 721.6,308.1 728.6,309.9 735.6,311.9 742.6,313.9 749.6,316 756.6,318.2 763.6,320.5 770.6,322.9 777.6,325.3 784.6,327.8 791.6,330.4 798.6,333 805.6,335.6 812.6,338.3 819.6,341 826.6,343.7" fill="none" stroke="var(--tier-1)" stroke-width="1.1" stroke-linecap="round"/>
-<polyline points="1099.8,346 1106.8,343.3 1113.8,340.6 1120.8,337.9 1127.8,335.2 1134.8,332.6 1141.8,329.9 1148.8,327.4 1155.8,324.9 1162.8,322.5 1169.8,320.1 1176.8,317.8 1183.8,315.6 1190.8,313.5 1197.8,311.5 1204.8,309.5 1211.8,307.7 1218.8,306 1225.8,304.5 1232.8,303 1239.8,301.7 1246.8,300.5 1253.8,299.4 1260.8,298.5 1267.8,297.7 1274.8,297.1 1281.8,296.6 1288.8,296.3 1295.8,296.1 1302.8,296 1309.8,296.1 1316.8,296.3 1323.8,296.7" fill="none" stroke="var(--tier-1)" stroke-width="1.1" stroke-linecap="round"/>
+<polyline points="428.9,346 434.6,343.3 441.6,340.6 448.6,337.9 455.6,335.2 462.6,332.6 469.6,330 476.6,327.4 483.6,325 490.6,322.5 497.6,320.2 504.6,317.9 511.6,315.7 518.6,313.6 525.6,311.5 532.6,309.6 539.6,307.8 546.6,306.1 553.6,304.5 560.6,303.1 567.6,301.8 574.6,300.6 581.6,299.5 588.6,298.6 595.6,297.8 602.6,297.1 609.6,296.6 616.6,296.3 623.6,296.1 630.6,296 637.6,296.1 644.6,296.3 651.6,296.7 658.6,297.2 665.6,297.9 672.6,298.7 679.6,299.7 686.6,300.7 693.6,302 700.6,303.3 707.6,304.8 714.6,306.4 721.6,308.1 728.6,309.9 735.6,311.9 742.6,313.9 749.6,316 756.6,318.2 763.6,320.5 770.6,322.9 777.6,325.3 784.6,327.8 791.6,330.4 798.6,333 805.6,335.6 812.6,338.3 819.6,341 826.6,343.7" fill="none" stroke="var(--tier-1)" stroke-width="1.1" stroke-linecap="round"/>
+<polyline points="1101.3,346 1106.8,343.3 1113.8,340.6 1120.8,337.9 1127.8,335.2 1134.8,332.6 1141.8,329.9 1148.8,327.4 1155.8,324.9 1162.8,322.5 1169.8,320.1 1176.8,317.8 1183.8,315.6 1190.8,313.5 1197.8,311.5 1204.8,309.5 1211.8,307.7 1218.8,306 1225.8,304.5 1232.8,303 1239.8,301.7 1246.8,300.5 1253.8,299.4 1260.8,298.5 1267.8,297.7 1274.8,297.1 1281.8,296.6 1288.8,296.3 1295.8,296.1 1302.8,296 1309.8,296.1 1316.8,296.3 1323.8,296.7" fill="none" stroke="var(--tier-1)" stroke-width="1.1" stroke-linecap="round"/>
 <use href="#g-sun" x="619" y="285" width="22" height="22" style="color:var(--tier-1)"/>
 <use href="#g-moon" x="284" y="303" width="20" height="20" style="color:var(--slate)"/>
 <use href="#g-moon" x="956" y="303" width="20" height="20" style="color:var(--slate)"/>
 <text class="fx-note halo" x="164" y="342">sets 8:15</text>
-<text class="fx-note halo" x="430.6" y="342">rises 5:46</text>
+<text class="fx-note halo" x="432" y="342">rises 5:49</text>
 <text class="fx-note halo" x="835.4" y="342">sets 8:14</text>
-<text class="fx-note halo" x="1102.8" y="342">rises 5:47</text>
+<text class="fx-note halo" x="1104.3" y="342">rises 5:50</text>
+<line x1="161" y1="343" x2="161" y2="349.5" stroke="var(--hairline-strong)" stroke-width="1"/>
+<line x1="428.9" y1="343" x2="428.9" y2="349.5" stroke="var(--hairline-strong)" stroke-width="1"/>
+<line x1="832.5" y1="343" x2="832.5" y2="349.5" stroke="var(--hairline-strong)" stroke-width="1"/>
+<line x1="1101.3" y1="343" x2="1101.3" y2="349.5" stroke="var(--hairline-strong)" stroke-width="1"/>
+<use href="#g-sunset" data-glyph="sunset" x="151" y="347.5" width="20" height="12" style="color:var(--tier-1)"/>
+<use href="#g-sunrise" data-glyph="sunrise" x="418.9" y="347.5" width="20" height="12" style="color:var(--tier-1)"/>
+<use href="#g-sunset" data-glyph="sunset" x="822.5" y="347.5" width="20" height="12" style="color:var(--tier-1)"/>
+<use href="#g-sunrise" data-glyph="sunrise" x="1091.3" y="347.5" width="20" height="12" style="color:var(--tier-1)"/>
 <text class="fx-num halo ft3" x="30" y="308" text-anchor="start">UV 8<tspan class="fx-word" dx="4">very high</tspan></text>
 <text class="fx-num halo ft3" x="646" y="298" text-anchor="start">UV 10<tspan class="fx-word" dx="4">very high</tspan></text>
 <text class="fx-num halo ft3" x="1302" y="306" text-anchor="middle">UV 10</text>
@@ -816,94 +1005,98 @@ tr.condense .reads { font-style: italic; color: var(--secondary); }
 <text class="fx-hr" x="1274" y="491" text-anchor="middle">12P</text>
 </svg>
     </div>
-    <p class="fig-legend">One shared clock, five lanes: WBGT curve inked by heat-stress band &middot; dew point &middot; sun path with UV (night hatched) &middot; rain-chance bars &middot; air-quality ticks. Ice bands mark runnable windows; cross-hatch marks vetoed hours.</p>
+    <div class="fig-legend">One shared clock, five lanes: WBGT curve inked by heat-stress band &middot; dew point with RH at markers &middot; sun path with UV, sunrise/sunset etched on the horizon (night hatched) &middot; rain-chance bars &middot; air-quality ticks. Ice bands mark runnable windows; cross-hatch marks vetoed hours.</div>
 
-    <h3 class="overline agate-head">Agate &middot; exact readings</h3>
+    <h3 class="overline agate-head">Agate &middot; exact readings<span class="scroll-hint" aria-hidden="true">scrub &#8594;</span></h3>
     <div class="hours-scroll" tabindex="0">
       <table class="hours">
         <caption class="sr">Hour-by-hour conditions for the next 48 hours at Central Park</caption>
         <thead>
-          <tr><th class="t" scope="col">Time</th><th scope="col">WBGT</th><th class="reads" scope="col">Reads</th><th scope="col">Dew&nbsp;pt</th><th scope="col">UV</th><th scope="col">AQI</th><th scope="col">Wind</th><th scope="col">Rain</th></tr>
+          <tr><th class="t" scope="col">Time</th><th scope="col">WBGT</th><th class="reads" scope="col">Reads</th><th scope="col">Dew&nbsp;pt</th><th scope="col">RH</th><th scope="col">UV</th><th scope="col">AQI</th><th scope="col">Wind</th><th scope="col">Rain</th></tr>
         </thead>
         <tbody>
-          <tr class="day"><td class="t">TUE</td><td colspan="7">Tuesday July 28 &middot; today</td></tr>
-          <tr class="tw4"><td class="t">3 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">73&deg;</td><td class="n c3">8</td><td class="n c1">62</td><td class="n cw">S 6</td><td class="n cw">0%</td></tr>
-          <tr class="tw4"><td class="t">4 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">73&deg;</td><td class="n c2">6</td><td class="n c1">63</td><td class="n cw">S 7</td><td class="n cw">0%</td></tr>
-          <tr class="tw3"><td class="t">5 PM</td><td class="n c3">87&deg;</td><td class="reads">high heat stress</td><td class="n c3">73&deg;</td><td class="n c1">4</td><td class="n c1">63</td><td class="n cw">S 7</td><td class="n cw">5%</td></tr>
-          <tr class="tw3"><td class="t">6 PM</td><td class="n c3">85&deg;</td><td class="reads">high heat stress</td><td class="n c3">73&deg;</td><td class="n c0">2</td><td class="n c1">61</td><td class="n cw">S 8</td><td class="n cw">15%</td></tr>
-          <tr class="tw2 veto"><td class="t">7 PM</td><td class="n c2">82&deg;</td><td class="reads">&#10005; vetoed &mdash; thunderstorms likely (60%)</td><td class="n c3">74&deg;</td><td class="n c0">1</td><td class="n c1">58</td><td class="n cw">S 10 g22</td><td class="n c4">60%</td></tr>
-          <tr class="tw1 veto"><td class="t">8 PM</td><td class="n c1">79&deg;</td><td class="reads">&#10005; vetoed &mdash; thunderstorms possible (45%)</td><td class="n c3">74&deg;</td><td class="n c0">0</td><td class="n c1">55</td><td class="n cw">SW 12 g24</td><td class="n c4">45%</td></tr>
-          <tr class="tw1"><td class="t">9 PM</td><td class="n c1">77&deg;</td><td class="reads">elevated</td><td class="n c3">74&deg;</td><td class="n c0">0</td><td class="n c1">54</td><td class="n cw">SW 8</td><td class="n cw">25%</td></tr>
-          <tr class="tw1"><td class="t">10 PM</td><td class="n c1">76&deg;</td><td class="reads">elevated</td><td class="n c3">73&deg;</td><td class="n c0">0</td><td class="n c1">52</td><td class="n cw">SW 7</td><td class="n cw">15%</td></tr>
-          <tr class="tw0"><td class="t">11 PM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c3">73&deg;</td><td class="n c0">0</td><td class="n c1">51</td><td class="n cw">SW 6</td><td class="n cw">10%</td></tr>
-          <tr class="day"><td class="t">WED</td><td colspan="7">Wednesday July 29</td></tr>
-          <tr class="tw0"><td class="t">12 AM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c3">72&deg;</td><td class="n c0">0</td><td class="n c0">50</td><td class="n cw">SW 5</td><td class="n cw">5%</td></tr>
-          <tr class="tw0"><td class="t">1 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">72&deg;</td><td class="n c0">0</td><td class="n c0">49</td><td class="n cw">SW 5</td><td class="n cw">5%</td></tr>
-          <tr class="tw0"><td class="t">2 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">71&deg;</td><td class="n c0">0</td><td class="n c0">49</td><td class="n cw">SW 4</td><td class="n cw">5%</td></tr>
-          <tr class="tw0"><td class="t">3 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">71&deg;</td><td class="n c0">0</td><td class="n c0">48</td><td class="n cw">SW 4</td><td class="n cw">0%</td></tr>
-          <tr class="tw0"><td class="t">4 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n c0">0</td><td class="n c0">48</td><td class="n cw">W 4</td><td class="n cw">0%</td></tr>
-          <tr class="tw0"><td class="t">5 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n c0">0</td><td class="n c0">48</td><td class="n cw">W 4</td><td class="n cw">0%</td></tr>
-          <tr class="tw0"><td class="t">6 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n c0">1</td><td class="n c0">48</td><td class="n cw">W 4</td><td class="n cw">0%</td></tr>
-          <tr class="tw1"><td class="t">7 AM</td><td class="n c1">76&deg;</td><td class="reads">elevated</td><td class="n c3">70&deg;</td><td class="n c0">2</td><td class="n c0">50</td><td class="n cw">W 5</td><td class="n cw">0%</td></tr>
-          <tr class="tw1"><td class="t">8 AM</td><td class="n c1">78&deg;</td><td class="reads">elevated</td><td class="n c3">70&deg;</td><td class="n c1">4</td><td class="n c1">52</td><td class="n cw">W 6</td><td class="n cw">0%</td></tr>
-          <tr class="tw2"><td class="t">9 AM</td><td class="n c2">81&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">70&deg;</td><td class="n c2">6</td><td class="n c1">54</td><td class="n cw">SW 7</td><td class="n cw">5%</td></tr>
-          <tr class="tw2"><td class="t">10 AM</td><td class="n c2">84&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">71&deg;</td><td class="n c3">8</td><td class="n c1">56</td><td class="n cw">SW 8</td><td class="n cw">10%</td></tr>
-          <tr class="tw3"><td class="t">11 AM</td><td class="n c3">86&deg;</td><td class="reads">high heat stress</td><td class="n c3">71&deg;</td><td class="n c3">9</td><td class="n c1">58</td><td class="n cw">S 8</td><td class="n cw">10%</td></tr>
-          <tr class="tw4"><td class="t">12 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">71&deg;</td><td class="n c3">10</td><td class="n c1">60</td><td class="n cw">S 9</td><td class="n cw">15%</td></tr>
-          <tr class="tw4"><td class="t">1 PM</td><td class="n c4">89&deg;</td><td class="reads">extreme caution</td><td class="n c3">71&deg;</td><td class="n c3">10</td><td class="n c1">61</td><td class="n cw">S 9</td><td class="n cw">15%</td></tr>
-          <tr class="tw4"><td class="t">2 PM</td><td class="n c4">89&deg;</td><td class="reads">extreme caution</td><td class="n c3">72&deg;</td><td class="n c3">9</td><td class="n c1">62</td><td class="n cw">S 9</td><td class="n cw">15%</td></tr>
-          <tr class="tw4"><td class="t">3 PM</td><td class="n c4">89&deg;</td><td class="reads">extreme caution</td><td class="n c3">72&deg;</td><td class="n c3">8</td><td class="n c1">62</td><td class="n cw">S 9</td><td class="n cw">15%</td></tr>
-          <tr class="tw4"><td class="t">4 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">72&deg;</td><td class="n c2">6</td><td class="n c1">61</td><td class="n cw">S 8</td><td class="n cw">10%</td></tr>
-          <tr class="tw3"><td class="t">5 PM</td><td class="n c3">86&deg;</td><td class="reads">high heat stress</td><td class="n c3">72&deg;</td><td class="n c1">4</td><td class="n c1">60</td><td class="n cw">S 8</td><td class="n cw">10%</td></tr>
-          <tr class="tw2"><td class="t">6 PM</td><td class="n c2">83&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">72&deg;</td><td class="n c0">2</td><td class="n c1">58</td><td class="n cw">S 7</td><td class="n cw">15%</td></tr>
-          <tr class="tw2"><td class="t">7 PM</td><td class="n c2">80&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">71&deg;</td><td class="n c0">1</td><td class="n c1">55</td><td class="n cw">S 7</td><td class="n cw">15%</td></tr>
-          <tr class="tw1"><td class="t">8 PM</td><td class="n c1">78&deg;</td><td class="reads">elevated</td><td class="n c3">71&deg;</td><td class="n c0">0</td><td class="n c1">54</td><td class="n cw">S 6</td><td class="n cw">10%</td></tr>
-          <tr class="tw1"><td class="t">9 PM</td><td class="n c1">76&deg;</td><td class="reads">elevated</td><td class="n c3">70&deg;</td><td class="n c0">0</td><td class="n c1">53</td><td class="n cw">S 5</td><td class="n cw">5%</td></tr>
-          <tr class="tw0"><td class="t">10 PM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n c0">0</td><td class="n c1">52</td><td class="n cw">S 5</td><td class="n cw">5%</td></tr>
-          <tr class="tw0"><td class="t">11 PM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n c0">0</td><td class="n c1">51</td><td class="n cw">S 4</td><td class="n cw">5%</td></tr>
-          <tr class="day"><td class="t">THU</td><td colspan="7">Thursday July 30</td></tr>
-          <tr class="condense tw0"><td class="t">12&ndash;4 AM</td><td class="n c0">72&ndash;74&deg;</td><td class="reads">low &mdash; quiet overnight</td><td class="n c2">68&ndash;69&deg;</td><td class="n c0">0</td><td class="n c1">49&ndash;51</td><td class="n cw">SW 4</td><td class="n cw">0%</td></tr>
-          <tr class="tw0"><td class="t">5 AM</td><td class="n c0">72&deg;</td><td class="reads">low</td><td class="n c2">68&deg;</td><td class="n c0">0</td><td class="n c0">49</td><td class="n cw">SW 4</td><td class="n cw">0%</td></tr>
-          <tr class="tw0"><td class="t">6 AM</td><td class="n c0">73&deg;</td><td class="reads">low</td><td class="n c2">68&deg;</td><td class="n c0">1</td><td class="n c0">50</td><td class="n cw">SW 5</td><td class="n cw">0%</td></tr>
-          <tr class="tw0"><td class="t">7 AM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c2">68&deg;</td><td class="n c0">2</td><td class="n c1">51</td><td class="n cw">SW 5</td><td class="n cw">0%</td></tr>
-          <tr class="tw1"><td class="t">8 AM</td><td class="n c1">77&deg;</td><td class="reads">elevated</td><td class="n c2">69&deg;</td><td class="n c1">4</td><td class="n c1">53</td><td class="n cw">SW 6</td><td class="n cw">5%</td></tr>
-          <tr class="condense tw4"><td class="t">9 AM&ndash;2 PM</td><td class="n c4">80&#8594;88&deg;</td><td class="reads">climbing &mdash; moderate by 9, high by 11, extreme caution by 1 PM</td><td class="n c3">69&ndash;71&deg;</td><td class="n c3">4&#8594;10</td><td class="n c1">53&ndash;61</td><td class="n cw">SW 7</td><td class="n cw">&le;15%</td></tr>
+          <tr class="day"><td class="t">TUE</td><td colspan="8">Tuesday July 28 &middot; today</td></tr>
+          <tr class="tw4"><td class="t">3 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">73&deg;</td><td class="n cw">61%</td><td class="n c3">8</td><td class="n c1">62</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 6</td><td class="n cw">0%</td></tr>
+          <tr class="tw4"><td class="t">4 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">73&deg;</td><td class="n cw">61%</td><td class="n c2">6</td><td class="n c1">63</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 7</td><td class="n cw">0%</td></tr>
+          <tr class="tw3"><td class="t">5 PM</td><td class="n c3">87&deg;</td><td class="reads">high heat stress</td><td class="n c3">73&deg;</td><td class="n cw">63%</td><td class="n c1">4</td><td class="n c1">63</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 7</td><td class="n cw">5%</td></tr>
+          <tr class="tw3"><td class="t">6 PM</td><td class="n c3">85&deg;</td><td class="reads">high heat stress</td><td class="n c3">73&deg;</td><td class="n cw">67%</td><td class="n c0">2</td><td class="n c1">61</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 8</td><td class="n cw">15%</td></tr>
+          <tr class="tw2 veto"><td class="t">7 PM</td><td class="n c2">82&deg;</td><td class="reads">&#10005; vetoed &mdash; thunderstorms likely (60%)</td><td class="n c3">74&deg;</td><td class="n cw">77%</td><td class="n c0">1</td><td class="n c1">58</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 10 g22</td><td class="n c4">60%</td></tr>
+          <tr class="tw1 veto"><td class="t">8 PM</td><td class="n c1">79&deg;</td><td class="reads">&#10005; vetoed &mdash; thunderstorms possible (45%)</td><td class="n c3">74&deg;</td><td class="n cw">85%</td><td class="n c0">0</td><td class="n c1">55</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 12 g24</td><td class="n c4">45%</td></tr>
+          <tr class="sun-row" data-sun-row><td class="t"></td><td colspan="8"><svg class="sun-mark" width="15" height="9" viewBox="0 0 24 14" aria-hidden="true"><use href="#g-sunset"/></svg>&mdash; sunset 8:15 &mdash;</td></tr>
+          <tr class="tw1"><td class="t">9 PM</td><td class="n c1">77&deg;</td><td class="reads">elevated</td><td class="n c3">74&deg;</td><td class="n cw">87%</td><td class="n c0">0</td><td class="n c1">54</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 8</td><td class="n cw">25%</td></tr>
+          <tr class="tw1"><td class="t">10 PM</td><td class="n c1">76&deg;</td><td class="reads">elevated</td><td class="n c3">73&deg;</td><td class="n cw">88%</td><td class="n c0">0</td><td class="n c1">52</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 7</td><td class="n cw">15%</td></tr>
+          <tr class="tw0"><td class="t">11 PM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c3">73&deg;</td><td class="n cw">90%</td><td class="n c0">0</td><td class="n c1">51</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 6</td><td class="n cw">10%</td></tr>
+          <tr class="day"><td class="t">WED</td><td colspan="8">Wednesday July 29</td></tr>
+          <tr class="tw0"><td class="t">12 AM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c3">72&deg;</td><td class="n cw">90%</td><td class="n c0">0</td><td class="n c0">50</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 5</td><td class="n cw">5%</td></tr>
+          <tr class="tw0"><td class="t">1 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">72&deg;</td><td class="n cw">90%</td><td class="n c0">0</td><td class="n c0">49</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 5</td><td class="n cw">5%</td></tr>
+          <tr class="tw0"><td class="t">2 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">71&deg;</td><td class="n cw">90%</td><td class="n c0">0</td><td class="n c0">49</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 4</td><td class="n cw">5%</td></tr>
+          <tr class="tw0"><td class="t">3 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">71&deg;</td><td class="n cw">90%</td><td class="n c0">0</td><td class="n c0">48</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 4</td><td class="n cw">0%</td></tr>
+          <tr class="tw0"><td class="t">4 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n cw">88%</td><td class="n c0">0</td><td class="n c0">48</td><td class="n cw"><svg class="wdir rW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>W 4</td><td class="n cw">0%</td></tr>
+          <tr class="tw0"><td class="t">5 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n cw">88%</td><td class="n c0">0</td><td class="n c0">48</td><td class="n cw"><svg class="wdir rW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>W 4</td><td class="n cw">0%</td></tr>
+          <tr class="sun-row" data-sun-row><td class="t"></td><td colspan="8"><svg class="sun-mark" width="15" height="9" viewBox="0 0 24 14" aria-hidden="true"><use href="#g-sunrise"/></svg>&mdash; sunrise 5:49 &mdash;</td></tr>
+          <tr class="tw0"><td class="t">6 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n cw">88%</td><td class="n c0">1</td><td class="n c0">48</td><td class="n cw"><svg class="wdir rW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>W 4</td><td class="n cw">0%</td></tr>
+          <tr class="tw1"><td class="t">7 AM</td><td class="n c1">76&deg;</td><td class="reads">elevated</td><td class="n c3">70&deg;</td><td class="n cw">82%</td><td class="n c0">2</td><td class="n c0">50</td><td class="n cw"><svg class="wdir rW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>W 5</td><td class="n cw">0%</td></tr>
+          <tr class="tw1"><td class="t">8 AM</td><td class="n c1">78&deg;</td><td class="reads">elevated</td><td class="n c3">70&deg;</td><td class="n cw">74%</td><td class="n c1">4</td><td class="n c1">52</td><td class="n cw"><svg class="wdir rW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>W 6</td><td class="n cw">0%</td></tr>
+          <tr class="tw2"><td class="t">9 AM</td><td class="n c2">81&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">70&deg;</td><td class="n cw">67%</td><td class="n c2">6</td><td class="n c1">54</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 7</td><td class="n cw">5%</td></tr>
+          <tr class="tw2"><td class="t">10 AM</td><td class="n c2">84&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">71&deg;</td><td class="n cw">65%</td><td class="n c3">8</td><td class="n c1">56</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 8</td><td class="n cw">10%</td></tr>
+          <tr class="tw3"><td class="t">11 AM</td><td class="n c3">86&deg;</td><td class="reads">high heat stress</td><td class="n c3">71&deg;</td><td class="n cw">61%</td><td class="n c3">9</td><td class="n c1">58</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 8</td><td class="n cw">10%</td></tr>
+          <tr class="tw4"><td class="t">12 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">71&deg;</td><td class="n cw">57%</td><td class="n c3">10</td><td class="n c1">60</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 9</td><td class="n cw">15%</td></tr>
+          <tr class="tw4"><td class="t">1 PM</td><td class="n c4">89&deg;</td><td class="reads">extreme caution</td><td class="n c3">71&deg;</td><td class="n cw">56%</td><td class="n c3">10</td><td class="n c1">61</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 9</td><td class="n cw">15%</td></tr>
+          <tr class="tw4"><td class="t">2 PM</td><td class="n c4">89&deg;</td><td class="reads">extreme caution</td><td class="n c3">72&deg;</td><td class="n cw">57%</td><td class="n c3">9</td><td class="n c1">62</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 9</td><td class="n cw">15%</td></tr>
+          <tr class="tw4"><td class="t">3 PM</td><td class="n c4">89&deg;</td><td class="reads">extreme caution</td><td class="n c3">72&deg;</td><td class="n cw">57%</td><td class="n c3">8</td><td class="n c1">62</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 9</td><td class="n cw">15%</td></tr>
+          <tr class="tw4"><td class="t">4 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">72&deg;</td><td class="n cw">59%</td><td class="n c2">6</td><td class="n c1">61</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 8</td><td class="n cw">10%</td></tr>
+          <tr class="tw3"><td class="t">5 PM</td><td class="n c3">86&deg;</td><td class="reads">high heat stress</td><td class="n c3">72&deg;</td><td class="n cw">63%</td><td class="n c1">4</td><td class="n c1">60</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 8</td><td class="n cw">10%</td></tr>
+          <tr class="tw2"><td class="t">6 PM</td><td class="n c2">83&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">72&deg;</td><td class="n cw">70%</td><td class="n c0">2</td><td class="n c1">58</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 7</td><td class="n cw">15%</td></tr>
+          <tr class="tw2"><td class="t">7 PM</td><td class="n c2">80&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">71&deg;</td><td class="n cw">74%</td><td class="n c0">1</td><td class="n c1">55</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 7</td><td class="n cw">15%</td></tr>
+          <tr class="tw1"><td class="t">8 PM</td><td class="n c1">78&deg;</td><td class="reads">elevated</td><td class="n c3">71&deg;</td><td class="n cw">79%</td><td class="n c0">0</td><td class="n c1">54</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 6</td><td class="n cw">10%</td></tr>
+          <tr class="sun-row" data-sun-row><td class="t"></td><td colspan="8"><svg class="sun-mark" width="15" height="9" viewBox="0 0 24 14" aria-hidden="true"><use href="#g-sunset"/></svg>&mdash; sunset 8:14 &mdash;</td></tr>
+          <tr class="tw1"><td class="t">9 PM</td><td class="n c1">76&deg;</td><td class="reads">elevated</td><td class="n c3">70&deg;</td><td class="n cw">82%</td><td class="n c0">0</td><td class="n c1">53</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 5</td><td class="n cw">5%</td></tr>
+          <tr class="tw0"><td class="t">10 PM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n cw">85%</td><td class="n c0">0</td><td class="n c1">52</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 5</td><td class="n cw">5%</td></tr>
+          <tr class="tw0"><td class="t">11 PM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n cw">88%</td><td class="n c0">0</td><td class="n c1">51</td><td class="n cw"><svg class="wdir rS" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>S 4</td><td class="n cw">5%</td></tr>
+          <tr class="day"><td class="t">THU</td><td colspan="8">Thursday July 30</td></tr>
+          <tr class="condense tw0"><td class="t">12&ndash;4 AM</td><td class="n c0">72&ndash;74&deg;</td><td class="reads">low &mdash; quiet overnight</td><td class="n c2">68&ndash;69&deg;</td><td class="n cw">85&ndash;88%</td><td class="n c0">0</td><td class="n c1">49&ndash;51</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 4</td><td class="n cw">0%</td></tr>
+          <tr class="tw0"><td class="t">5 AM</td><td class="n c0">72&deg;</td><td class="reads">low</td><td class="n c2">68&deg;</td><td class="n cw">87%</td><td class="n c0">0</td><td class="n c0">49</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 4</td><td class="n cw">0%</td></tr>
+          <tr class="sun-row" data-sun-row><td class="t"></td><td colspan="8"><svg class="sun-mark" width="15" height="9" viewBox="0 0 24 14" aria-hidden="true"><use href="#g-sunrise"/></svg>&mdash; sunrise 5:50 &mdash;</td></tr>
+          <tr class="tw0"><td class="t">6 AM</td><td class="n c0">73&deg;</td><td class="reads">low</td><td class="n c2">68&deg;</td><td class="n cw">85%</td><td class="n c0">1</td><td class="n c0">50</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 5</td><td class="n cw">0%</td></tr>
+          <tr class="tw0"><td class="t">7 AM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c2">68&deg;</td><td class="n cw">79%</td><td class="n c0">2</td><td class="n c1">51</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 5</td><td class="n cw">0%</td></tr>
+          <tr class="tw1"><td class="t">8 AM</td><td class="n c1">77&deg;</td><td class="reads">elevated</td><td class="n c2">69&deg;</td><td class="n cw">76%</td><td class="n c1">4</td><td class="n c1">53</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 6</td><td class="n cw">5%</td></tr>
+          <tr class="condense tw4"><td class="t">9 AM&ndash;2 PM</td><td class="n c4">80&#8594;88&deg;</td><td class="reads">climbing &mdash; moderate by 9, high by 11, extreme caution by 1 PM</td><td class="n c3">69&ndash;71&deg;</td><td class="n cw">70&#8594;57%</td><td class="n c3">4&#8594;10</td><td class="n c1">53&ndash;61</td><td class="n cw"><svg class="wdir rSW" width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><use href="#g-warrow"/></svg>SW 7</td><td class="n cw">&le;15%</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <section class="explainers" aria-label="What each metric means">
+  <section class="explainers" id="explainers" aria-label="What each metric means">
     <h2 class="sr">What each metric means</h2>
     <details>
       <summary><svg class="g-e" width="14" height="24" aria-hidden="true"><use href="#g-thermo" width="14" height="24"/></svg><span class="lab">WBGT &mdash; heat stress</span></summary>
       <p>Wet-bulb globe temperature folds air temperature, humidity, sun load, and wind into one heat-stress number &mdash; the standard used for athletics. It omits your fitness, acclimatization, and pace. Words follow the National Weather Service bands: low, elevated, moderate, high heat stress, extreme caution, extreme (a veto at 90&deg;F+).</p>
-      <p class="src">source: NWS gridpoint forecast (forecast value, not estimated)</p>
+      <div class="src">source: NWS gridpoint forecast (forecast value, not estimated)</div>
     </details>
     <details>
       <summary><svg class="g-e" width="17" height="22" aria-hidden="true"><use href="#g-drop" width="17" height="22"/></svg><span class="lab">Dew point &mdash; humidity</span></summary>
       <p>The absolute moisture in the air, which sets how well sweat can evaporate. Below 55&deg;F is comfortable; at 70&deg;F+ evaporation stalls and heart rate drifts up at any pace. It omits temperature itself &mdash; that is what WBGT is for.</p>
-      <p class="src">source: NWS gridpoint forecast</p>
+      <div class="src">source: NWS gridpoint forecast</div>
     </details>
     <details>
       <summary><svg class="g-e" width="22" height="22" aria-hidden="true"><use href="#g-sun" width="22" height="22"/></svg><span class="lab">UV index</span></summary>
       <p>The EPA scale for sunburn speed on exposed skin &mdash; at UV 9, damage begins in about 15 minutes. It says nothing about heat: dawn hours can be brutal for WBGT yet UV 0. Shade, cover, and sunscreen change your exposure, not the index.</p>
-      <p class="src">source: Open-Meteo model (forecast)</p>
+      <div class="src">source: Open-Meteo model (forecast)</div>
     </details>
     <details>
       <summary><svg class="g-e" width="24" height="15" aria-hidden="true"><use href="#g-haze" width="24" height="15"/></svg><span class="lab">AQI &mdash; air quality</span></summary>
       <p>The EPA Air Quality Index, taken from the worst nearby monitor and its dominant pollutant &mdash; a protective reading, not an average. Moderate (51&ndash;100) is fine for most runners; unusually sensitive people may shorten hard sessions. 201+ vetoes the hour.</p>
-      <p class="src">now: AirNow monitor (measured) &middot; hourly forecast: CAMS model (modeled)</p>
+      <div class="src">now: AirNow monitor (measured) &middot; hourly forecast: CAMS model (modeled)</div>
     </details>
     <details>
       <summary><svg class="g-e" width="24" height="16" aria-hidden="true"><use href="#g-wind" width="24" height="16"/></svg><span class="lab">Wind &amp; gusts</span></summary>
       <p>Sustained speed plus gusts. In heat, wind helps &mdash; it moves saturated air off your skin. Today&rsquo;s S 6 is too little to matter. It omits direction changes along a loop; see the route note for exposure.</p>
-      <p class="src">source: NWS gridpoint forecast</p>
+      <div class="src">source: NWS gridpoint forecast</div>
     </details>
     <details>
       <summary><svg class="g-e" width="24" height="22" aria-hidden="true"><use href="#g-storm" width="24" height="22"/></svg><span class="lab">Rain &amp; thunder</span></summary>
       <p>Chance of measurable precipitation for the hour. Rain alone rarely cancels a run; lightning always does &mdash; any hour with thunder probability at 30% or more is struck from the ledger with the reason named, never averaged away.</p>
-      <p class="src">source: NWS gridpoint forecast (probabilityOfThunder, weather layer)</p>
+      <div class="src">source: NWS gridpoint forecast (probabilityOfThunder, weather layer)</div>
     </details>
   </section>
 
@@ -917,9 +1110,9 @@ tr.condense .reads { font-style: italic; color: var(--secondary); }
 </main>
 
 <footer class="wrap foot">
-  <p>forecast &amp; alerts: National Weather Service, gridpoint OKX 34,45 &middot; forecast fetched 2:21 PM ET &middot; alerts fetched 2:29 PM ET</p>
-  <p>air quality now: EPA AirNow, worst nearby monitor (measured) &middot; fetched 2:05 PM ET &middot; UV + hourly AQI: Open-Meteo (modeled, CAMS) &middot; fetched 2:10 PM ET</p>
-  <p>no composite score is computed &mdash; read the words. &middot; mockup ledger-v2a etched panel &middot; whentorun</p>
+  <div class="fine">forecast &amp; alerts: National Weather Service, gridpoint OKX 34,45 &middot; forecast fetched 2:21 PM ET &middot; alerts fetched 2:29 PM ET</div>
+  <div class="fine">air quality now: EPA AirNow, worst nearby monitor (measured) &middot; fetched 2:05 PM ET &middot; UV + hourly AQI: Open-Meteo (modeled, CAMS) &middot; fetched 2:10 PM ET</div>
+  <div class="fine">no composite score is computed &mdash; read the words. &middot; mockup ledger-v2a etched panel &middot; whentorun</div>
 </footer>
 
 <script>
