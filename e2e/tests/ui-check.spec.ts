@@ -225,6 +225,7 @@ for (const variant of variants) {
     });
 
     test('compass rose shows wind direction in the current panel', async ({ page }) => {
+      test.skip(variant.includes('v3'), 'v3 dropped the static rose (Kui nit) — per-hour vanes only');
       const ok = await page.evaluate(() => {
         const rose = document.querySelector('svg[data-glyph="compass"], [data-glyph="compass"] svg');
         if (!rose) return false;
@@ -240,18 +241,126 @@ for (const variant of variants) {
         expect(hasWord, 'affordance must be arrows/gradient, never the word "scrub"').toBe(false);
       });
 
-      test('v3: single unit toggle and glyph theme controls', async ({ page }) => {
+      test('v3: single cycling controls — one unit button (no slash), one theme button', async ({ page }) => {
         const r = await page.evaluate(() => {
-          const unit = document.querySelectorAll('[data-unit-toggle]');
-          const theme = document.querySelectorAll('[data-theme-btn]');
+          const unit = document.querySelectorAll<HTMLElement>('[data-unit-toggle]');
+          const theme = document.querySelectorAll<HTMLElement>('[data-theme-btn]');
+          const unitSlash = Array.from(unit).some((b) => (b.textContent || '').includes('/'));
           const themeWordy = Array.from(theme).some((b) =>
-            /(auto|light|dark)/i.test((b.textContent || '').replace(/\s/g, '')),
+            /(auto|light|dark|system)/i.test((b.textContent || '').replace(/\s/g, '')),
           );
-          return { units: unit.length, themes: theme.length, themeWordy };
+          return { units: unit.length, themes: theme.length, unitSlash, themeWordy };
         });
-        expect(r.units, 'exactly one °F/°C toggle button (data-unit-toggle)').toBe(1);
-        expect(r.themes, 'three glyph theme buttons (data-theme-btn)').toBe(3);
-        expect(r.themeWordy, 'theme buttons are glyphs, not words (aria-label ok)').toBe(false);
+        expect(r.units, 'exactly one unit toggle button (data-unit-toggle)').toBe(1);
+        expect(r.unitSlash, 'unit button shows current unit only — no slash').toBe(false);
+        expect(r.themes, 'ONE cycling theme button (data-theme-btn), system icon distinctive').toBe(1);
+        expect(r.themeWordy, 'theme button is a glyph, not words (aria-label ok)').toBe(false);
+      });
+
+      test('v3: banned prod copy and removed elements', async ({ page }) => {
+        const r = await page.evaluate(() => {
+          const text = document.body.innerText.toLowerCase();
+          const banned = [
+            'no composite score',
+            'no single number',
+            'not a stop order',
+            'not a veto',
+            "band's ink",
+            'one clock',
+            'fig. 1',
+            'fig 1',
+            'nyc running conditions',
+            'new york running conditions',
+          ].filter((s) => text.includes(s));
+          const tableWords: string[] = [];
+          for (const row of document.querySelectorAll('table tr, ol.ledger li, [data-hour-row]')) {
+            const t = (row.textContent || '').toLowerCase();
+            if (/extreme caution|heat stress|moderate heat/.test(t)) {
+              tableWords.push(t.slice(0, 60));
+              if (tableWords.length > 3) break;
+            }
+          }
+          const staticCompass = document.querySelectorAll('[data-glyph="compass"]').length;
+          return { banned, tableWords: tableWords.slice(0, 3), staticCompass };
+        });
+        expect(r.banned, `banned copy present: ${r.banned.join(' | ')}`).toEqual([]);
+        expect(r.tableWords, 'no WBGT category language inside table rows (legend covers it)').toEqual([]);
+        // But the numeral itself must be labeled or it's ambiguous vs temp/dew:
+        // on mobile (no column headers) every hour row needs a small "wbgt" label.
+        const rowLabeled = await page.evaluate(() => {
+          const rows = document.querySelectorAll('ol.ledger li, [data-hour-row]');
+          if (!rows.length) return true; // desktop table with headers handles it
+          let labeled = 0;
+          for (const row of rows) if (/wbgt/i.test(row.textContent || '')) labeled++;
+          return labeled >= rows.length * 0.8; // divider/narrative rows exempt
+        });
+        expect(rowLabeled, 'mobile hour rows label the WBGT numeral (bare temps are ambiguous)').toBe(true);
+        // Deck 2 aligns with the WBGT column start — blank under the time column.
+        const deckAligned = await page.evaluate(() => {
+          const row = document.querySelector('ol.ledger li:not([data-sun-row]):not([data-narrative]), [data-hour-row]');
+          if (!row) return true;
+          const wbgt = row.querySelector('[data-metric="wbgt"], .lwbgt, [class*="wbgt"]');
+          const deck2 = row.querySelector('[data-deck2], .deck2, [class*="deck2"]');
+          if (!wbgt || !deck2) return false;
+          const dx = Math.abs(deck2.getBoundingClientRect().left - wbgt.getBoundingClientRect().left);
+          return dx <= 8;
+        });
+        expect(deckAligned, 'mobile deck 2 left-aligns with the WBGT column, not the time column').toBe(true);
+        expect(r.staticCompass, 'static compass rose removed').toBe(0);
+      });
+
+      test('v3: precip axis with 50/100 marks and daily numeric tags', async ({ page }) => {
+        const r = await page.evaluate(() => {
+          const axis = document.querySelector('[data-precip-axis]');
+          const marks = axis ? /50/.test(axis.textContent || '') && /100/.test(axis.textContent || '') : false;
+          const tags = document.querySelectorAll('[data-precip-tag]').length;
+          return { axis: !!axis, marks, tags };
+        });
+        expect(r.axis, 'precipitation y-axis (data-precip-axis) below the temperature range').toBe(true);
+        expect(r.marks, 'axis marks at 50% and 100%').toBe(true);
+        expect(r.tags, 'daily numeric reminder tags for precip (data-precip-tag)').toBeGreaterThanOrEqual(2);
+      });
+
+      test('v3: date locked while scrubbing; y-axis pill not duplicated', async ({ page }) => {
+        const r = await page.evaluate(() => {
+          const lock = document.querySelector<HTMLElement>('[data-date-lock]');
+          const sticky = lock ? ['sticky', 'absolute', 'fixed'].includes(getComputedStyle(lock).position) : false;
+          const pills = Array.from(document.querySelectorAll<HTMLElement>('[data-y-axis]')).filter(
+            (el) => el.getBoundingClientRect().width > 0,
+          ).length;
+          return { lock: !!lock, sticky, pills };
+        });
+        expect(r.lock && r.sticky, 'sticky date indicator (data-date-lock) inside the chart scroller').toBe(true);
+        expect(r.pills, 'exactly one visible y-axis pill (mobile duplication bug)').toBe(1);
+      });
+
+      test('v3: scrub arrows adapt to scroll position', async ({ page }) => {
+        const r = await page.evaluate(async () => {
+          const scroller = Array.from(document.querySelectorAll<HTMLElement>('body *')).find((e) => {
+            const cs = getComputedStyle(e);
+            return /(auto|scroll)/.test(cs.overflowX) && e.scrollWidth > e.clientWidth + 40;
+          });
+          if (!scroller) return { ok: false, why: 'no scroller' };
+          const vis = (sel: string) => {
+            const el = scroller.parentElement?.querySelector<HTMLElement>(sel) || document.querySelector<HTMLElement>(sel);
+            if (!el) return null;
+            const cs = getComputedStyle(el);
+            return cs.display !== 'none' && cs.visibility !== 'hidden' && parseFloat(cs.opacity || '1') > 0.05;
+          };
+          scroller.scrollLeft = 0;
+          await new Promise((r2) => setTimeout(r2, 120));
+          const atStart = { left: vis('[data-scrub-left]'), right: vis('[data-scrub-right]') };
+          scroller.scrollLeft = scroller.scrollWidth;
+          await new Promise((r2) => setTimeout(r2, 120));
+          const atEnd = { left: vis('[data-scrub-left]'), right: vis('[data-scrub-right]') };
+          scroller.scrollLeft = 0;
+          return { ok: true, atStart, atEnd };
+        });
+        expect(r.ok, r.why || '').toBe(true);
+        expect(r.atStart?.right, 'right arrow visible at start').toBe(true);
+        expect(r.atStart?.left, 'left arrow hidden at start').toBe(false);
+        expect(r.atEnd?.left, 'left arrow visible at right extreme').toBe(true);
+        expect(r.atEnd?.right, 'right arrow hidden at right extreme').toBe(false);
       });
 
       test('v3: air temp and dew point side by side under WBGT, neutral ink', async ({ page }) => {
