@@ -354,12 +354,15 @@ tr[data-sun-row] th.t, tr[data-sun-row] td {
 }
 tr[data-sun-row] .g { width: 15px; height: 15px; vertical-align: -3px; color: var(--tier-1); }
 
-/* desktop / wide: single-line rows in a scrub container with edge fade */
-@media (min-width: 768px) {
+/* mid widths where the wide rows genuinely overflow: edge fade + scrub cue */
+@media (min-width: 768px) and (max-width: 860px) {
   .hours-scroll {
     -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 48px), transparent);
     mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 48px), transparent);
   }
+}
+@media (min-width: 861px) {
+  .hours-sec .scroll-hint { display: none; }  /* table fits — nothing to scrub */
 }
 /* narrow: the table folds — two-deck rows, no horizontal scrolling anywhere */
 @media (max-width: 767px) {
