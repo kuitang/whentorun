@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>when to run &mdash; Central Park (mockup A &middot; broadsheet)</title>
+<link rel="stylesheet" href="../static/css/tokens.css">
+<style>
+/* ============ a-broadsheet: editorial prose-led, Spectral-forward ============ */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+}
+.wrap {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 var(--space-md) calc(var(--space-xxl) + env(safe-area-inset-bottom));
+}
+.overline {
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  font-weight: 600;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--slate);
+}
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+a { color: var(--steel-text); }
+
+/* ---------- masthead ---------- */
+.masthead { padding-top: calc(var(--space-sm) + env(safe-area-inset-top)); }
+.mast-top {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: var(--space-sm); flex-wrap: wrap;
+}
+.dateline {
+  font-family: var(--font-label); font-size: var(--size-label);
+  letter-spacing: var(--ls-smallcaps); text-transform: uppercase;
+  color: var(--secondary); white-space: nowrap;
+}
+.wordmark {
+  margin: var(--space-xs) 0 var(--space-sm); font-weight: 300;
+  font-size: var(--size-screen-title); line-height: 1.1; letter-spacing: 0.01em;
+}
+.mast-nav {
+  display: flex; align-items: center; gap: var(--space-sm);
+  border-bottom: 1px solid var(--hairline);
+}
+.units { display: flex; border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-surface); overflow: hidden; flex: none; }
+.units button {
+  font-family: var(--font-label); font-size: var(--size-body); font-weight: 500;
+  min-height: var(--hit-target); min-width: var(--hit-target);
+  padding: 0 var(--space-sm); border: 0; background: transparent;
+  color: var(--secondary); cursor: pointer;
+}
+.units button[aria-pressed="true"] { background: var(--ice); color: var(--ink); }
+.ink-rule { height: 2px; background: var(--ink); border: 0; margin: 0; }
+.paths {
+  display: flex; gap: var(--space-xs); overflow-x: auto;
+  flex: 1; min-width: 0; scrollbar-width: none;
+}
+.paths::-webkit-scrollbar { display: none; }
+.paths a {
+  display: inline-flex; align-items: center; white-space: nowrap;
+  min-height: var(--hit-target); padding: 0 var(--space-sm);
+  font-family: var(--font-label); font-size: var(--size-body); font-weight: 500;
+  letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none;
+  color: var(--slate); border-bottom: 2px solid transparent;
+}
+.paths a:hover, .paths a:active { color: var(--ink); }
+.paths a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+
+/* ---------- alert banner (advisory class: caution, not a veto) ---------- */
+.alert {
+  margin: var(--space-sm) 0; padding: var(--space-sm) var(--space-md);
+  background: var(--card); border-top: 1px solid var(--hairline-strong);
+  border-bottom: 1px solid var(--hairline-strong);
+  border-left: 3px solid var(--ink); border-radius: var(--radius-surface);
+}
+.alert .overline { color: var(--ink); margin-right: var(--space-xs); }
+.alert p { margin: 0; font-size: var(--size-list); line-height: 1.45; color: var(--slate); }
+
+/* ---------- compressed current panel ---------- */
+.current {
+  background: var(--ice); border-radius: var(--radius-surface);
+  padding: var(--space-sm) var(--space-md);
+  margin: var(--space-sm) 0;
+}
+.current .overline { color: var(--slate); }
+.wbgt-row {
+  display: flex; align-items: baseline; gap: var(--space-md); flex-wrap: wrap;
+}
+.wbgt-num {
+  font-weight: 300; font-size: calc(var(--size-display) * 1.25);
+  line-height: 1.05; letter-spacing: -0.01em;
+}
+.wbgt-phrase { font-size: var(--size-card-title); font-weight: 400; }
+.wbgt-phrase small {
+  display: block; font-family: var(--font-label); font-size: var(--size-label);
+  font-weight: 500; letter-spacing: var(--ls-smallcaps); text-transform: uppercase;
+  color: var(--slate);
+}
+.mono-strip {
+  margin: var(--space-xs) 0 0; font-family: var(--font-mono);
+  font-size: var(--size-caption); line-height: 1.5; color: var(--slate);
+}
+
+/* ---------- lede (the column) ---------- */
+.lede { margin: var(--space-sm) 0; }
+.lede .overline { display: none; } /* kicker: desktop flavor; the bold sentence carries mobile */
+.headline {
+  display: none; margin: var(--space-xs) 0 var(--space-sm);
+  font-weight: 500; font-size: var(--size-screen-title); line-height: var(--lh-title);
+}
+.lede p { margin: var(--space-xs) 0 0; }
+.lede strong { font-weight: 500; }
+.windows-line {
+  display: none; margin: 0; padding: var(--space-sm) 0;
+  border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline);
+  font-family: var(--font-mono); font-size: var(--size-caption);
+  line-height: 1.6; color: var(--slate);
+}
+.windows-line strong { color: var(--ink); font-weight: 600; }
+
+/* ---------- hourly agate table ---------- */
+.hourly { margin-top: var(--space-sm); }
+.hourly-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: var(--space-sm);
+}
+.scroll-hint {
+  font-family: var(--font-mono); font-size: var(--size-caption);
+  color: var(--secondary); white-space: nowrap;
+}
+.table-scroll {
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  border-top: 1px solid var(--hairline-strong);
+}
+table.agate {
+  border-collapse: collapse; width: 100%; min-width: 680px;
+  font-family: var(--font-mono); font-size: var(--size-caption);
+  font-variant-numeric: tabular-nums; line-height: 1.4;
+}
+.agate thead th {
+  font-family: var(--font-label); font-size: var(--size-label); font-weight: 600;
+  letter-spacing: var(--ls-smallcaps); text-transform: uppercase;
+  color: var(--secondary); text-align: left;
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--hairline);
+}
+.agate tbody th, .agate tbody td {
+  text-align: left; white-space: nowrap; font-weight: 400;
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--hairline);
+}
+.agate td.wb strong { font-weight: 600; }
+.agate tr { --row-bg: var(--paper); }
+.agate tr.best { --row-bg: var(--ice); background: var(--ice); }
+/* sticky time column; tier tick lives on its left edge so it never scrolls away */
+.agate .rt, .agate thead th:first-child {
+  position: sticky; left: 0; z-index: 1; background: var(--row-bg, var(--paper));
+  box-shadow: 1px 0 0 var(--hairline);
+  border-left: 3px solid var(--tick, transparent);
+}
+.agate thead th:first-child { background: var(--paper); }
+/* tier ticks: monochrome escalation; the words carry the meaning */
+.agate tr.t2 { --tick: var(--tone-dormant); }
+.agate tr.t3 { --tick: var(--tone-quiet); }
+.agate tr.t4 { --tick: var(--ink); }
+.agate tr.vetoed th, .agate tr.vetoed td { border-bottom: 0; }
+.note-row td { border-bottom: 1px solid var(--hairline); padding: 0 var(--space-sm) 6px; }
+.note {
+  display: block; position: sticky; left: var(--space-sm);
+  width: max-content; max-width: min(86vw, 460px);
+  font-family: var(--font-serif); font-style: italic;
+  font-size: var(--size-caption); line-height: 1.4; color: var(--ink);
+  white-space: normal;
+}
+.best-note-row td { background: var(--ice); border-bottom: 0;
+  padding-top: 6px; }
+.day-row td { padding: var(--space-md) var(--space-sm) var(--space-xs);
+  border-bottom: 1px solid var(--hairline-strong); }
+.day-label {
+  display: inline-block; position: sticky; left: var(--space-sm);
+  font-family: var(--font-label); font-size: var(--size-label); font-weight: 600;
+  letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--slate);
+}
+.agate-legend {
+  margin: var(--space-sm) 0 0; font-family: var(--font-mono);
+  font-size: var(--size-caption); color: var(--secondary); line-height: 1.5;
+}
+
+/* ---------- the column, continued ---------- */
+.prose2 { margin-top: var(--space-lg); max-width: 62ch; }
+.prose2 p { margin: 0 0 var(--space-md); }
+.prose2 p:first-of-type::first-letter {
+  float: left; font-weight: 300; font-size: calc(var(--size-display) * 1.6);
+  line-height: 0.85; padding: 4px var(--space-sm) 0 0;
+}
+
+/* ---------- explainers ---------- */
+.explain { margin-top: var(--space-lg); }
+.explain details { border-bottom: 1px solid var(--hairline); }
+.explain details:first-of-type { border-top: 1px solid var(--hairline-strong); }
+.explain summary {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-sm); min-height: var(--hit-target); cursor: pointer;
+  padding: var(--space-xs) 0; list-style: none;
+  font-size: var(--size-body); font-weight: 500;
+}
+.explain summary::-webkit-details-marker { display: none; }
+.explain summary::after {
+  content: "+"; font-family: var(--font-mono); color: var(--secondary);
+  font-size: var(--size-card-title); line-height: 1;
+}
+.explain details[open] summary::after { content: "\2212"; }
+.exp-body { padding: 0 0 var(--space-md); max-width: 62ch; }
+.exp-body p { margin: 0 0 var(--space-sm); font-size: var(--size-list); color: var(--slate); }
+.exp-body b {
+  font-family: var(--font-label); font-size: var(--size-label); font-weight: 600;
+  letter-spacing: var(--ls-smallcaps); text-transform: uppercase;
+  color: var(--secondary); font-style: normal;
+}
+
+/* ---------- route aside / clothing ---------- */
+.route {
+  margin: var(--space-lg) 0 0; padding-left: var(--space-md);
+  border-left: 2px solid var(--hairline-strong);
+  font-style: italic; color: var(--slate); max-width: 58ch;
+}
+.route .overline { display: block; font-style: normal; margin-bottom: var(--space-xs); }
+.clothing { margin: var(--space-lg) 0 0; max-width: 62ch; }
+.clothing p { margin: var(--space-xs) 0 0; font-size: var(--size-list); color: var(--slate); }
+
+/* ---------- footer ---------- */
+.foot {
+  margin-top: var(--space-xl); padding-top: var(--space-md);
+  border-top: 2px solid var(--ink);
+}
+.foot p {
+  margin: 0 0 var(--space-sm); font-family: var(--font-mono);
+  font-size: var(--size-caption); line-height: 1.6; color: var(--secondary);
+}
+.foot .credo { font-family: var(--font-serif); font-style: italic;
+  font-size: var(--size-list); color: var(--slate); }
+.theme-btn {
+  font-family: var(--font-label); font-size: var(--size-body); font-weight: 500;
+  min-height: var(--hit-target); padding: 0 var(--space-md);
+  border: 1px solid var(--hairline-strong); border-radius: var(--radius-surface);
+  background: var(--card); color: var(--ink); cursor: pointer;
+}
+
+/* ============ desktop broadsheet: 1024px+ (designed at 1280) ============ */
+@media (min-width: 1024px) {
+  .wrap { padding-left: var(--space-xxl); padding-right: var(--space-xxl); }
+  .wordmark { font-size: calc(var(--size-display) * 1.25); }
+  .headline { display: block; }
+  .lede .overline { display: inline-block; }
+  .windows-line { display: block; }
+  .scroll-hint { display: none; }
+  .wbgt-num { font-size: calc(var(--size-display) * 2); }
+  .sheet {
+    display: grid; column-gap: var(--space-xxl); row-gap: 0;
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+    grid-template-areas:
+      "alert  alert"
+      "cur    lede"
+      "p2     win"
+      "p2     tab"
+      "aside  tab"
+      "clo    tab"
+      ".      exp";
+    align-items: start;
+  }
+  .alert   { grid-area: alert; }
+  .current { grid-area: cur; margin-top: var(--space-md); }
+  .lede    { grid-area: lede; margin: var(--space-md) 0 0; }
+  .windows-line { grid-area: win; margin-top: var(--space-md); }
+  .hourly  { grid-area: tab; margin-top: var(--space-lg); }
+  .prose2  { grid-area: p2; }
+  .explain { grid-area: exp; }
+  .route   { grid-area: aside; }
+  .clothing{ grid-area: clo; margin-bottom: var(--space-xl); }
+  /* the broadsheet column rule */
+  .lede, .windows-line, .hourly, .explain {
+    border-left: 1px solid var(--hairline);
+    padding-left: var(--space-xxl);
+  }
+  .lede { padding-bottom: var(--space-sm); }
+  .lede p { font-size: calc(var(--size-body) * 1.125); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <div class="mast-top">
+    <span class="overline">NYC &middot; Running conditions</span>
+    <span class="dateline">Tue, Jul 28, 2026 &middot; 2:30 PM ET</span>
+  </div>
+  <h1 class="wordmark">when to run</h1>
+  <div class="ink-rule" role="presentation"></div>
+  <div class="mast-nav">
+    <nav class="paths" aria-label="Running paths">
+      <a href="#" aria-current="page">Central Park</a>
+      <a href="#">Hudson Greenway</a>
+      <a href="#">East River</a>
+      <a href="#">Brooklyn</a>
+      <a href="#">Van Cortlandt</a>
+    </nav>
+    <div class="units" role="group" aria-label="Temperature units">
+      <button type="button" aria-pressed="true">&deg;F</button>
+      <button type="button" aria-pressed="false">&deg;C</button>
+    </div>
+  </div>
+</header>
+
+<main class="sheet">
+
+<section class="alert" aria-label="Active weather alert">
+  <p><b class="overline">Heat advisory</b> until 8 PM EDT Tuesday &mdash;
+  caution, not a stop.</p>
+</section>
+
+<section class="current" aria-label="Current conditions">
+  <span class="overline">Central Park &middot; now &middot; 2:30 PM</span>
+  <div class="wbgt-row">
+    <span class="wbgt-num">87&deg;</span>
+    <span class="wbgt-phrase">High heat stress
+      <small>wet-bulb globe temperature</small></span>
+  </div>
+  <p class="mono-strip">dew 73&deg; oppressive &middot; UV 9 very high &middot;
+    AQI 62 moderate PM2.5 &middot; S 6 g12 &middot; sky 45%</p>
+</section>
+
+<section class="lede" aria-label="The morning line">
+  <span class="overline">The morning line</span>
+  <h2 class="headline">Wait for first light.</h2>
+  <p><strong>Run tomorrow, 5 to 8 AM.</strong> The daylight left today all
+  reads WBGT 85&nbsp;&deg;F or more; tonight brings likely thunder. Dawn
+  Wednesday: WBGT 76&deg; elevated, dew 70&deg;, UV 0&#8211;2, AQI 48 good.</p>
+</section>
+
+<p class="windows-line" aria-label="Window summary">
+  <strong>Next best &middot; Wed 5&#8211;8 AM</strong> &mdash; WBGT 76&deg;
+  elevated &middot; dew 70&deg; &middot; UV 0&#8211;2 &middot; AQI 48 good<br>
+  Tonight 7&#8211;8 PM &mdash; not recommended: thunderstorms likely (60%)<br>
+  Wed evening &mdash; fair: WBGT 80&deg; by 7 PM, skies clearing
+</p>
+
+<section class="hourly" aria-label="48-hour forecast">
+  <div class="hourly-head">
+    <span class="overline">The next 48 hours</span>
+    <span class="scroll-hint" aria-hidden="true">scroll for wind &amp; rain &rarr;</span>
+  </div>
+  <div class="table-scroll" tabindex="0" role="region" aria-label="Hourly conditions table, scrolls horizontally">
+    <table class="agate">
+      <caption class="sr-only">Hourly running conditions for Central Park,
+        Tuesday afternoon through Thursday afternoon</caption>
+      <thead>
+        <tr>
+          <th scope="col">Time</th>
+          <th scope="col">WBGT &deg;F</th>
+          <th scope="col">Dew pt</th>
+          <th scope="col">UV</th>
+          <th scope="col">AQI</th>
+          <th scope="col">Wind mph</th>
+          <th scope="col">Precip</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr class="t4"><th scope="row" class="rt">3 PM</th><td class="wb"><strong>88</strong> Extreme caution</td><td>73&deg;</td><td>8</td><td>62</td><td>S 6 g12</td><td>5%</td></tr>
+<tr class="t4"><th scope="row" class="rt">4 PM</th><td class="wb"><strong>88</strong> Extreme caution</td><td>73&deg;</td><td>6</td><td>63</td><td>S 7 g13</td><td>5%</td></tr>
+<tr class="t3"><th scope="row" class="rt">5 PM</th><td class="wb"><strong>87</strong> High heat stress</td><td>73&deg;</td><td>4</td><td>63</td><td>S 7 g12</td><td>10%</td></tr>
+<tr class="t3"><th scope="row" class="rt">6 PM</th><td class="wb"><strong>85</strong> High heat stress</td><td>73&deg;</td><td>2</td><td>61</td><td>S 6</td><td>15%</td></tr>
+<tr class="t2 vetoed"><th scope="row" class="rt">7 PM</th><td class="wb"><strong>82</strong> Moderate heat stress</td><td>74&deg;</td><td>1</td><td>58</td><td>S 8 g16</td><td>60%</td></tr>
+<tr class="note-row veto-note-row"><td colspan="7"><em class="note veto-note">Not recommended — thunderstorms likely (60%)</em></td></tr>
+<tr class="t1 vetoed"><th scope="row" class="rt">8 PM</th><td class="wb"><strong>79</strong> Elevated</td><td>74&deg;</td><td>0</td><td>55</td><td>S 9 g18</td><td>45%</td></tr>
+<tr class="note-row veto-note-row"><td colspan="7"><em class="note veto-note">Not recommended — thunderstorms likely (45%)</em></td></tr>
+<tr class="t1"><th scope="row" class="rt">9 PM</th><td class="wb"><strong>77</strong> Elevated</td><td>74&deg;</td><td>0</td><td>53</td><td>SW 7</td><td>25%</td></tr>
+<tr class="t1"><th scope="row" class="rt">10 PM</th><td class="wb"><strong>76</strong> Elevated</td><td>73&deg;</td><td>0</td><td>52</td><td>SW 6</td><td>15%</td></tr>
+<tr class="t1"><th scope="row" class="rt">11 PM</th><td class="wb"><strong>75</strong> Elevated</td><td>73&deg;</td><td>0</td><td>51</td><td>SW 5</td><td>10%</td></tr>
+<tr class="day-row"><td colspan="7"><span class="day-label">Wednesday, July 29</span></td></tr>
+<tr class="t1"><th scope="row" class="rt">12 AM</th><td class="wb"><strong>75</strong> Elevated</td><td>72&deg;</td><td>0</td><td>50</td><td>SW 5</td><td>5%</td></tr>
+<tr class="t1"><th scope="row" class="rt">1 AM</th><td class="wb"><strong>75</strong> Elevated</td><td>72&deg;</td><td>0</td><td>50</td><td>SW 4</td><td>5%</td></tr>
+<tr class="t1"><th scope="row" class="rt">2 AM</th><td class="wb"><strong>74</strong> Elevated</td><td>71&deg;</td><td>0</td><td>49</td><td>SW 4</td><td>5%</td></tr>
+<tr class="t1"><th scope="row" class="rt">3 AM</th><td class="wb"><strong>74</strong> Elevated</td><td>71&deg;</td><td>0</td><td>49</td><td>SW 4</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">4 AM</th><td class="wb"><strong>74</strong> Elevated</td><td>70&deg;</td><td>0</td><td>48</td><td>SW 3</td><td>0%</td></tr>
+<tr class="note-row best-note-row"><td colspan="7"><em class="note best-note">Best window — Wednesday 5&#8211;8&nbsp;AM</em></td></tr>
+<tr class="t1 best"><th scope="row" class="rt">5 AM</th><td class="wb"><strong>74</strong> Elevated</td><td>70&deg;</td><td>0</td><td>48</td><td>SW 3</td><td>0%</td></tr>
+<tr class="t1 best"><th scope="row" class="rt">6 AM</th><td class="wb"><strong>74</strong> Elevated</td><td>70&deg;</td><td>0</td><td>48</td><td>S 3</td><td>0%</td></tr>
+<tr class="t1 best"><th scope="row" class="rt">7 AM</th><td class="wb"><strong>76</strong> Elevated</td><td>70&deg;</td><td>2</td><td>50</td><td>S 4</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">8 AM</th><td class="wb"><strong>78</strong> Elevated</td><td>71&deg;</td><td>4</td><td>53</td><td>S 5</td><td>0%</td></tr>
+<tr class="t2"><th scope="row" class="rt">9 AM</th><td class="wb"><strong>81</strong> Moderate heat stress</td><td>71&deg;</td><td>6</td><td>55</td><td>S 6</td><td>0%</td></tr>
+<tr class="t2"><th scope="row" class="rt">10 AM</th><td class="wb"><strong>84</strong> Moderate heat stress</td><td>72&deg;</td><td>8</td><td>58</td><td>S 7</td><td>0%</td></tr>
+<tr class="t3"><th scope="row" class="rt">11 AM</th><td class="wb"><strong>86</strong> High heat stress</td><td>72&deg;</td><td>9</td><td>60</td><td>S 7</td><td>5%</td></tr>
+<tr class="t4"><th scope="row" class="rt">12 PM</th><td class="wb"><strong>88</strong> Extreme caution</td><td>72&deg;</td><td>10</td><td>62</td><td>S 8</td><td>5%</td></tr>
+<tr class="t4"><th scope="row" class="rt">1 PM</th><td class="wb"><strong>89</strong> Extreme caution</td><td>72&deg;</td><td>10</td><td>63</td><td>S 8 g14</td><td>5%</td></tr>
+<tr class="t4"><th scope="row" class="rt">2 PM</th><td class="wb"><strong>89</strong> Extreme caution</td><td>72&deg;</td><td>9</td><td>64</td><td>S 8 g15</td><td>10%</td></tr>
+<tr class="t4"><th scope="row" class="rt">3 PM</th><td class="wb"><strong>89</strong> Extreme caution</td><td>71&deg;</td><td>8</td><td>64</td><td>S 9</td><td>10%</td></tr>
+<tr class="t4"><th scope="row" class="rt">4 PM</th><td class="wb"><strong>88</strong> Extreme caution</td><td>71&deg;</td><td>6</td><td>63</td><td>S 9</td><td>10%</td></tr>
+<tr class="t3"><th scope="row" class="rt">5 PM</th><td class="wb"><strong>86</strong> High heat stress</td><td>70&deg;</td><td>4</td><td>61</td><td>S 8</td><td>10%</td></tr>
+<tr class="t2"><th scope="row" class="rt">6 PM</th><td class="wb"><strong>83</strong> Moderate heat stress</td><td>70&deg;</td><td>2</td><td>58</td><td>S 7</td><td>5%</td></tr>
+<tr class="t2"><th scope="row" class="rt">7 PM</th><td class="wb"><strong>80</strong> Moderate heat stress</td><td>69&deg;</td><td>1</td><td>55</td><td>S 6</td><td>5%</td></tr>
+<tr class="t1"><th scope="row" class="rt">8 PM</th><td class="wb"><strong>78</strong> Elevated</td><td>69&deg;</td><td>0</td><td>52</td><td>S 5</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">9 PM</th><td class="wb"><strong>76</strong> Elevated</td><td>68&deg;</td><td>0</td><td>50</td><td>SW 5</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">10 PM</th><td class="wb"><strong>75</strong> Elevated</td><td>68&deg;</td><td>0</td><td>49</td><td>SW 4</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">11 PM</th><td class="wb"><strong>74</strong> Elevated</td><td>67&deg;</td><td>0</td><td>48</td><td>SW 4</td><td>0%</td></tr>
+<tr class="day-row"><td colspan="7"><span class="day-label">Thursday, July 30</span></td></tr>
+<tr class="t1"><th scope="row" class="rt">12 AM</th><td class="wb"><strong>73</strong> Elevated</td><td>67&deg;</td><td>0</td><td>47</td><td>W 4</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">1 AM</th><td class="wb"><strong>73</strong> Elevated</td><td>66&deg;</td><td>0</td><td>47</td><td>W 3</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">2 AM</th><td class="wb"><strong>72</strong> Elevated</td><td>66&deg;</td><td>0</td><td>46</td><td>W 3</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">3 AM</th><td class="wb"><strong>72</strong> Elevated</td><td>65&deg;</td><td>0</td><td>46</td><td>W 3</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">4 AM</th><td class="wb"><strong>71</strong> Elevated</td><td>65&deg;</td><td>0</td><td>45</td><td>W 3</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">5 AM</th><td class="wb"><strong>71</strong> Elevated</td><td>64&deg;</td><td>0</td><td>45</td><td>W 3</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">6 AM</th><td class="wb"><strong>72</strong> Elevated</td><td>64&deg;</td><td>1</td><td>46</td><td>W 4</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">7 AM</th><td class="wb"><strong>74</strong> Elevated</td><td>65&deg;</td><td>2</td><td>48</td><td>W 4</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">8 AM</th><td class="wb"><strong>76</strong> Elevated</td><td>65&deg;</td><td>4</td><td>50</td><td>SW 5</td><td>0%</td></tr>
+<tr class="t1"><th scope="row" class="rt">9 AM</th><td class="wb"><strong>79</strong> Elevated</td><td>66&deg;</td><td>6</td><td>52</td><td>SW 5</td><td>0%</td></tr>
+<tr class="t2"><th scope="row" class="rt">10 AM</th><td class="wb"><strong>82</strong> Moderate heat stress</td><td>66&deg;</td><td>8</td><td>54</td><td>SW 6</td><td>0%</td></tr>
+<tr class="t2"><th scope="row" class="rt">11 AM</th><td class="wb"><strong>84</strong> Moderate heat stress</td><td>67&deg;</td><td>9</td><td>56</td><td>SW 6</td><td>5%</td></tr>
+<tr class="t3"><th scope="row" class="rt">12 PM</th><td class="wb"><strong>86</strong> High heat stress</td><td>67&deg;</td><td>10</td><td>58</td><td>SW 7</td><td>5%</td></tr>
+<tr class="t3"><th scope="row" class="rt">1 PM</th><td class="wb"><strong>87</strong> High heat stress</td><td>67&deg;</td><td>10</td><td>60</td><td>SW 7</td><td>5%</td></tr>
+<tr class="t4"><th scope="row" class="rt">2 PM</th><td class="wb"><strong>88</strong> Extreme caution</td><td>68&deg;</td><td>9</td><td>61</td><td>SW 7 g13</td><td>5%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="agate-legend">left ticks echo the WBGT band (none &lt;80 &middot;
+    faint 80&#8211;85 &middot; gray 85&#8211;88 &middot; ink 88+); the words are
+    the meaning &middot; AQI after tonight is modeled (CAMS)</p>
+</section>
+
+<section class="prose2" aria-label="The column, continued">
+  <p>This afternoon is for shade and errands, not intervals. At 2:30 the park
+  reads a wet-bulb globe temperature of 87&nbsp;&deg;F &mdash; high heat stress,
+  in the National Weather Service&rsquo;s words &mdash; with a dew point of
+  73&nbsp;&deg;F that keeps sweat from doing its work. A heat advisory holds
+  until 8 PM. An advisory is a caution, not a closure: if you must run today,
+  keep it short and slow, hold the shaded east drives, and treat the fountains
+  as aid stations.</p>
+  <p>Tonight looks tempting on the thermometer and wrong on the radar. WBGT
+  eases to 82&nbsp;&deg;F by 7 PM, but thunderstorms are likely &mdash; 60
+  percent at 7, 45 at 8 &mdash; and no temperature justifies lightning. After
+  the line clears, 9 to 11 PM is honest if unlovely: WBGT 77&nbsp;&deg;F
+  against a dew point of 74. The real appointment is Wednesday, 5 to 8 AM,
+  before the UV index climbs past 2 and the day boils back toward
+  89&nbsp;&deg;F by noon. Wednesday evening offers a fair consolation &mdash;
+  WBGT 80&nbsp;&deg;F by 7 PM under clearing skies &mdash; for those who
+  cannot rise early.</p>
+</section>
+
+<section class="explain" aria-label="What the numbers mean">
+  <details>
+    <summary>WBGT &mdash; wet-bulb globe temperature</summary>
+    <div class="exp-body">
+      <p><b>Measures</b> &mdash; the combined heat load of temperature,
+        humidity, direct sun, and wind: the closest single number to what
+        running in heat actually costs.</p>
+      <p><b>Leaves out</b> &mdash; your acclimation, fitness, and pace.</p>
+      <p><b>The words</b> &mdash; under 80&nbsp;&deg;F elevated at most;
+        80&#8211;85 moderate heat stress; 85&#8211;88 high heat stress;
+        88&#8211;90 extreme caution; 90 and up we simply say not to run.</p>
+      <p><b>Authority</b> &mdash; National Weather Service heat-stress bands.</p>
+      <p><b>This page</b> &mdash; NWS gridpoint forecast (a forecast, not a
+        measurement), fetched 2:24 PM ET.</p>
+    </div>
+  </details>
+  <details>
+    <summary>Dew point</summary>
+    <div class="exp-body">
+      <p><b>Measures</b> &mdash; the moisture in the air, and so how well sweat
+        can evaporate. Above 70&nbsp;&deg;F, it mostly cannot.</p>
+      <p><b>The words</b> &mdash; under 55 comfortable; 55&#8211;60 noticeable;
+        60&#8211;65 sticky; 65&#8211;70 very humid; 70&#8211;75 oppressive;
+        75 and up miserable.</p>
+      <p><b>Authority</b> &mdash; NWS observation and forecast fields.</p>
+      <p><b>This page</b> &mdash; NWS gridpoint forecast, fetched 2:24 PM ET.</p>
+    </div>
+  </details>
+  <details>
+    <summary>UV index</summary>
+    <div class="exp-body">
+      <p><b>Measures</b> &mdash; sunburning ultraviolet at the surface.
+        0&#8211;2 low; 3&#8211;5 moderate; 6&#8211;7 high; 8&#8211;10 very
+        high; 11+ extreme.</p>
+      <p><b>Leaves out</b> &mdash; heat; a cool day can still burn.</p>
+      <p><b>Authority</b> &mdash; EPA UV index scale.</p>
+      <p><b>This page</b> &mdash; Open-Meteo model (modeled, not measured),
+        fetched 2:00 PM ET.</p>
+    </div>
+  </details>
+  <details>
+    <summary>AQI &mdash; air quality index</summary>
+    <div class="exp-body">
+      <p><b>Measures</b> &mdash; EPA&rsquo;s index over ozone and particle
+        pollution. We show the worst reading among nearby monitors and name the
+        dominant pollutant &mdash; today AQI 62, moderate (PM2.5): unusually
+        sensitive runners may want to shorten hard efforts.</p>
+      <p><b>The words</b> &mdash; 0&#8211;50 good; 51&#8211;100 moderate;
+        101&#8211;150 unhealthy for sensitive groups; 151&#8211;200 unhealthy;
+        201+ we veto the hour outright.</p>
+      <p><b>Authority</b> &mdash; EPA AirNow.</p>
+      <p><b>This page</b> &mdash; current: AirNow monitors (measured), fetched
+        2:10 PM ET; hourly forecast: modeled (CAMS via Open-Meteo) and labeled
+        so.</p>
+    </div>
+  </details>
+  <details>
+    <summary>Wind</summary>
+    <div class="exp-body">
+      <p><b>Measures</b> &mdash; sustained speed and gusts, in mph. Under 10 it
+        is company; over 15 on an exposed path it is a workout of its own.
+        Today: south at 6, gusting 12 &mdash; barely a factor.</p>
+      <p><b>This page</b> &mdash; NWS gridpoint forecast, fetched 2:24 PM ET.</p>
+    </div>
+  </details>
+  <details>
+    <summary>Alerts &mdash; and what vetoes an hour</summary>
+    <div class="exp-body">
+      <p><b>Measures</b> &mdash; NWS watches, warnings, and advisories for this
+        park&rsquo;s zone (NYZ072). An <em>advisory</em>, like today&rsquo;s
+        heat advisory, is a caution banner. <em>Warning-class</em> events
+        &mdash; severe thunderstorm, flash flood, excessive heat &mdash; veto
+        the hour, as do thunder chances of 30% or more, AQI 201+, WBGT
+        90&nbsp;&deg;F+, and icy precipitation. Every veto is named in the
+        table; nothing is hidden in a color.</p>
+      <p><b>This page</b> &mdash; NWS alert feed, fetched 2:29 PM ET.</p>
+    </div>
+  </details>
+</section>
+
+<aside class="route" aria-label="Route context">
+  <span class="overline">On the loop</span>
+  Good tree shade on the loop&rsquo;s east and north sides; the reservoir path
+  is exposed. Hills concentrate at the north end. The drives drain well after
+  rain, so Wednesday morning&rsquo;s footing should be clean even if
+  tonight&rsquo;s storms deliver.
+</aside>
+
+<section class="clothing" aria-label="Clothing">
+  <span class="overline">What to wear</span>
+  <p>Today: singlet, split shorts, cap, and water on anything past thirty
+  minutes. Wednesday at dawn: the same kit, minus the sun.</p>
+</section>
+
+</main>
+
+<footer class="foot">
+  <p class="credo">No score. We print the official numbers and the official
+  words for them, and let you decide.</p>
+  <p>Sources &mdash; NWS gridpoint forecast OKX 34,45 (fetched 2:24 PM ET)
+  &middot; NWS alerts, zone NYZ072 (2:29 PM ET) &middot; AirNow monitors,
+  measured (2:10 PM ET) &middot; Open-Meteo UV &amp; modeled AQI, CAMS
+  (2:00 PM ET). Forecasts are forecasts; measurements are measurements;
+  anything estimated is labeled.</p>
+  <p>Static mockup A &middot; &ldquo;broadsheet&rdquo; &middot; data frozen at
+  Tue Jul 28 2026, 2:30 PM ET.</p>
+  <button type="button" class="theme-btn" id="themeBtn">Theme: System</button>
+</footer>
+
+</div>
+<script>
+/* mockup-only theme demo: cycles System -> Dark -> Light via data-theme */
+(function () {
+  var btn = document.getElementById("themeBtn");
+  var states = ["System", "Dark", "Light"];
+  var i = 0;
+  btn.addEventListener("click", function () {
+    i = (i + 1) % states.length;
+    var s = states[i];
+    if (s === "System") {
+      document.documentElement.removeAttribute("data-theme");
+    } else {
+      document.documentElement.setAttribute("data-theme", s.toLowerCase());
+    }
+    btn.textContent = "Theme: " + s;
+  });
+})();
+</script>
+</body>
+</html>

@@ -24,6 +24,15 @@
   --tone-quiet: #5D666C;
   --tone-dormant: #8B949A;
 
+  /* tier inks — editorial spot colors for category-tier numerals.
+   * Ordinal severity ramp; always paired with the category word (color is
+   * never the sole encoding). All >= 5.6:1 on --paper (AA small text). */
+  --tier-0: #34664A;  /* good / low — moss */
+  --tier-1: #7A5E0E;  /* moderate — ochre */
+  --tier-2: #A0491C;  /* elevated / caution — burnt sienna */
+  --tier-3: #A62B2B;  /* high / unhealthy — madder */
+  --tier-4: #5C2340;  /* extreme / veto — aubergine */
+
   /* type */
   --font-serif: "Spectral", Georgia, serif;
   --font-label: "Archivo", system-ui, sans-serif;
@@ -74,6 +83,11 @@
     --tone-steady: #DCE1E4;
     --tone-quiet: #8E979D;
     --tone-dormant: #6B747A;
+    --tier-0: #8FBF9F;
+    --tier-1: #CBAB56;
+    --tier-2: #D98D5F;
+    --tier-3: #D97F7F;
+    --tier-4: #C490B8;
   }
 }
 
@@ -92,6 +106,11 @@
   --tone-steady: #DCE1E4;
   --tone-quiet: #8E979D;
   --tone-dormant: #6B747A;
+  --tier-0: #8FBF9F;
+  --tier-1: #CBAB56;
+  --tier-2: #D98D5F;
+  --tier-3: #D97F7F;
+  --tier-4: #C490B8;
 }
 
 @font-face {

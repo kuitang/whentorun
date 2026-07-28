@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>when to run &mdash; Central Park &middot; almanac mockup</title>
+<link rel="stylesheet" href="../static/css/tokens.css">
+<style>
+/* ============================================================
+   b-almanac — dense table-first mockup. The 48h ledger is the
+   hero; everything above it is a compressed header band.
+   Mobile-first at 390px; desktop 1280 is the adaptation.
+   ============================================================ */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--size-body);
+  line-height: 1.5; /* almanac register: tighter than editorial 1.6 */
+  font-variant-numeric: tabular-nums;
+}
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 14px calc(24px + env(safe-area-inset-bottom));
+}
+a { color: inherit; }
+em { font-style: italic; }
+
+.overline {
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  font-weight: 600;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+
+/* ---------- masthead ---------- */
+.masthead { padding-top: calc(8px + env(safe-area-inset-top)); }
+.masthead-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  border-bottom: 2px solid var(--ink); /* the masthead ink rule */
+  padding-bottom: 2px;
+}
+.wordmark {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: 27px;
+  line-height: 1.15;
+  letter-spacing: 0.005em;
+  margin: 0;
+}
+.wordmark .overline { display: block; margin-bottom: 1px; }
+.units { display: flex; }
+.units button {
+  appearance: none;
+  border: 0;
+  background: none;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--secondary);
+  min-height: var(--hit-target);
+  min-width: var(--hit-target);
+  padding: 0 6px;
+  cursor: pointer;
+  border-radius: var(--radius-surface);
+}
+.units button[aria-pressed="true"] {
+  color: var(--ink);
+  box-shadow: inset 0 -2px 0 var(--ink);
+}
+.units button:active { background: var(--ice); }
+.pathnav {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--hairline);
+  scrollbar-width: none;
+}
+.pathnav::-webkit-scrollbar { display: none; }
+.pathnav a {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hit-target);
+  padding: 0 11px;
+  font-family: var(--font-label);
+  font-weight: 500;
+  font-size: 16px;
+  text-decoration: none;
+  color: var(--secondary);
+  white-space: nowrap;
+}
+.pathnav a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 var(--ink);
+}
+.pathnav a:active { background: var(--ice); }
+
+/* ---------- alert strip ---------- */
+.alert {
+  margin-top: var(--space-sm);
+  border-left: 3px solid var(--ink);
+  background: var(--card);
+  border-radius: var(--radius-surface);
+  padding: 6px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+}
+.alert .overline { color: var(--ink); }
+.alert p { margin: 0; font-size: var(--size-list); line-height: 1.4; color: var(--slate); }
+
+/* ---------- compressed current band ---------- */
+.current {
+  margin-top: var(--space-sm);
+  background: var(--ice);
+  border-radius: var(--radius-surface);
+  padding: 8px 12px 10px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 12px;
+  align-items: center;
+}
+.current .wbgt-big {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: 46px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.current .wbgt-big sup {
+  font-size: 20px;
+  vertical-align: 14px;
+  font-weight: 400;
+}
+.current .phrase {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 17px;
+  line-height: var(--lh-title);
+}
+.current .phrase .overline { color: var(--slate); margin-right: 6px; }
+.current .strip {
+  grid-column: 1 / -1;
+  margin: 5px 0 0;
+  border-top: 1px solid var(--hairline);
+  padding-top: 5px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--slate);
+}
+.current .strip b { font-weight: 600; color: var(--ink); }
+
+/* ---------- next-best-window line ---------- */
+.window-line {
+  margin: 6px 0 0;
+  padding: 5px 0 7px;
+  border-bottom: 1px solid var(--hairline);
+  font-size: var(--size-list);
+  line-height: 1.4;
+}
+.window-line .overline { margin-right: 6px; }
+.window-line .tonight {
+  display: block;
+  font-style: italic;
+  color: var(--secondary);
+  font-size: 14px;
+  margin-top: 1px;
+}
+
+/* ---------- the 48h ledger ---------- */
+.ledger-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 6px 0 4px;
+}
+.ledger-head .hint { color: var(--tone-dormant); }
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-top: 1px solid var(--hairline-strong);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 566px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.35;
+}
+caption { position: absolute; clip: rect(0 0 0 0); width: 1px; height: 1px; overflow: hidden; }
+thead th {
+  font-family: var(--font-label);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+  text-align: right;
+  padding: 6px 8px 5px;
+  border-bottom: 1px solid var(--hairline-strong);
+  white-space: nowrap;
+}
+thead th:first-child, thead th.h-cat { text-align: left; }
+td, tbody th {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--hairline);
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+td.n { text-align: right; }
+td.wind { text-align: right; color: var(--slate); }
+td.wind .g { color: var(--tone-dormant); }
+td.cat {
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  text-align: left;
+  color: var(--slate);
+}
+tbody th {
+  text-align: left;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+/* sticky time column + tier tick lives on its left edge */
+tbody th, thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--paper);
+  border-left: 3px solid transparent;
+  min-width: 56px;
+}
+/* tier ticks — reinforce the category word, never replace it */
+tr.t-extreme  > th { border-left-color: var(--ink); }
+tr.t-high     > th { border-left-color: var(--tone-warm); }
+tr.t-moderate > th { border-left-color: var(--tone-steady); }
+tr.t-elevated > th { border-left-color: var(--tone-quiet); }
+tr.t-low      > th { border-left-color: var(--tone-dormant); }
+/* day dividers */
+tr.day th, tr.day td {
+  font-family: var(--font-label);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+  padding-top: 11px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--hairline-strong);
+}
+tr.day th { border-left-color: transparent; }
+/* vetoed hours: metrics recede, the named reason carries the judgment */
+tr.veto td { color: var(--secondary); }
+tr.veto td.cat { color: var(--secondary); }
+tr.note td {
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  white-space: normal;
+  padding-top: 2px;
+  color: var(--ink);
+}
+tr.veto th, tr.veto-note th { background: var(--paper); }
+/* best-window hours sit on the ice surface */
+tr.best th, tr.best td,
+tr.window-note th, tr.window-note td { background: var(--ice); }
+tr.window-note td { color: var(--steel-text); }
+
+/* ---------- below the fold: explainers, aside, clothing ---------- */
+.lower { margin-top: var(--space-xl); }
+.lower h2 {
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  font-weight: 600;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+  margin: 0 0 2px;
+}
+details {
+  border-bottom: 1px solid var(--hairline);
+}
+details:first-of-type { border-top: 1px solid var(--hairline-strong); }
+summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-height: var(--hit-target);
+  padding: 4px 2px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  list-style: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::after {
+  content: "+";
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--secondary);
+}
+details[open] summary::after { content: "\2212"; }
+summary .tag {
+  white-space: nowrap;
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+  margin-left: auto;
+}
+details p {
+  margin: 0 0 var(--space-md);
+  padding: 0 2px;
+  font-size: var(--size-list);
+  line-height: var(--lh-body);
+  color: var(--slate);
+  max-width: 62ch;
+}
+.route {
+  margin: var(--space-lg) 0 0;
+  border-left: 2px solid var(--steel);
+  padding-left: var(--space-md);
+  font-style: italic;
+  font-size: var(--size-list);
+  line-height: var(--lh-body);
+  color: var(--slate);
+  max-width: 58ch;
+}
+.route .overline { font-style: normal; display: block; margin-bottom: 2px; }
+.clothing {
+  margin: var(--space-lg) 0 0;
+  font-size: var(--size-list);
+  line-height: 1.5;
+  max-width: 58ch;
+}
+.clothing .overline { margin-right: 6px; }
+
+/* ---------- attribution footer ---------- */
+footer {
+  margin-top: var(--space-xxl);
+  border-top: 1px solid var(--hairline-strong);
+  padding-top: var(--space-md);
+  color: var(--secondary);
+  font-size: var(--size-caption);
+  line-height: var(--lh-body);
+}
+footer .fetched {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin: 0 0 var(--space-sm);
+}
+footer p { margin: 0 0 var(--space-sm); max-width: 70ch; }
+.theme-demo {
+  margin-top: var(--space-sm);
+}
+.theme-demo button {
+  appearance: none;
+  background: none;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-surface);
+  color: var(--slate);
+  font-family: var(--font-label);
+  font-size: 16px;
+  font-weight: 500;
+  min-height: var(--hit-target);
+  padding: 0 var(--space-md);
+  cursor: pointer;
+}
+.theme-demo button:active { background: var(--ice); }
+
+:focus-visible { outline: 2px solid var(--steel-text); outline-offset: 1px; }
+
+/* ---------- desktop 1280: the adaptation ---------- */
+@media (min-width: 900px) {
+  .wrap { padding-left: var(--space-xl); padding-right: var(--space-xl); }
+  .wordmark { font-size: 34px; }
+  .current { padding: 12px 16px 14px; }
+  .current .wbgt-big { font-size: 60px; }
+  .current .phrase { font-size: 20px; }
+  .current .strip { font-size: 13.5px; }
+  .ledger-head .hint { display: none; }
+  table { min-width: 0; font-size: 13.5px; }
+  td, tbody th { padding: 6px 14px; }
+  thead th { padding: 8px 14px 6px; }
+  td.cat { font-size: 14.5px; }
+  .lower {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: var(--space-lg) 48px;
+    align-items: start;
+  }
+  .explainers { grid-row: 1 / 3; }
+  .route { margin-top: 0; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="masthead-top">
+      <h1 class="wordmark">
+        <span class="overline">NYC running conditions</span>
+        when to run
+      </h1>
+      <div class="units" role="group" aria-label="Temperature units">
+        <button type="button" aria-pressed="true">&deg;F</button>
+        <button type="button" aria-pressed="false">&deg;C</button>
+      </div>
+    </div>
+    <nav class="pathnav" aria-label="Running paths">
+      <a href="#" aria-current="page">Central Park</a>
+      <a href="#">Hudson Greenway</a>
+      <a href="#">East River</a>
+      <a href="#">Brooklyn</a>
+      <a href="#">Van Cortlandt</a>
+    </nav>
+  </header>
+
+  <aside class="alert" role="status">
+    <span class="overline">Heat advisory</span>
+    <p>In effect until 8 PM EDT Tuesday &middot; NWS</p>
+  </aside>
+
+  <section class="current" aria-label="Current conditions">
+    <div class="wbgt-big">87<sup>&deg;F</sup></div>
+    <p class="phrase"><span class="overline">WBGT now</span> High heat stress</p>
+    <p class="strip">dew <b>73&deg;</b> Oppressive &middot; UV <b>9</b> Very High &middot; AQI <b>62</b> Moderate (PM2.5) &middot; wind <b>S 6</b> g12</p>
+  </section>
+
+  <p class="window-line">
+    <span class="overline">Next best window</span>
+    Wed 5&ndash;8 AM &mdash; WBGT 76&deg; Elevated &middot; dew 70&deg; &middot; UV 0&ndash;2 &middot; AQI 48 Good
+    <span class="tonight">Tonight 7&ndash;8 PM not recommended &mdash; thunderstorms likely (60%).</span>
+  </p>
+
+  <section aria-label="48-hour outlook">
+    <div class="ledger-head">
+      <h2 class="overline" style="margin:0">48-hour outlook &middot; hourly</h2>
+      <span class="overline hint">slide &rarr;</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <caption>Hourly running conditions for Central Park, next 48 hours</caption>
+        <thead>
+          <tr>
+            <th scope="col">Time</th>
+            <th scope="col">WBGT</th>
+            <th scope="col" class="h-cat">Heat stress</th>
+            <th scope="col">Dew pt</th>
+            <th scope="col">UV</th>
+            <th scope="col">AQI</th>
+            <th scope="col">Wind mph</th>
+            <th scope="col">Precip %</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr class="day"><th scope="row">TUE</th><td colspan="7">Tuesday &middot; July 28 &middot; today</td></tr>
+            <tr class="t-extreme">
+              <th scope="row">3 PM</th>
+              <td class="n">88&deg;</td>
+              <td class="cat">Extreme caution</td>
+              <td class="n">73&deg;</td>
+              <td class="n">8</td>
+              <td class="n">62</td>
+              <td class="wind">S 6 <span class="g">g12</span></td>
+              <td class="n">15</td>
+            </tr>
+            <tr class="t-extreme">
+              <th scope="row">4 PM</th>
+              <td class="n">88&deg;</td>
+              <td class="cat">Extreme caution</td>
+              <td class="n">73&deg;</td>
+              <td class="n">7</td>
+              <td class="n">63</td>
+              <td class="wind">S 7 <span class="g">g13</span></td>
+              <td class="n">15</td>
+            </tr>
+            <tr class="t-high">
+              <th scope="row">5 PM</th>
+              <td class="n">87&deg;</td>
+              <td class="cat">High</td>
+              <td class="n">73&deg;</td>
+              <td class="n">5</td>
+              <td class="n">63</td>
+              <td class="wind">S 7 <span class="g">g14</span></td>
+              <td class="n">20</td>
+            </tr>
+            <tr class="t-high">
+              <th scope="row">6 PM</th>
+              <td class="n">85&deg;</td>
+              <td class="cat">High</td>
+              <td class="n">74&deg;</td>
+              <td class="n">3</td>
+              <td class="n">61</td>
+              <td class="wind">S 8 <span class="g">g15</span></td>
+              <td class="n">25</td>
+            </tr>
+            <tr class="t-moderate veto">
+              <th scope="row">7 PM</th>
+              <td class="n">82&deg;</td>
+              <td class="cat">Moderate</td>
+              <td class="n">74&deg;</td>
+              <td class="n">1</td>
+              <td class="n">58</td>
+              <td class="wind">S 9 <span class="g">g18</span></td>
+              <td class="n">60</td>
+            </tr>
+            <tr class="t-moderate note veto-note"><th scope="row"></th><td colspan="7"><em>Not recommended — thunderstorms likely (60%)</em></td></tr>
+            <tr class="t-elevated veto">
+              <th scope="row">8 PM</th>
+              <td class="n">79&deg;</td>
+              <td class="cat">Elevated</td>
+              <td class="n">74&deg;</td>
+              <td class="n">0</td>
+              <td class="n">56</td>
+              <td class="wind">SW 8 <span class="g">g16</span></td>
+              <td class="n">45</td>
+            </tr>
+            <tr class="t-elevated note veto-note"><th scope="row"></th><td colspan="7"><em>Not recommended — thunderstorms likely (45%)</em></td></tr>
+            <tr class="t-elevated">
+              <th scope="row">9 PM</th>
+              <td class="n">77&deg;</td>
+              <td class="cat">Elevated</td>
+              <td class="n">74&deg;</td>
+              <td class="n">0</td>
+              <td class="n">54</td>
+              <td class="wind">SW 6</td>
+              <td class="n">25</td>
+            </tr>
+            <tr class="t-elevated">
+              <th scope="row">10 PM</th>
+              <td class="n">76&deg;</td>
+              <td class="cat">Elevated</td>
+              <td class="n">73&deg;</td>
+              <td class="n">0</td>
+              <td class="n">52</td>
+              <td class="wind">SW 5</td>
+              <td class="n">15</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">11 PM</th>
+              <td class="n">75&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">73&deg;</td>
+              <td class="n">0</td>
+              <td class="n">51</td>
+              <td class="wind">SW 5</td>
+              <td class="n">10</td>
+            </tr>
+            <tr class="day"><th scope="row">WED</th><td colspan="7">Wednesday &middot; July 29</td></tr>
+            <tr class="t-low">
+              <th scope="row">12 AM</th>
+              <td class="n">75&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">72&deg;</td>
+              <td class="n">0</td>
+              <td class="n">50</td>
+              <td class="wind">SW 4</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">1 AM</th>
+              <td class="n">74&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">72&deg;</td>
+              <td class="n">0</td>
+              <td class="n">50</td>
+              <td class="wind">SW 4</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">2 AM</th>
+              <td class="n">74&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">71&deg;</td>
+              <td class="n">0</td>
+              <td class="n">49</td>
+              <td class="wind">SW 4</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">3 AM</th>
+              <td class="n">74&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">71&deg;</td>
+              <td class="n">0</td>
+              <td class="n">49</td>
+              <td class="wind">W 3</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">4 AM</th>
+              <td class="n">74&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">70&deg;</td>
+              <td class="n">0</td>
+              <td class="n">48</td>
+              <td class="wind">W 3</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="note window-note"><th scope="row"></th><td colspan="7"><em>Best window of the next 48 hours &mdash; cool, clean air</em></td></tr>
+            <tr class="t-low best">
+              <th scope="row">5 AM</th>
+              <td class="n">74&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">70&deg;</td>
+              <td class="n">0</td>
+              <td class="n">48</td>
+              <td class="wind">W 3</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-low best">
+              <th scope="row">6 AM</th>
+              <td class="n">74&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">70&deg;</td>
+              <td class="n">1</td>
+              <td class="n">48</td>
+              <td class="wind">W 3</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-elevated best">
+              <th scope="row">7 AM</th>
+              <td class="n">76&deg;</td>
+              <td class="cat">Elevated</td>
+              <td class="n">70&deg;</td>
+              <td class="n">2</td>
+              <td class="n">49</td>
+              <td class="wind">W 4</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-elevated">
+              <th scope="row">8 AM</th>
+              <td class="n">78&deg;</td>
+              <td class="cat">Elevated</td>
+              <td class="n">71&deg;</td>
+              <td class="n">4</td>
+              <td class="n">52</td>
+              <td class="wind">SW 5</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-moderate">
+              <th scope="row">9 AM</th>
+              <td class="n">81&deg;</td>
+              <td class="cat">Moderate</td>
+              <td class="n">71&deg;</td>
+              <td class="n">6</td>
+              <td class="n">55</td>
+              <td class="wind">SW 6</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-moderate">
+              <th scope="row">10 AM</th>
+              <td class="n">84&deg;</td>
+              <td class="cat">Moderate</td>
+              <td class="n">71&deg;</td>
+              <td class="n">8</td>
+              <td class="n">58</td>
+              <td class="wind">S 7</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-high">
+              <th scope="row">11 AM</th>
+              <td class="n">86&deg;</td>
+              <td class="cat">High</td>
+              <td class="n">72&deg;</td>
+              <td class="n">9</td>
+              <td class="n">60</td>
+              <td class="wind">S 7</td>
+              <td class="n">10</td>
+            </tr>
+            <tr class="t-extreme">
+              <th scope="row">12 PM</th>
+              <td class="n">88&deg;</td>
+              <td class="cat">Extreme caution</td>
+              <td class="n">72&deg;</td>
+              <td class="n">10</td>
+              <td class="n">61</td>
+              <td class="wind">S 8</td>
+              <td class="n">10</td>
+            </tr>
+            <tr class="t-extreme">
+              <th scope="row">1 PM</th>
+              <td class="n">89&deg;</td>
+              <td class="cat">Extreme caution</td>
+              <td class="n">72&deg;</td>
+              <td class="n">10</td>
+              <td class="n">62</td>
+              <td class="wind">S 8</td>
+              <td class="n">10</td>
+            </tr>
+            <tr class="t-extreme">
+              <th scope="row">2 PM</th>
+              <td class="n">89&deg;</td>
+              <td class="cat">Extreme caution</td>
+              <td class="n">72&deg;</td>
+              <td class="n">9</td>
+              <td class="n">62</td>
+              <td class="wind">S 8</td>
+              <td class="n">15</td>
+            </tr>
+            <tr class="t-extreme">
+              <th scope="row">3 PM</th>
+              <td class="n">89&deg;</td>
+              <td class="cat">Extreme caution</td>
+              <td class="n">72&deg;</td>
+              <td class="n">8</td>
+              <td class="n">61</td>
+              <td class="wind">S 8</td>
+              <td class="n">15</td>
+            </tr>
+            <tr class="t-extreme">
+              <th scope="row">4 PM</th>
+              <td class="n">88&deg;</td>
+              <td class="cat">Extreme caution</td>
+              <td class="n">71&deg;</td>
+              <td class="n">6</td>
+              <td class="n">60</td>
+              <td class="wind">S 8</td>
+              <td class="n">15</td>
+            </tr>
+            <tr class="t-high">
+              <th scope="row">5 PM</th>
+              <td class="n">86&deg;</td>
+              <td class="cat">High</td>
+              <td class="n">71&deg;</td>
+              <td class="n">4</td>
+              <td class="n">58</td>
+              <td class="wind">S 7</td>
+              <td class="n">20</td>
+            </tr>
+            <tr class="t-moderate">
+              <th scope="row">6 PM</th>
+              <td class="n">83&deg;</td>
+              <td class="cat">Moderate</td>
+              <td class="n">70&deg;</td>
+              <td class="n">2</td>
+              <td class="n">55</td>
+              <td class="wind">S 6</td>
+              <td class="n">20</td>
+            </tr>
+            <tr class="t-moderate">
+              <th scope="row">7 PM</th>
+              <td class="n">80&deg;</td>
+              <td class="cat">Moderate</td>
+              <td class="n">69&deg;</td>
+              <td class="n">1</td>
+              <td class="n">52</td>
+              <td class="wind">SW 5</td>
+              <td class="n">15</td>
+            </tr>
+            <tr class="t-elevated">
+              <th scope="row">8 PM</th>
+              <td class="n">78&deg;</td>
+              <td class="cat">Elevated</td>
+              <td class="n">69&deg;</td>
+              <td class="n">0</td>
+              <td class="n">50</td>
+              <td class="wind">SW 5</td>
+              <td class="n">10</td>
+            </tr>
+            <tr class="t-elevated">
+              <th scope="row">9 PM</th>
+              <td class="n">76&deg;</td>
+              <td class="cat">Elevated</td>
+              <td class="n">68&deg;</td>
+              <td class="n">0</td>
+              <td class="n">49</td>
+              <td class="wind">SW 4</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">10 PM</th>
+              <td class="n">75&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">68&deg;</td>
+              <td class="n">0</td>
+              <td class="n">48</td>
+              <td class="wind">W 4</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">11 PM</th>
+              <td class="n">74&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">67&deg;</td>
+              <td class="n">0</td>
+              <td class="n">47</td>
+              <td class="wind">W 3</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="day"><th scope="row">THU</th><td colspan="7">Thursday &middot; July 30</td></tr>
+            <tr class="t-low">
+              <th scope="row">12 AM</th>
+              <td class="n">73&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">67&deg;</td>
+              <td class="n">0</td>
+              <td class="n">46</td>
+              <td class="wind">W 3</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">1 AM</th>
+              <td class="n">73&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">66&deg;</td>
+              <td class="n">0</td>
+              <td class="n">46</td>
+              <td class="wind">NW 3</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">2 AM</th>
+              <td class="n">72&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">66&deg;</td>
+              <td class="n">0</td>
+              <td class="n">45</td>
+              <td class="wind">NW 3</td>
+              <td class="n">0</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">3 AM</th>
+              <td class="n">72&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">65&deg;</td>
+              <td class="n">0</td>
+              <td class="n">45</td>
+              <td class="wind">NW 3</td>
+              <td class="n">0</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">4 AM</th>
+              <td class="n">72&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">65&deg;</td>
+              <td class="n">0</td>
+              <td class="n">44</td>
+              <td class="wind">NW 2</td>
+              <td class="n">0</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">5 AM</th>
+              <td class="n">72&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">65&deg;</td>
+              <td class="n">0</td>
+              <td class="n">44</td>
+              <td class="wind">NW 2</td>
+              <td class="n">0</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">6 AM</th>
+              <td class="n">73&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">65&deg;</td>
+              <td class="n">1</td>
+              <td class="n">45</td>
+              <td class="wind">NW 3</td>
+              <td class="n">0</td>
+            </tr>
+            <tr class="t-low">
+              <th scope="row">7 AM</th>
+              <td class="n">75&deg;</td>
+              <td class="cat">Low</td>
+              <td class="n">66&deg;</td>
+              <td class="n">3</td>
+              <td class="n">47</td>
+              <td class="wind">N 3</td>
+              <td class="n">0</td>
+            </tr>
+            <tr class="t-elevated">
+              <th scope="row">8 AM</th>
+              <td class="n">77&deg;</td>
+              <td class="cat">Elevated</td>
+              <td class="n">66&deg;</td>
+              <td class="n">5</td>
+              <td class="n">49</td>
+              <td class="wind">N 4</td>
+              <td class="n">0</td>
+            </tr>
+            <tr class="t-moderate">
+              <th scope="row">9 AM</th>
+              <td class="n">80&deg;</td>
+              <td class="cat">Moderate</td>
+              <td class="n">66&deg;</td>
+              <td class="n">7</td>
+              <td class="n">51</td>
+              <td class="wind">N 4</td>
+              <td class="n">0</td>
+            </tr>
+            <tr class="t-moderate">
+              <th scope="row">10 AM</th>
+              <td class="n">83&deg;</td>
+              <td class="cat">Moderate</td>
+              <td class="n">67&deg;</td>
+              <td class="n">8</td>
+              <td class="n">53</td>
+              <td class="wind">NE 5</td>
+              <td class="n">0</td>
+            </tr>
+            <tr class="t-high">
+              <th scope="row">11 AM</th>
+              <td class="n">85&deg;</td>
+              <td class="cat">High</td>
+              <td class="n">67&deg;</td>
+              <td class="n">9</td>
+              <td class="n">55</td>
+              <td class="wind">NE 5</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-high">
+              <th scope="row">12 PM</th>
+              <td class="n">87&deg;</td>
+              <td class="cat">High</td>
+              <td class="n">67&deg;</td>
+              <td class="n">10</td>
+              <td class="n">56</td>
+              <td class="wind">E 5</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-extreme">
+              <th scope="row">1 PM</th>
+              <td class="n">88&deg;</td>
+              <td class="cat">Extreme caution</td>
+              <td class="n">68&deg;</td>
+              <td class="n">10</td>
+              <td class="n">57</td>
+              <td class="wind">SE 6</td>
+              <td class="n">5</td>
+            </tr>
+            <tr class="t-extreme">
+              <th scope="row">2 PM</th>
+              <td class="n">88&deg;</td>
+              <td class="cat">Extreme caution</td>
+              <td class="n">68&deg;</td>
+              <td class="n">9</td>
+              <td class="n">57</td>
+              <td class="wind">SE 6</td>
+              <td class="n">5</td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="lower">
+    <section class="explainers" aria-label="About these metrics">
+      <h2>What each column measures</h2>
+      <details>
+        <summary>WBGT &mdash; heat stress on a working body <span class="tag">forecast &middot; NWS</span></summary>
+        <p>Wet-bulb globe temperature folds air temperature, humidity, sun load, and wind into one number for a body producing heat &mdash; the standard used by race medical directors and the military. It omits your fitness, acclimatization, and pace. Bands (NWS): under 80&deg;F low, 80&ndash;85 moderate, 85&ndash;88 high, 88&ndash;90 extreme caution, 90+ we advise against running at all. Values come from the NWS forecast gridpoint for this park; when the NWS field is missing we compute an estimate and label it so.</p>
+      </details>
+      <details>
+        <summary>Dew point &mdash; how well sweat works <span class="tag">forecast &middot; NWS</span></summary>
+        <p>Dew point is absolute moisture in the air, and it governs whether sweat evaporates. Unlike relative humidity it does not swing with temperature through the day. Under 55&deg;F is comfortable, 60&ndash;65 noticeable, 65&ndash;70 sticky, 70&ndash;75 oppressive, 75+ severely limits cooling. Today&rsquo;s 73&deg; means your effort will feel one to two gears harder than the pace suggests.</p>
+      </details>
+      <details>
+        <summary>UV index <span class="tag">forecast &middot; Open-Meteo</span></summary>
+        <p>The WHO/EPA ultraviolet scale. 0&ndash;2 low, 3&ndash;5 moderate, 6&ndash;7 high, 8&ndash;10 very high, 11+ extreme. It measures skin and eye exposure risk, not heat &mdash; a cool clear noon can still burn. Forecast hourly by Open-Meteo; sunscreen and a cap advised from 6 upward on exposed routes.</p>
+      </details>
+      <details>
+        <summary>AQI &mdash; air quality <span class="tag">monitored &middot; AirNow</span></summary>
+        <p>The EPA Air Quality Index. We show the worst reading among nearby official monitors, across all pollutants, with the dominant pollutant named &mdash; the protective framing. 0&ndash;50 good, 51&ndash;100 moderate, 101&ndash;150 unhealthy for sensitive groups, 151&ndash;200 unhealthy, 201+ we advise against outdoor exercise. Current values are monitored (AirNow); hourly forecasts are modeled (CAMS) and labeled as such.</p>
+      </details>
+      <details>
+        <summary>Wind and gusts <span class="tag">forecast &middot; NWS</span></summary>
+        <p>Sustained speed with direction, plus gusts when notable. Below 10 mph wind barely registers on a run; 10&ndash;20 costs seconds per mile into it; gusts above 30 make bridges and waterfront paths unpleasant. In heat, a little wind helps &mdash; it is the only cooling you get when the dew point is high.</p>
+      </details>
+      <details>
+        <summary>Precipitation and thunder <span class="tag">forecast &middot; NWS</span></summary>
+        <p>Chance of measurable precipitation for each hour. Rain is a comfort call; lightning is not &mdash; when the chance of thunder reaches 30% or storms appear in the forecast weather, we mark the hour not recommended and say why. There is no safe outdoor place in a thunderstorm.</p>
+      </details>
+      <details>
+        <summary>Alerts <span class="tag">live &middot; NWS zone NYZ072</span></summary>
+        <p>Official National Weather Service watches, warnings, and advisories for this park&rsquo;s forecast zone. Advisories (like today&rsquo;s Heat Advisory) appear as the banner above &mdash; caution, your call. Warning-class events &mdash; severe thunderstorm, flash flood, excessive heat &mdash; mark affected hours not recommended, with the warning named.</p>
+      </details>
+    </section>
+
+    <aside class="route">
+      <span class="overline">Central Park &middot; route context</span>
+      Good tree shade on the loop&rsquo;s east and north sides; the reservoir path is exposed. Hills concentrate at the north end. Drains well after rain.
+    </aside>
+
+    <p class="clothing"><span class="overline">Clothing</span>Lightest kit &mdash; singlet, split shorts, cap. Carry fluids for anything over 40 minutes; tomorrow&rsquo;s 5 AM window needs nothing extra.</p>
+  </div>
+
+  <footer>
+    <p class="fetched">NWS gridpoint OKX 34,45 fetched 2:24 PM &middot; NWS alerts 2:28 PM &middot; AirNow monitors 2:10 PM &middot; Open-Meteo 2:02 PM &middot; all times ET, Tue Jul 28</p>
+    <p>Weather and heat-stress data: National Weather Service (api.weather.gov). Air quality: EPA AirNow, worst nearby monitor. UV and modeled hourly air quality: Open-Meteo. Categories follow NWS and EPA definitions &mdash; we report the metrics and their official words, never a combined score. Forecasts change; check the banner before you head out.</p>
+    <div class="theme-demo">
+      <button type="button" id="themeBtn">Theme: System</button>
+    </div>
+  </footer>
+
+</div>
+<script>
+/* mockup-only theme demo: cycles System -> Light -> Dark by stamping
+   data-theme on <html>, mirroring the server-rendered cookie behavior */
+(function () {
+  var btn = document.getElementById("themeBtn");
+  var states = ["System", "Light", "Dark"];
+  var i = 0;
+  btn.addEventListener("click", function () {
+    i = (i + 1) % 3;
+    var s = states[i];
+    if (s === "System") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = s.toLowerCase();
+    btn.textContent = "Theme: " + s;
+  });
+})();
+</script>
+</body>
+</html>

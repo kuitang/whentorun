@@ -1,0 +1,32 @@
+[
+    {
+        "dateObserved": "2026-07-27",
+        "hourObserved": "20:00",
+        "localTimeZone": "EDT",
+        "reportingAreaName": "New York City Region",
+        "siteID": "360610135",
+        "siteName": "CCNY",
+        "parameterName": "PM2.5",
+        "nowcastAQI": 66,
+        "aqiCategoryName": "Moderate",
+        "reportingAgency": "New York Dept. of Environmental Conservation",
+        "lookupBehavior": "Closest Reading By Pollutant",
+        "consideredMonitors": "All",
+        "lookupBoundary": "Reporting Area"
+    },
+    {
+        "dateObserved": "2026-07-27",
+        "hourObserved": "20:00",
+        "localTimeZone": "EDT",
+        "reportingAreaName": "New York City Region",
+        "siteID": "360610135",
+        "siteName": "CCNY",
+        "parameterName": "OZONE",
+        "nowcastAQI": 64,
+        "aqiCategoryName": "Moderate",
+        "reportingAgency": "New York Dept. of Environmental Conservation",
+        "lookupBehavior": "Closest Reading By Pollutant",
+        "consideredMonitors": "All",
+        "lookupBoundary": "Reporting Area"
+    }
+]

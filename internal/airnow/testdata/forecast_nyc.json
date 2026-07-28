@@ -1,0 +1,58 @@
+[
+    {
+        "dateIssue": "2026-07-27",
+        "dateValid": "2026-07-27",
+        "reportingArea": "New York City Region",
+        "reportingAreaCode": "ny003",
+        "stateCode": "NY",
+        "parameterName": "OZONE",
+        "aqi": 97,
+        "forecastAgency": "New York Dept. of Environmental Conservation",
+        "categoryNumber": 2,
+        "categoryName": "Moderate",
+        "actionDay": false,
+        "discussion": ""
+    },
+    {
+        "dateIssue": "2026-07-27",
+        "dateValid": "2026-07-27",
+        "reportingArea": "New York City Region",
+        "reportingAreaCode": "ny003",
+        "stateCode": "NY",
+        "parameterName": "PM2.5",
+        "aqi": 58,
+        "forecastAgency": "New York Dept. of Environmental Conservation",
+        "categoryNumber": 2,
+        "categoryName": "Moderate",
+        "actionDay": false,
+        "discussion": ""
+    },
+    {
+        "dateIssue": "2026-07-27",
+        "dateValid": "2026-07-28",
+        "reportingArea": "New York City Region",
+        "reportingAreaCode": "ny003",
+        "stateCode": "NY",
+        "parameterName": "PM2.5",
+        "aqi": 58,
+        "forecastAgency": "New York Dept. of Environmental Conservation",
+        "categoryNumber": 2,
+        "categoryName": "Moderate",
+        "actionDay": false,
+        "discussion": ""
+    },
+    {
+        "dateIssue": "2026-07-27",
+        "dateValid": "2026-07-28",
+        "reportingArea": "New York City Region",
+        "reportingAreaCode": "ny003",
+        "stateCode": "NY",
+        "parameterName": "OZONE",
+        "aqi": 46,
+        "forecastAgency": "New York Dept. of Environmental Conservation",
+        "categoryNumber": 1,
+        "categoryName": "Good",
+        "actionDay": false,
+        "discussion": ""
+    }
+]

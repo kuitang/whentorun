@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>when to run — Central Park (d-nocturne)</title>
+<link rel="stylesheet" href="../static/css/tokens.css">
+<style>
+/* ============================================================
+   d-nocturne — dark athletic. Slate-recessed surfaces; elevation
+   by lightness, not borders. Pre-dawn window is the hero.
+   Mobile-first at 390px; desktop 1280 is the adaptation.
+   ============================================================ */
+
+* { box-sizing: border-box; }
+
+html { background: var(--paper); }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+/* ---------- masthead ---------- */
+
+.masthead {
+  padding-top: calc(var(--space-sm) + env(safe-area-inset-top, 0px));
+}
+
+.overline {
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  font-weight: 600;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+
+.wordmark {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--size-screen-title);
+  line-height: var(--lh-title);
+  color: var(--ink);
+}
+
+.masthead-rule {
+  height: 2px;
+  background: var(--ink);
+  margin-top: var(--space-xs);
+  border: 0;
+}
+
+/* path nav + unit toggle: one 44px row, nav scrolls inside itself */
+.nav-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-sm);
+  min-height: var(--hit-target);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.path-nav {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1 1 auto;
+  gap: var(--space-md);
+}
+.path-nav::-webkit-scrollbar { display: none; }
+
+.path-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hit-target);
+  white-space: nowrap;
+  font-family: var(--font-label);
+  font-size: var(--size-body);      /* controls >= 16px */
+  font-weight: 500;
+  letter-spacing: var(--ls-smallcaps);
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--secondary);
+  border-bottom: 2px solid transparent;
+}
+.path-nav a[aria-current="page"] {
+  color: var(--ink);
+  border-bottom-color: var(--steel);
+}
+.path-nav a:hover, .path-nav a:active { color: var(--ink); }
+
+.unit-toggle {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.unit-toggle button {
+  min-height: var(--hit-target);
+  min-width: var(--hit-target);
+  padding: 0 var(--space-sm);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-label);
+  font-size: var(--size-body);      /* controls >= 16px */
+  font-weight: 500;
+  letter-spacing: var(--ls-smallcaps);
+  color: var(--secondary);
+}
+.unit-toggle button[aria-pressed="true"] {
+  color: var(--ink);
+  border-bottom: 2px solid var(--steel);
+}
+
+/* ---------- alert banner (advisory-class: banner, not veto) ---------- */
+
+.alert {
+  margin-top: var(--space-sm);
+  background: var(--card);            /* one step lighter than paper */
+  border-left: 2px solid var(--steel);
+  border-radius: var(--radius-surface);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+.alert .kicker {
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  font-weight: 700;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--steel-text);
+}
+.alert .alert-text {
+  font-size: var(--size-list);
+  color: var(--ink);
+}
+
+/* ---------- compressed current panel ---------- */
+
+.current {
+  margin-top: var(--space-sm);
+  background: var(--ice);             /* emphasis surface, lighter again */
+  border-radius: var(--radius-surface);
+  padding: var(--space-md);
+}
+.current .overline { color: var(--secondary); }
+
+.current-lead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.wbgt-big {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--size-display);
+  line-height: 1.15;
+  color: var(--ink);
+}
+.wbgt-big sup {
+  font-size: var(--size-card-title);
+  font-weight: 300;
+}
+.wbgt-phrase {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: var(--size-card-title);
+  line-height: var(--lh-title);
+  color: var(--tone-warm);
+}
+.metric-strip {
+  margin-top: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: var(--size-caption);
+  line-height: 1.55;
+  color: var(--slate);
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.metric-strip::-webkit-scrollbar { display: none; }
+.metric-strip b { color: var(--ink); font-weight: 600; }
+.metric-strip .sep { color: var(--tone-dormant); padding: 0 var(--space-xs); }
+
+/* ---------- next-best window: the pre-dawn hero ---------- */
+
+.window-hero {
+  margin-top: var(--space-sm);
+  background: var(--card);
+  border-left: 2px solid var(--steel);
+  border-radius: var(--radius-surface);
+  padding: var(--space-sm) var(--space-md);
+}
+.window-hero .win-title {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--size-card-title);
+  line-height: var(--lh-title);
+  color: var(--ink);
+}
+.window-hero .win-title b {
+  font-weight: 500;
+  color: var(--steel);
+}
+.window-hero .win-detail {
+  font-family: var(--font-mono);
+  font-size: var(--size-caption);
+  color: var(--slate);
+  margin-top: 2px;
+}
+.window-hero .win-veto {
+  margin-top: var(--space-xs);
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--hairline);
+  font-size: var(--size-caption);
+  font-family: var(--font-label);
+  color: var(--secondary);
+}
+
+/* ---------- 48h hourly table ---------- */
+
+.hourly { margin-top: var(--space-md); }
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-xs);
+}
+.scroll-hint {
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  color: var(--tone-dormant);
+}
+
+.table-scroller {
+  overflow-x: auto;
+  background: var(--card);            /* table sits one step above paper */
+  border-radius: var(--radius-surface);
+  -webkit-overflow-scrolling: touch;
+}
+
+table.hours {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 560px;
+  font-family: var(--font-mono);
+  font-size: var(--size-caption);     /* 13px mono, allowed for data */
+  line-height: 1.4;
+  color: var(--slate);
+}
+
+.hours th, .hours td {
+  text-align: left;
+  padding: var(--space-xs) var(--space-sm);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--hairline);
+  font-weight: 400;
+}
+
+.hours thead th {
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  font-weight: 600;
+  letter-spacing: var(--ls-smallcaps);
+  text-transform: uppercase;
+  color: var(--secondary);
+  border-bottom: 1px solid var(--hairline-strong);
+}
+
+/* sticky first (time) column; opaque background per row class */
+.hours th:first-child, .hours td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--card);
+  min-width: 62px;
+  border-left: 2px solid transparent;  /* tier tick lives here */
+}
+.hours td:first-child { color: var(--ink); }
+
+/* tier ticks — subtle left border by lightness; words carry the meaning */
+tr.tier-extreme  td:first-child { border-left-color: var(--tone-steady); }
+tr.tier-high     td:first-child { border-left-color: var(--slate); }
+tr.tier-moderate td:first-child { border-left-color: var(--secondary); }
+tr.tier-elevated td:first-child { border-left-color: var(--tone-dormant); }
+tr.vetoed        td:first-child { border-left: 2px dashed var(--secondary); }
+
+.hours .cat { color: var(--ink); }
+.hours .cat-word { color: var(--secondary); font-size: var(--size-label); }
+
+/* vetoed hours: dimmed metrics + a named reason line (never color alone) */
+tr.vetoed td { color: var(--tone-dormant); }
+tr.vetoed td:first-child { color: var(--secondary); }
+tr.veto-reason td {
+  padding-top: 0;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--card);
+}
+.veto-note {
+  position: sticky;
+  left: var(--space-sm);
+  display: inline-block;
+  font-family: var(--font-label);
+  font-size: var(--size-caption);
+  color: var(--ink);
+  padding-bottom: var(--space-xs);
+}
+
+/* the pre-dawn hero rows: lifted to the ice surface, steel tick */
+tr.hero-window td { background: var(--ice); color: var(--slate); }
+tr.hero-window td:first-child {
+  background: var(--ice);
+  border-left: 2px solid var(--steel);
+  color: var(--ink);
+}
+tr.hero-window .cat { color: var(--steel); }
+
+/* day divider rows */
+tr.day-divider td {
+  background: var(--paper);
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-top: var(--space-md);
+}
+tr.day-divider td:first-child { background: var(--paper); border-left-color: transparent; }
+.day-label {
+  position: sticky;
+  left: var(--space-sm);
+  display: inline-block;
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  font-weight: 700;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+
+.hourly-note {
+  margin: var(--space-sm) 0 0;
+  font-size: var(--size-caption);
+  color: var(--secondary);
+  font-style: italic;
+}
+
+/* ---------- explainers ---------- */
+
+.explainers { margin-top: var(--space-xl); }
+.explainers details {
+  border-bottom: 1px solid var(--hairline);
+}
+.explainers summary {
+  min-height: var(--hit-target);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+  font-size: var(--size-body);         /* control >= 16px */
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--ink);
+  list-style: none;
+}
+.explainers summary::-webkit-details-marker { display: none; }
+.explainers summary::before {
+  content: "+";
+  font-family: var(--font-mono);
+  color: var(--tone-dormant);
+  width: 1em;
+}
+.explainers details[open] summary::before { content: "−"; }
+.explainers summary .src {
+  margin-left: auto;
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  letter-spacing: var(--ls-smallcaps);
+  text-transform: uppercase;
+  color: var(--tone-dormant);
+}
+.explainers .body {
+  padding: 0 0 var(--space-md) calc(1em + var(--space-sm));
+  font-size: var(--size-list);
+  color: var(--slate);
+  max-width: 62ch;
+}
+
+/* ---------- route aside, clothing, footer ---------- */
+
+.route-aside {
+  margin: var(--space-xl) 0 0;
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--hairline-strong);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--slate);
+  max-width: 62ch;
+}
+.route-aside .overline { font-style: normal; display: block; margin-bottom: var(--space-xs); }
+
+.clothing {
+  margin-top: var(--space-lg);
+  font-size: var(--size-list);
+  color: var(--slate);
+  max-width: 62ch;
+}
+.clothing b {
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  font-weight: 700;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+
+footer {
+  margin-top: var(--space-xxl);
+  padding: var(--space-lg) 0 calc(var(--space-xxl) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--hairline-strong);
+  font-size: var(--size-caption);
+  color: var(--secondary);
+}
+footer .fetched {
+  font-family: var(--font-mono);
+  margin-top: var(--space-sm);
+  line-height: 1.7;
+}
+footer a { color: var(--steel-text); }
+
+/* ---------- desktop (1280) adaptation ---------- */
+
+@media (min-width: 900px) {
+  .wrap { padding: 0 var(--space-xxl); }
+  .wordmark { font-size: var(--size-display); }
+  .current { padding: var(--space-lg) var(--space-xl); }
+  .window-hero { padding: var(--space-md) var(--space-xl); }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xxl);
+    align-items: start;
+  }
+  table.hours { min-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ================= masthead ================= -->
+  <header class="masthead">
+    <div class="overline">NYC · Running Conditions · Night Edition</div>
+    <h1 class="wordmark">when to run</h1>
+    <div class="masthead-rule" role="presentation"></div>
+    <div class="nav-row">
+      <nav class="path-nav" aria-label="Running paths">
+        <a href="#" aria-current="page">Central Park</a>
+        <a href="#">Hudson Greenway</a>
+        <a href="#">East River</a>
+        <a href="#">Brooklyn</a>
+        <a href="#">Van Cortlandt</a>
+      </nav>
+      <div class="unit-toggle" role="group" aria-label="Units">
+        <button type="button" aria-pressed="true">°F</button>
+        <button type="button" aria-pressed="false">°C</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= alert banner ================= -->
+  <aside class="alert" role="status">
+    <span class="kicker">Advisory</span>
+    <span class="alert-text">Heat Advisory until 8 PM EDT Tuesday · NWS</span>
+  </aside>
+
+  <!-- ================= compressed current panel ================= -->
+  <section class="current" aria-label="Current conditions">
+    <div class="overline">Now · 2:30 PM ET · Tue Jul 28</div>
+    <div class="current-lead">
+      <span class="wbgt-big">WBGT 87<sup>°F</sup></span>
+      <span class="wbgt-phrase">High heat stress</span>
+    </div>
+    <div class="metric-strip">
+      dew <b>73°</b> Oppressive<span class="sep">·</span>UV <b>9</b> Very High<span class="sep">·</span>AQI <b>62</b> Moderate (PM2.5)<span class="sep">·</span>wind <b>6</b> S, gusts 12<span class="sep">·</span>sky 45%<span class="sep">·</span>no precip
+    </div>
+  </section>
+
+  <!-- ================= next-best window (pre-dawn hero) ================= -->
+  <section class="window-hero" aria-label="Next best window">
+    <div class="win-title">Next best — <b>tomorrow, 5–8 AM</b>, pre-dawn.</div>
+    <div class="win-detail">WBGT 76° Elevated · dew 70° Very humid · UV 0–2 · AQI 48 Good</div>
+    <div class="win-veto">Tonight 7–8 PM vetoed — thunderstorms likely (60%). Today&rsquo;s remaining daylight runs WBGT 85°F+.</div>
+  </section>
+
+  <!-- ================= 48h hourly table ================= -->
+  <section class="hourly" aria-label="48-hour outlook">
+    <div class="section-head">
+      <span class="overline">Next 48 hours</span>
+      <span class="scroll-hint">slide for wind + precip →</span>
+    </div>
+    <div class="table-scroller" tabindex="0">
+      <table class="hours">
+        <thead>
+          <tr>
+            <th scope="col">Time</th>
+            <th scope="col">WBGT</th>
+            <th scope="col">Dew pt</th>
+            <th scope="col">UV</th>
+            <th scope="col">AQI</th>
+            <th scope="col">Wind</th>
+            <th scope="col">Precip</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="tier-extreme"><td>3 PM</td><td><span class="cat">88° Extreme caution</span></td><td>73°</td><td>9</td><td>62 <span class="cat-word">Moderate</span></td><td>6 S</td><td>0%</td></tr>
+          <tr class="tier-extreme"><td>4 PM</td><td><span class="cat">88° Extreme caution</span></td><td>73°</td><td>8</td><td>62 <span class="cat-word">Moderate</span></td><td>7 S</td><td>5%</td></tr>
+          <tr class="tier-high"><td>5 PM</td><td><span class="cat">87° High heat stress</span></td><td>73°</td><td>6</td><td>63 <span class="cat-word">Moderate</span></td><td>7 S</td><td>10%</td></tr>
+          <tr class="tier-high"><td>6 PM</td><td><span class="cat">85° High heat stress</span></td><td>73°</td><td>4</td><td>63 <span class="cat-word">Moderate</span></td><td>8 S</td><td>20%</td></tr>
+          <tr class="tier-moderate vetoed"><td>7 PM</td><td><span class="cat">82° Moderate</span></td><td>74°</td><td>2</td><td>61 <span class="cat-word">Moderate</span></td><td>9 S</td><td>60%</td></tr>
+          <tr class="veto-reason"><td colspan="7"><span class="veto-note">Not recommended — thunderstorms likely (60%)</span></td></tr>
+          <tr class="tier-elevated vetoed"><td>8 PM</td><td><span class="cat">79° Elevated</span></td><td>74°</td><td>0</td><td>58 <span class="cat-word">Moderate</span></td><td>10 S</td><td>45%</td></tr>
+          <tr class="veto-reason"><td colspan="7"><span class="veto-note">Not recommended — thunderstorms likely (45%)</span></td></tr>
+          <tr class="tier-elevated"><td>9 PM</td><td><span class="cat">77° Elevated</span></td><td>74°</td><td>0</td><td>55 <span class="cat-word">Moderate</span></td><td>7 S</td><td>25%</td></tr>
+          <tr class="tier-elevated"><td>10 PM</td><td><span class="cat">76° Elevated</span></td><td>73°</td><td>0</td><td>53 <span class="cat-word">Moderate</span></td><td>6 S</td><td>15%</td></tr>
+          <tr class="tier-elevated"><td>11 PM</td><td><span class="cat">75° Elevated</span></td><td>73°</td><td>0</td><td>52 <span class="cat-word">Moderate</span></td><td>5 S</td><td>10%</td></tr>
+
+          <tr class="day-divider"><td colspan="7"><span class="day-label">Wednesday · Jul 29</span></td></tr>
+          <tr class="tier-elevated"><td>12 AM</td><td><span class="cat">75° Elevated</span></td><td>72°</td><td>0</td><td>51 <span class="cat-word">Moderate</span></td><td>5 S</td><td>5%</td></tr>
+          <tr class="tier-elevated"><td>1 AM</td><td><span class="cat">74° Elevated</span></td><td>72°</td><td>0</td><td>50 <span class="cat-word">Good</span></td><td>4 S</td><td>5%</td></tr>
+          <tr class="tier-elevated"><td>2 AM</td><td><span class="cat">74° Elevated</span></td><td>71°</td><td>0</td><td>50 <span class="cat-word">Good</span></td><td>4 SW</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>3 AM</td><td><span class="cat">74° Elevated</span></td><td>71°</td><td>0</td><td>49 <span class="cat-word">Good</span></td><td>4 SW</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>4 AM</td><td><span class="cat">74° Elevated</span></td><td>70°</td><td>0</td><td>48 <span class="cat-word">Good</span></td><td>3 SW</td><td>0%</td></tr>
+          <tr class="tier-elevated hero-window"><td>5 AM</td><td><span class="cat">74° Elevated</span></td><td>70°</td><td>0</td><td>48 <span class="cat-word">Good</span></td><td>3 SW</td><td>0%</td></tr>
+          <tr class="tier-elevated hero-window"><td>6 AM</td><td><span class="cat">74° Elevated</span></td><td>70°</td><td>1</td><td>48 <span class="cat-word">Good</span></td><td>4 SW</td><td>0%</td></tr>
+          <tr class="tier-elevated hero-window"><td>7 AM</td><td><span class="cat">76° Elevated</span></td><td>70°</td><td>2</td><td>49 <span class="cat-word">Good</span></td><td>5 SW</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>8 AM</td><td><span class="cat">78° Elevated</span></td><td>71°</td><td>4</td><td>52 <span class="cat-word">Moderate</span></td><td>6 SW</td><td>0%</td></tr>
+          <tr class="tier-moderate"><td>9 AM</td><td><span class="cat">81° Moderate</span></td><td>71°</td><td>6</td><td>55 <span class="cat-word">Moderate</span></td><td>6 SW</td><td>0%</td></tr>
+          <tr class="tier-moderate"><td>10 AM</td><td><span class="cat">84° Moderate</span></td><td>72°</td><td>8</td><td>58 <span class="cat-word">Moderate</span></td><td>7 SW</td><td>0%</td></tr>
+          <tr class="tier-high"><td>11 AM</td><td><span class="cat">86° High heat stress</span></td><td>72°</td><td>9</td><td>60 <span class="cat-word">Moderate</span></td><td>7 SW</td><td>0%</td></tr>
+          <tr class="tier-extreme"><td>12 PM</td><td><span class="cat">88° Extreme caution</span></td><td>72°</td><td>10</td><td>62 <span class="cat-word">Moderate</span></td><td>8 SW</td><td>0%</td></tr>
+          <tr class="tier-extreme"><td>1 PM</td><td><span class="cat">89° Extreme caution</span></td><td>72°</td><td>10</td><td>63 <span class="cat-word">Moderate</span></td><td>8 SW</td><td>5%</td></tr>
+          <tr class="tier-extreme"><td>2 PM</td><td><span class="cat">89° Extreme caution</span></td><td>72°</td><td>9</td><td>64 <span class="cat-word">Moderate</span></td><td>8 S</td><td>5%</td></tr>
+          <tr class="tier-extreme"><td>3 PM</td><td><span class="cat">89° Extreme caution</span></td><td>71°</td><td>8</td><td>64 <span class="cat-word">Moderate</span></td><td>9 S</td><td>10%</td></tr>
+          <tr class="tier-extreme"><td>4 PM</td><td><span class="cat">88° Extreme caution</span></td><td>71°</td><td>6</td><td>63 <span class="cat-word">Moderate</span></td><td>9 S</td><td>10%</td></tr>
+          <tr class="tier-high"><td>5 PM</td><td><span class="cat">86° High heat stress</span></td><td>70°</td><td>4</td><td>61 <span class="cat-word">Moderate</span></td><td>8 S</td><td>10%</td></tr>
+          <tr class="tier-moderate"><td>6 PM</td><td><span class="cat">83° Moderate</span></td><td>70°</td><td>2</td><td>58 <span class="cat-word">Moderate</span></td><td>7 S</td><td>5%</td></tr>
+          <tr class="tier-moderate"><td>7 PM</td><td><span class="cat">80° Moderate</span></td><td>69°</td><td>1</td><td>55 <span class="cat-word">Moderate</span></td><td>6 S</td><td>5%</td></tr>
+          <tr class="tier-elevated"><td>8 PM</td><td><span class="cat">78° Elevated</span></td><td>69°</td><td>0</td><td>53 <span class="cat-word">Moderate</span></td><td>6 S</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>9 PM</td><td><span class="cat">76° Elevated</span></td><td>68°</td><td>0</td><td>51 <span class="cat-word">Moderate</span></td><td>5 S</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>10 PM</td><td><span class="cat">75° Elevated</span></td><td>68°</td><td>0</td><td>50 <span class="cat-word">Good</span></td><td>5 S</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>11 PM</td><td><span class="cat">74° Elevated</span></td><td>67°</td><td>0</td><td>49 <span class="cat-word">Good</span></td><td>4 SW</td><td>0%</td></tr>
+
+          <tr class="day-divider"><td colspan="7"><span class="day-label">Thursday · Jul 30</span></td></tr>
+          <tr class="tier-elevated"><td>12 AM</td><td><span class="cat">73° Elevated</span></td><td>67°</td><td>0</td><td>48 <span class="cat-word">Good</span></td><td>4 SW</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>1 AM</td><td><span class="cat">73° Elevated</span></td><td>66°</td><td>0</td><td>47 <span class="cat-word">Good</span></td><td>4 W</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>2 AM</td><td><span class="cat">72° Elevated</span></td><td>66°</td><td>0</td><td>46 <span class="cat-word">Good</span></td><td>3 W</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>3 AM</td><td><span class="cat">72° Elevated</span></td><td>65°</td><td>0</td><td>46 <span class="cat-word">Good</span></td><td>3 W</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>4 AM</td><td><span class="cat">71° Elevated</span></td><td>65°</td><td>0</td><td>45 <span class="cat-word">Good</span></td><td>3 W</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>5 AM</td><td><span class="cat">71° Elevated</span></td><td>65°</td><td>0</td><td>45 <span class="cat-word">Good</span></td><td>3 W</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>6 AM</td><td><span class="cat">72° Elevated</span></td><td>65°</td><td>1</td><td>46 <span class="cat-word">Good</span></td><td>4 W</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>7 AM</td><td><span class="cat">74° Elevated</span></td><td>66°</td><td>3</td><td>48 <span class="cat-word">Good</span></td><td>5 W</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>8 AM</td><td><span class="cat">76° Elevated</span></td><td>66°</td><td>5</td><td>50 <span class="cat-word">Good</span></td><td>5 SW</td><td>0%</td></tr>
+          <tr class="tier-elevated"><td>9 AM</td><td><span class="cat">79° Elevated</span></td><td>67°</td><td>7</td><td>53 <span class="cat-word">Moderate</span></td><td>6 SW</td><td>0%</td></tr>
+          <tr class="tier-moderate"><td>10 AM</td><td><span class="cat">82° Moderate</span></td><td>67°</td><td>8</td><td>55 <span class="cat-word">Moderate</span></td><td>6 SW</td><td>0%</td></tr>
+          <tr class="tier-high"><td>11 AM</td><td><span class="cat">85° High heat stress</span></td><td>68°</td><td>9</td><td>58 <span class="cat-word">Moderate</span></td><td>7 SW</td><td>0%</td></tr>
+          <tr class="tier-high"><td>12 PM</td><td><span class="cat">87° High heat stress</span></td><td>68°</td><td>10</td><td>60 <span class="cat-word">Moderate</span></td><td>7 S</td><td>0%</td></tr>
+          <tr class="tier-extreme"><td>1 PM</td><td><span class="cat">88° Extreme caution</span></td><td>68°</td><td>10</td><td>61 <span class="cat-word">Moderate</span></td><td>8 S</td><td>5%</td></tr>
+          <tr class="tier-extreme"><td>2 PM</td><td><span class="cat">88° Extreme caution</span></td><td>68°</td><td>9</td><td>62 <span class="cat-word">Moderate</span></td><td>8 S</td><td>5%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="hourly-note">Hourly AQI beyond the current observation is modeled (CAMS), anchored to the AirNow daily category. WBGT from the NWS grid forecast.</p>
+  </section>
+
+  <div class="two-col">
+    <div>
+      <!-- ================= explainers ================= -->
+      <section class="explainers" aria-label="What these numbers mean">
+        <div class="overline">What these numbers mean</div>
+
+        <details>
+          <summary>WBGT — wet bulb globe temperature <span class="src">NWS · forecast</span></summary>
+          <div class="body">The heat-stress standard used by race directors and the military: it folds temperature, humidity, sun load and wind into one thermometer reading. It does not know your pace or acclimatization. Values here come from the NWS gridpoint forecast (converted from °C); when the grid is missing, we compute an estimate and label it so. At 88–90°F organizers shorten or cancel workouts; above 90°F we mark hours not recommended.</div>
+        </details>
+
+        <details>
+          <summary>Dew point — how the air feels <span class="src">NWS · forecast</span></summary>
+          <div class="body">The humidity number that matters for runners: sweat stops evaporating as dew point climbs. Under 60°F is comfortable, 65–70°F is very humid, above 70°F is oppressive — expect a slower pace at the same effort. Tonight stays near 73–74°F; tomorrow pre-dawn drops to 70°F, which is as good as this air mass gets.</div>
+        </details>
+
+        <details>
+          <summary>UV index <span class="src">Open-Meteo · forecast</span></summary>
+          <div class="body">The WHO/EPA scale for sunburn risk. 0–2 needs no protection, 8+ ("Very High") burns exposed skin in under 15 minutes. UV is the one metric that is always zero before dawn — another argument for the 5 AM window. Forecast from Open-Meteo; the NWS grid does not carry UV.</div>
+        </details>
+
+        <details>
+          <summary>AQI — air quality index <span class="src">AirNow · monitored</span></summary>
+          <div class="body">EPA index from the worst nearby AirNow monitor, taking the highest pollutant — today that is PM2.5 at 62, "Moderate": fine for most runners, noticeable if you are sensitive. Hourly forecast values are modeled (CAMS) and labeled as such. We mark hours at 201+ ("Very Unhealthy") not recommended.</div>
+        </details>
+
+        <details>
+          <summary>Wind <span class="src">NWS · forecast</span></summary>
+          <div class="body">Sustained speed and direction, with gusts when notable. Light south air at 6 mph does little for cooling today; in winter the same table drives wind-chill vetoes below −10°F. Direction matters most on the exposed river paths.</div>
+        </details>
+
+        <details>
+          <summary>Precipitation &amp; thunder <span class="src">NWS · forecast</span></summary>
+          <div class="body">Chance of measurable rain each hour. Rain alone never vetoes a run; lightning does — any hour with thunderstorm probability at 30% or higher is marked not recommended by name, tonight 7–8 PM included. Warning-class alerts (severe thunderstorm, flash flood) also veto outright.</div>
+        </details>
+      </section>
+    </div>
+
+    <div>
+      <!-- ================= route context ================= -->
+      <aside class="route-aside">
+        <span class="overline">Central Park · route notes</span>
+        Good tree shade on the loop&rsquo;s east and north sides; the reservoir path is exposed. Hills concentrate at the north end. Drains well after rain. Before dawn, the park drives are car-free and lit — run the main loop, not the bridle trails.
+      </aside>
+
+      <!-- ================= clothing line ================= -->
+      <p class="clothing"><b>Clothing</b> — Singlet, split shorts, cap; carry fluids for anything over 40 minutes at this dew point. For the 5 AM window: the same, plus something reflective for the dark.</p>
+    </div>
+  </div>
+
+  <!-- ================= attribution footer ================= -->
+  <footer>
+    <div>Forecasts are read straight from their sources and shown with their official category words — never combined into a score.</div>
+    <div class="fetched">
+      NWS gridpoint forecast &amp; alerts (api.weather.gov) — fetched 2:21 PM ET<br>
+      EPA AirNow observations, worst nearby monitor — observed 2:00 PM, fetched 2:05 PM ET<br>
+      Open-Meteo UV &amp; modeled hourly AQI (CAMS) — fetched 2:10 PM ET<br>
+      Mockup d-nocturne · dark tokens forced via <span>data-theme="dark"</span>
+    </div>
+  </footer>
+
+</div>
+
+</body>
+</html>
