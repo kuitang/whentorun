@@ -350,7 +350,7 @@ svg text { font-family: var(--font-serif); }
   border-collapse: separate; border-spacing: 0;   /* separate: borders travel with the sticky head */
   width: 100%;
   margin-top: var(--space-xs);
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.4;
 }
 .hours th, .hours td {
@@ -386,7 +386,7 @@ tr.tw4 > .t { border-left-color: var(--tier-4); }
 /* WBGT: the dominant column — wider, larger 500-weight tier-ink numeral,
    the category word alongside; the ONLY tier-colored value in the ledger */
 .hours .c-wbgt { text-align: left; white-space: normal; width: 24%; }
-.hours .c-wbgt .n { font-size: 17px; font-weight: 500; }
+.hours .c-wbgt .n { font-size: 20px; font-weight: 500; }
 .hours .c-wbgt .w-word { font-size: 13px; color: var(--slate); }
 /* air temp + dew point: neutral ink, plainly labeled, visibly quieter */
 .hours .c-temp, .hours .c-dew { color: var(--ink); }
@@ -596,6 +596,22 @@ tr[data-sun-row] .g { width: 15px; height: 15px; vertical-align: -3px; color: va
 .bolt-td { width: 9px; height: 12px; vertical-align: -1px; }
 .fig-key2 { font-size: 13px; color: var(--secondary); margin: 2px 0 0; }
 .fig-key2 .kdot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; margin-right: 2px; }
+
+.fig-wrap .scroll-hint-left { right: auto; left: 52px; }
+.scroll-hint { background: linear-gradient(270deg, var(--paper) 55%, transparent); padding: 6px 2px 6px 12px; }
+@media (max-width: 767px) {
+  /* one tier tick per row: the row edge carries it; the time cell's goes */
+  .hours tr:not(.day) > .t { border-left: 0; padding-left: 0; }
+  /* a true grid when folded: the time column is absolutely placed and every
+     content line — deck 1, deck 2, and any wrapped continuation — shares the
+     same indent, so nothing ever lands back under the time column */
+  .hours tr:not(.day):not([data-sun-row]):not([data-narrative]) { padding-left: 113px; }
+  .hours tr:not(.day):not([data-sun-row]):not([data-narrative]) > .t {
+    position: absolute; left: 9px; top: 7px; width: 100px; flex: none;
+  }
+  /* the window annotation stacks under the time instead of floating */
+  .hours .w-ann { position: static; display: block; margin: 1px 0 0; }
+}
 </style>
 </head>
 <body>
@@ -821,7 +837,7 @@ tr[data-sun-row] .g { width: 15px; height: 15px; vertical-align: -3px; color: va
         </div>
 <svg width="1344" height="316" viewBox="0 0 1344 316" role="img" aria-labelledby="figtitle figdesc">
 <title id="figtitle">WBGT, temperature and dew point for the next 48 hours on one shared Fahrenheit axis</title>
-<desc id="figdesc">Line chart from 3 PM Tuesday to 2 PM Thursday. WBGT is drawn in its heat-band ink, temperature as a dashed neutral line, dew point dotted. Ice-tinted bands mark the best windows: Wednesday 5 to 8 AM before work, and Wednesday 7 to 9 PM after work. Tuesday 7 to 9 PM is cross-hatched and vetoed for thunderstorms. A Heat Advisory bracket spans 3 to 8 PM Tuesday. Hatched bars along the base count the chance of rain, with bolt marks at the 60 and 45 percent storm hours.</desc>
+<desc id="figdesc">Line chart from 3 PM Tuesday to 2 PM Thursday. WBGT is drawn in its heat-band ink, temperature as a dashed neutral line, dew point dotted. Ice-tinted bands mark the best windows: Wednesday 5 to 8 AM before work, and Wednesday 7 to 9 PM after work. Tuesday 7 to 9 PM is cross-hatched and struck out for thunderstorms. A Heat Advisory bracket spans 3 to 8 PM Tuesday. Hatched bars along the base count the chance of rain, with bolt marks at the 60 and 45 percent storm hours.</desc>
 <defs>
 <pattern id="hatchVeto" width="3.5" height="3.5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pv" x1="0" y1="0" x2="0" y2="3.5"/></pattern>
 <pattern id="hatchWin" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pw" x1="0" y1="0" x2="0" y2="9"/></pattern>
@@ -836,7 +852,7 @@ tr[data-sun-row] .g { width: 15px; height: 15px; vertical-align: -3px; color: va
   <rect class="win-ice" x="794" y="48" width="56" height="220"/>
   <rect class="win-hatch" x="794" y="48" width="56" height="220"/>
 </g>
-<!-- vetoed span: Tue 7-9 PM, dense diagonal hatch -->
+<!-- struck span: Tue 7-9 PM, dense diagonal hatch -->
 <rect class="veto-hatch" x="122" y="48" width="56" height="220"/>
 <!-- gridlines at 70 / 80 / 90 -->
 <line class="lx-grid" x1="0" y1="84" x2="1344" y2="84"/>
@@ -848,7 +864,7 @@ tr[data-sun-row] .g { width: 15px; height: 15px; vertical-align: -3px; color: va
 <!-- top annotations: advisory bracket, veto reason, window names -->
 <text class="fx-ann f3" x="10" y="16">HEAT ADVISORY &#8212; UNTIL 8 PM</text>
 <path class="lx-brk b3" d="M 10 26 V 22 H 150 V 26"/>
-<text class="fx-ann f4" x="122" y="40">&#10005; VETOED &#8212; THUNDERSTORMS</text>
+<text class="fx-ann f4" x="122" y="40">&#10005; THUNDERSTORMS</text>
 <path class="lx-brk b4" d="M 122 44 V 48 M 122 44 H 178 M 178 44 V 48"/>
 <text class="fx-winlab" x="444" y="66" text-anchor="middle">before work</text>
 <text class="fx-wint" x="444" y="82" text-anchor="middle">Wed 5&#8211;8 AM</text>
@@ -945,7 +961,6 @@ tr[data-sun-row] .g { width: 15px; height: 15px; vertical-align: -3px; color: va
       <span class="scroll-hint scroll-hint-left" data-scrub-left hidden aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>
     </div>
     <div class="fig-legend">
-      <span class="lg-wbgt">WBGT changes ink with its heat band: <span class="sw tt0">&#9473;</span> low &middot; <span class="sw tt1">&#9473;</span> elevated &middot; <span class="sw tt2">&#9473;</span> moderate &middot; <span class="sw tt3">&#9473;</span> high &middot; <span class="sw tt4">&#9473;</span> extreme</span><br>
       <span class="lg-air"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><line x1="1" y1="5" x2="29" y2="5" stroke="currentColor" stroke-width="1" stroke-dasharray="6 4"/></svg> temperature</span> &middot;
       <span class="lg-dew"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><line x1="2" y1="5" x2="29" y2="5" stroke="currentColor" stroke-width="1.2" stroke-dasharray="0.2 4" stroke-linecap="round"/></svg> dew point</span> &middot;
       <span class="lg-rain"><svg class="lg-samp" viewBox="0 0 30 10" aria-hidden="true"><rect x="4" y="2" width="9" height="8" class="rainbar"/><use href="#g-bolt" x="18" y="0" width="8" height="10.2" class="bolt-g"/></svg> chance of rain, bolt marks thunder</span>
@@ -968,8 +983,8 @@ tr[data-sun-row] .g { width: 15px; height: 15px; vertical-align: -3px; color: va
 <tr class="tw4"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>4&nbsp;PM</th><td class="c-wbgt"><span class="n tt4">88&#176;</span></td><td class="c-temp">91&#176;</td><td class="c-dew">73&#176;</td><td class="c-rh q0">61%</td><td class="c-uv q1">6</td><td class="c-aqi q1">63</td><td class="c-wind q0"><svg class="vane" aria-hidden="true"><use href="#g-vane"/></svg>S 7</td><td class="c-rain q0">0%</td></tr>
 <tr class="tw3"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>5&nbsp;PM</th><td class="c-wbgt"><span class="n tt3">87&#176;</span></td><td class="c-temp">90&#176;</td><td class="c-dew">73&#176;</td><td class="c-rh q0">63%</td><td class="c-uv q1">4</td><td class="c-aqi q1">63</td><td class="c-wind q0"><svg class="vane" aria-hidden="true"><use href="#g-vane"/></svg>S 7</td><td class="c-rain q0">5%</td></tr>
 <tr class="tw3"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-cloud"/></svg>6&nbsp;PM</th><td class="c-wbgt"><span class="n tt3">85&#176;</span></td><td class="c-temp">88&#176;</td><td class="c-dew">73&#176;</td><td class="c-rh q1">67%</td><td class="c-uv q0">2</td><td class="c-aqi q1">61</td><td class="c-wind q0"><svg class="vane" aria-hidden="true"><use href="#g-vane"/></svg>S 8</td><td class="c-rain q0">15%</td></tr>
-<tr class="tw2 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>7&nbsp;PM</th><td class="c-wbgt"><span class="n tt2">82&#176;</span> <span class="w-word vt">&#10005; vetoed &mdash; thunderstorms likely (60%)</span></td><td class="c-temp">84&#176;</td><td class="c-dew">74&#176;</td><td class="c-rh q1">77%</td><td class="c-uv q0">1</td><td class="c-aqi q1">58</td><td class="c-wind q2"><svg class="vane" aria-hidden="true"><use href="#g-vane"/></svg>S 10 g22</td><td class="c-rain q2">60% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
-<tr class="tw1 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>8&nbsp;PM</th><td class="c-wbgt"><span class="n tt1">79&#176;</span> <span class="w-word vt">&#10005; vetoed &mdash; thunderstorms possible (45%)</span></td><td class="c-temp">81&#176;</td><td class="c-dew">74&#176;</td><td class="c-rh q2">85%</td><td class="c-uv q0">0</td><td class="c-aqi q1">55</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(45deg)" aria-hidden="true"><use href="#g-vane"/></svg>SW 12 g24</td><td class="c-rain q1">45% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw2 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>7&nbsp;PM</th><td class="c-wbgt"><span class="n tt2">82&#176;</span> <span class="w-word vt">&#10005; thunderstorms likely (60%)</span></td><td class="c-temp">84&#176;</td><td class="c-dew">74&#176;</td><td class="c-rh q1">77%</td><td class="c-uv q0">1</td><td class="c-aqi q1">58</td><td class="c-wind q2"><svg class="vane" aria-hidden="true"><use href="#g-vane"/></svg>S 10 g22</td><td class="c-rain q2">60% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
+<tr class="tw1 veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>8&nbsp;PM</th><td class="c-wbgt"><span class="n tt1">79&#176;</span> <span class="w-word vt">&#10005; thunderstorms possible (45%)</span></td><td class="c-temp">81&#176;</td><td class="c-dew">74&#176;</td><td class="c-rh q2">85%</td><td class="c-uv q0">0</td><td class="c-aqi q1">55</td><td class="c-wind q2"><svg class="vane" style="transform:rotate(45deg)" aria-hidden="true"><use href="#g-vane"/></svg>SW 12 g24</td><td class="c-rain q1">45% <svg class="g bolt-td" aria-hidden="true"><use href="#g-bolt"/></svg></td></tr>
 <tr data-sun-row><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sunset"/></svg></th><td colspan="8">&mdash; sunset 8:15 &mdash;</td></tr>
 <tr data-narrative><td colspan="9">&mdash; storms pass by 9&nbsp;PM &mdash;</td></tr>
 <tr class="tw1"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-rain"/></svg>9&nbsp;PM</th><td class="c-wbgt"><span class="n tt1">77&#176;</span></td><td class="c-temp">78&#176;</td><td class="c-dew">74&#176;</td><td class="c-rh q2">88%</td><td class="c-uv q0">0</td><td class="c-aqi q1">54</td><td class="c-wind q0"><svg class="vane" style="transform:rotate(45deg)" aria-hidden="true"><use href="#g-vane"/></svg>SW 8</td><td class="c-rain q1">25%</td></tr>

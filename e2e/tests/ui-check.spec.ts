@@ -271,6 +271,8 @@ for (const variant of variants) {
             'fig 1',
             'nyc running conditions',
             'new york running conditions',
+            'vetoed',
+            'changes ink',
           ].filter((s) => text.includes(s));
           const tableWords: string[] = [];
           for (const row of document.querySelectorAll('table tr, ol.ledger li, [data-hour-row]')) {
@@ -296,14 +298,19 @@ for (const variant of variants) {
         });
         expect(rowLabeled, 'mobile hour rows label the WBGT numeral (bare temps are ambiguous)').toBe(true);
         // Deck 2 aligns with the WBGT column start — blank under the time column.
+        // Compare the first deck-2 cell's left edge against the WBGT cell's left
+        // edge in the same row (both are flex items, so rects reflect layout).
         const deckAligned = await page.evaluate(() => {
-          const row = document.querySelector('ol.ledger li:not([data-sun-row]):not([data-narrative]), [data-hour-row]');
-          if (!row) return true;
-          const wbgt = row.querySelector('[data-metric="wbgt"], .lwbgt, [class*="wbgt"]');
-          const deck2 = row.querySelector('[data-deck2], .deck2, [class*="deck2"]');
-          if (!wbgt || !deck2) return false;
-          const dx = Math.abs(deck2.getBoundingClientRect().left - wbgt.getBoundingClientRect().left);
-          return dx <= 8;
+          if (document.documentElement.clientWidth >= 768) return true; // desktop keeps columns
+          const rows = document.querySelectorAll('.hours tr:not(.day):not([data-sun-row]):not([data-narrative]):not(.condense), ol.ledger li:not([data-sun-row]):not([data-narrative])');
+          for (const row of rows) {
+            const wbgt = row.querySelector('.c-wbgt, [data-metric="wbgt"]');
+            const first = row.querySelector('.c-rh, [data-deck2], .deck2');
+            if (!wbgt || !first) continue;
+            const dx = Math.abs(first.getBoundingClientRect().left - wbgt.getBoundingClientRect().left);
+            return dx <= 10;
+          }
+          return false;
         });
         expect(deckAligned, 'mobile deck 2 left-aligns with the WBGT column, not the time column').toBe(true);
         expect(r.staticCompass, 'static compass rose removed').toBe(0);
@@ -361,6 +368,29 @@ for (const variant of variants) {
         expect(r.atStart?.left, 'left arrow hidden at start').toBe(false);
         expect(r.atEnd?.left, 'left arrow visible at right extreme').toBe(true);
         expect(r.atEnd?.right, 'right arrow hidden at right extreme').toBe(false);
+      });
+
+      test('v3: chevrons sit on opposite edges of every scroller pair', async ({ page }) => {
+        const bad = await page.evaluate(() => {
+          const out: string[] = [];
+          for (const L of document.querySelectorAll<HTMLElement>('[data-scrub-left]')) {
+            const wrap = L.parentElement!;
+            const R = wrap.querySelector<HTMLElement>('[data-scrub-right]');
+            if (!R) continue;
+            L.hidden = false;
+            R.hidden = false;
+            const w = wrap.getBoundingClientRect();
+            const l = L.getBoundingClientRect();
+            const rr = R.getBoundingClientRect();
+            const mid = w.left + w.width / 2;
+            if (!(l.left + l.width / 2 < mid && rr.left + rr.width / 2 > mid)) {
+              out.push(`${wrap.className}: left@${Math.round(l.left)} right@${Math.round(rr.left)} mid@${Math.round(mid)}`);
+            }
+            L.hidden = true;
+          }
+          return out;
+        });
+        expect(bad, `left chevron must sit left of center, right chevron right: ${bad.join(' | ')}`).toEqual([]);
       });
 
       test('v3: air temp and dew point side by side under WBGT, neutral ink', async ({ page }) => {
