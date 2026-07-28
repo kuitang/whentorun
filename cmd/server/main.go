@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -33,6 +34,30 @@ const airnowKey = "nyc"
 // (see the note on merge.Sources.Forecast).
 var ttlNWSTextForecast = cache.TTL{Fresh: time.Hour, ServeStale: 6 * time.Hour}
 
+// ttl applies the E2E_CACHE_TTL override ("fresh,serveStale", e.g. "1s,8s")
+// so the Playwright degraded-mode specs can watch an entry age through
+// fresh → stale-labeled → unavailable in seconds instead of hours. Unset
+// (production) returns def unchanged.
+func ttl(def cache.TTL) cache.TTL {
+	spec := os.Getenv("E2E_CACHE_TTL")
+	if spec == "" {
+		return def
+	}
+	fs, ss, ok := strings.Cut(spec, ",")
+	if !ok {
+		log.Fatalf("E2E_CACHE_TTL %q: want \"fresh,serveStale\" durations", spec)
+	}
+	fresh, err := time.ParseDuration(strings.TrimSpace(fs))
+	if err != nil {
+		log.Fatalf("E2E_CACHE_TTL fresh %q: %v", fs, err)
+	}
+	stale, err := time.ParseDuration(strings.TrimSpace(ss))
+	if err != nil {
+		log.Fatalf("E2E_CACHE_TTL serveStale %q: %v", ss, err)
+	}
+	return cache.TTL{Fresh: fresh, ServeStale: stale}
+}
+
 // caches bundles every per-source cache the merger reads.
 type caches struct {
 	grid     *cache.Cache[*nws.Gridpoint]
@@ -44,14 +69,28 @@ type caches struct {
 }
 
 func newCaches() *caches {
-	nwsClient := &nws.Client{}
-	om := openmeteo.New(openmeteo.DefaultConfig(), nil)
+	// Upstream base URLs are overridable via environment so E2E can point
+	// the server at the fixture stub (e2e/stub); unset means production.
+	nwsClient := &nws.Client{BaseURL: os.Getenv("NWS_BASE_URL")}
+
+	omCfg := openmeteo.DefaultConfig()
+	if base := os.Getenv("OPENMETEO_BASE_URL"); base != "" {
+		omCfg.WeatherURL = strings.TrimSuffix(base, "/") + "/v1/forecast"
+	}
+	if base := os.Getenv("OPENMETEO_AQ_BASE_URL"); base != "" {
+		omCfg.AirQualityURL = strings.TrimSuffix(base, "/") + "/v1/air-quality"
+	}
+	om := openmeteo.New(omCfg, nil)
 
 	// The AirNow key lives ONLY in the environment (Fly secret); with no
 	// key the fetch fails, the cache stays empty, and merge honestly
 	// reports the source unavailable (falling back to modeled CAMS AQI).
 	airnowAPIKey := os.Getenv("AIRNOW_API_KEY")
-	an := airnow.New(airnow.DefaultConfig(), airnowAPIKey, nil)
+	anCfg := airnow.DefaultConfig()
+	if base := os.Getenv("AIRNOW_BASE_URL"); base != "" {
+		anCfg.BaseURL = base
+	}
+	an := airnow.New(anCfg, airnowAPIKey, nil)
 
 	mustPath := func(slug string) domain.Path {
 		p := domain.PathBySlug(slug)
@@ -62,21 +101,21 @@ func newCaches() *caches {
 	}
 
 	return &caches{
-		grid: cache.New("nws-grid", cache.TTLNWSGrid,
+		grid: cache.New("nws-grid", ttl(cache.TTLNWSGrid),
 			func(ctx context.Context, slug string) (*nws.Gridpoint, error) {
 				p := mustPath(slug)
 				return nwsClient.Gridpoint(ctx, p.GridID, p.GridX, p.GridY)
 			}),
-		forecast: cache.New("nws-forecast", ttlNWSTextForecast,
+		forecast: cache.New("nws-forecast", ttl(ttlNWSTextForecast),
 			func(ctx context.Context, slug string) (*nws.TextForecast, error) {
 				p := mustPath(slug)
 				return nwsClient.Forecast(ctx, p.GridID, p.GridX, p.GridY)
 			}),
-		alerts: cache.New("nws-alerts", cache.TTLAlerts,
+		alerts: cache.New("nws-alerts", ttl(cache.TTLAlerts),
 			func(ctx context.Context, zone string) ([]domain.Alert, error) {
 				return nwsClient.ActiveAlerts(ctx, zone)
 			}),
-		airnow: cache.New("airnow", cache.TTLAirNow,
+		airnow: cache.New("airnow", ttl(cache.TTLAirNow),
 			func(ctx context.Context, _ string) ([]airnow.ObservationRecord, error) {
 				if airnowAPIKey == "" {
 					return nil, errors.New("AIRNOW_API_KEY not set")
@@ -84,12 +123,12 @@ func newCaches() *caches {
 				cp := mustPath(webserver.DefaultSlug)
 				return an.Observation(ctx, cp.Lat, cp.Lon)
 			}),
-		omw: cache.New("openmeteo-weather", cache.TTLOpenMeteo,
+		omw: cache.New("openmeteo-weather", ttl(cache.TTLOpenMeteo),
 			func(ctx context.Context, slug string) (openmeteo.WeatherData, error) {
 				p := mustPath(slug)
 				return om.Weather(ctx, p.Lat, p.Lon)
 			}),
-		oma: cache.New("openmeteo-air", cache.TTLOpenMeteo,
+		oma: cache.New("openmeteo-air", ttl(cache.TTLOpenMeteo),
 			func(ctx context.Context, slug string) ([]openmeteo.AirQualityHour, error) {
 				p := mustPath(slug)
 				return om.AirQuality(ctx, p.Lat, p.Lon)

@@ -146,9 +146,9 @@
   <hr class="mast-rule">
   <div class="slider-wrap">
     <nav class="paths" data-route-slider aria-label="Running paths">
-      <a href="#" data-geo>Use my location</a>
+      <a href="#" data-geo{{if .MyLocationDefault}} aria-current="true"{{end}}>Use my location</a>
       {{- range .Paths}}
-      <a href="/p/{{.Slug}}"{{if eq .Slug $.Path.Slug}} aria-current="true"{{end}}>{{pathShort .Slug}}</a>
+      <a href="/p/{{.Slug}}"{{if and (eq .Slug $.Path.Slug) (not $.MyLocationDefault)}} aria-current="true"{{end}}>{{pathShort .Slug}}</a>
       {{- end}}
     </nav>
     <span class="scroll-hint" data-scrub-right aria-hidden="true"><svg><use href="#g-chevrons"/></svg></span>

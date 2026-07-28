@@ -186,6 +186,10 @@ func (s *server) renderPage(w http.ResponseWriter, r *http.Request, path domain.
 		http.Error(w, "temporarily unavailable", http.StatusInternalServerError)
 		return
 	}
+	// On the bare index with no path preference the slider highlights
+	// "Use my location": the rendered path is only the My-Location proxy.
+	// Direct /p/{slug} visits highlight the visited path.
+	page.MyLocationDefault = pf.path == "" && r.URL.Path == "/"
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store")
 	if err := s.templates().ExecuteTemplate(w, "page", page); err != nil {

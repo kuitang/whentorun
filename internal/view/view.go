@@ -40,6 +40,12 @@ type Page struct {
 	// y-axis labels the fig template renders beside ChartSVG.
 	Clothing  string
 	ChartMeta chart.Meta
+
+	// MyLocationDefault marks that no explicit path preference is set, so
+	// the route slider highlights "Use my location" as the selected chip
+	// (the shown path is then the My-Location proxy, not a user choice).
+	// Set by internal/web from the path cookie, not by Build.
+	MyLocationDefault bool
 }
 
 // BreakVM is one narrative divider row destined for the hourly ledger: it

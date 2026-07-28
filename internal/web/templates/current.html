@@ -35,7 +35,7 @@
       <div class="strip">
         <div class="strip-text">
           <span data-metric="uv">UV <span class="{{qspan .Now.UV.Quality}}">{{.Now.UV.Display}}</span>{{with .Now.UVWord}} {{.}}{{end}}</span> &middot;
-          <span data-metric="aqi">AQI <span class="{{qspan .Now.AQI.Quality}}">{{.Now.AQI.Display}}</span>{{with .Now.AQIWord}} {{.}}{{end}}{{with .Now.AQIPollutant}} ({{.}}){{end}}</span> &middot;
+          <span data-metric="aqi">AQI <span class="{{qspan .Now.AQI.Quality}}">{{.Now.AQI.Display}}</span>{{with .Now.AQIWord}} {{.}}{{end}}{{with .Now.AQIPollutant}} ({{.}}){{end}}{{if .Now.AQI.Source.Modeled}} <span data-aqi-modeled>(modeled, CAMS)</span>{{end}}</span> &middot;
           <span data-metric="rh">humidity <span class="{{qspan .Now.RH.Quality}}">{{.Now.RH.Display}}</span></span> &middot;
           <span data-metric="wind"><svg class="vane"{{vane .Now.WindDeg}} aria-hidden="true"><use href="#g-vane"/></svg>wind <span class="{{qspan .Now.Wind.Quality}}">{{.Now.Wind.Display}}</span></span> &middot;
           <span data-metric="rain">rain <span class="{{qspan .Now.Rain.Quality}}">{{.Now.Rain.Display}}</span></span>
