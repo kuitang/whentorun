@@ -1,0 +1,152 @@
+/* Merritt design tokens — from the locked design bundle (July 2026).
+ * Day = "Rhodium"; Dark = "Slate, recessed"; follows system scheme unless
+ * <html data-theme="light|dark"> overrides it (server-stamped from cookie).
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Day / Rhodium */
+  --paper: #F6F7F7;          /* app background */
+  --card: #FFFFFF;           /* resting surface */
+  --ice: #D6E3E9;            /* emphasis surface (the ONLY tinted surface) */
+  --ink: #16191B;            /* primary text */
+  --slate: #3A4348;          /* labels, icons, small text on ice */
+  --secondary: #5D666C;      /* captions, placeholders, metadata (AA 5.5:1 on paper) */
+  --steel: #5C8FA6;          /* accents + text >= 19px ONLY (3.3:1 — fails AA small) */
+  --steel-text: #426F86;     /* steel-colored text < 19px (AA 5.1:1) */
+  --hairline: rgba(22, 25, 27, 0.12);
+  --hairline-strong: rgba(22, 25, 27, 0.16);
+
+  /* weather tone — tint only; the phrase is the display, never a label */
+  --tone-warm: #426F86;
+  --tone-steady: #3A4348;
+  --tone-quiet: #5D666C;
+  --tone-dormant: #8B949A;
+
+  /* type */
+  --font-serif: "Spectral", Georgia, serif;
+  --font-label: "Archivo", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --size-display: 32px;
+  --size-screen-title: 24px;
+  --size-card-title: 20px;
+  --size-body: 16px;
+  --size-list: 15.5px;
+  --size-caption: 13px;
+  --size-label: 11px;
+  --lh-body: 1.6;
+  --lh-title: 1.3;
+  --ls-label: 0.16em;
+  --ls-smallcaps: 0.14em;
+
+  /* geometry */
+  --radius-surface: 2px;     /* engraved-plate register */
+  --radius-pill: 22px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 14px;
+  --space-lg: 20px;
+  --space-xl: 26px;
+  --space-xxl: 32px;
+  --hit-target: 44px;
+
+  /* motion */
+  --motion-fast: 180ms;
+  --motion-base: 240ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Dark / "Slate, recessed" — elevation by lightness, no borders */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14181B;
+    --card: #1A2025;
+    --ice: #20262C;            /* emphasis surface (panel) */
+    --ink: #DCE1E4;            /* ~87% white; never #FFF (serif halation) */
+    --slate: #AEB6BB;          /* body on panel */
+    --secondary: #8E979D;      /* captions, metadata */
+    --steel: #A5C2CE;          /* accent, desaturated; no large filled shapes */
+    --steel-text: #A5C2CE;
+    --hairline: rgba(220, 225, 228, 0.12);
+    --hairline-strong: rgba(220, 225, 228, 0.16);
+    --tone-warm: #A5C2CE;
+    --tone-steady: #DCE1E4;
+    --tone-quiet: #8E979D;
+    --tone-dormant: #6B747A;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #14181B;
+  --card: #1A2025;
+  --ice: #20262C;
+  --ink: #DCE1E4;
+  --slate: #AEB6BB;
+  --secondary: #8E979D;
+  --steel: #A5C2CE;
+  --steel-text: #A5C2CE;
+  --hairline: rgba(220, 225, 228, 0.12);
+  --hairline-strong: rgba(220, 225, 228, 0.16);
+  --tone-warm: #A5C2CE;
+  --tone-steady: #DCE1E4;
+  --tone-quiet: #8E979D;
+  --tone-dormant: #6B747A;
+}
+
+@font-face {
+  font-family: "Spectral";
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  src: url("/static/fonts/spectral-300.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Spectral";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/static/fonts/spectral-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Spectral";
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("/static/fonts/spectral-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Spectral";
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+  src: url("/static/fonts/spectral-italic-300.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Spectral";
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  src: url("/static/fonts/spectral-italic-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Archivo";
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  src: url("/static/fonts/archivo-var.woff2") format("woff2-variations");
+}
+
+/* Breathing hairline — Merritt's loading affordance (no spinners) */
+@keyframes breathe {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+.loading-hairline {
+  height: 1px;
+  background: var(--hairline-strong);
+  animation: breathe 1.6s var(--ease-out) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading-hairline { animation: none; }
+}
