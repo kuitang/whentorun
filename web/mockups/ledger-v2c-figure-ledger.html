@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>when to run &mdash; Central Park &middot; figure-ledger mockup</title>
+<link rel="stylesheet" href="../static/css/tokens.css">
+<style>
+/* ============ ledger-v2c — FIGURE LEDGER ============
+   All type Spectral (Georgia/serif fallback). Zero sans-serif, zero monospace.
+   Colors/spacing from tokens.css; tier inks color every metric numeral. */
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 var(--space-md); }
+a { color: var(--steel-text); }
+h2 { margin: 0; }
+svg text { font-family: var(--font-serif); }
+
+.overline {
+  font-family: var(--font-serif);
+  font-size: var(--size-label);
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* tier inks — numerals only; the word always sits beside them */
+.tt0 { color: var(--tier-0); } .tt1 { color: var(--tier-1); }
+.tt2 { color: var(--tier-2); } .tt3 { color: var(--tier-3); }
+.tt4 { color: var(--tier-4); }
+.tt0, .tt1, .tt2, .tt3, .tt4 { font-weight: 500; }
+.st { color: var(--steel-text); }
+
+/* engraved glyphs */
+.g { width: 18px; height: 18px; vertical-align: -4px; color: var(--slate); }
+
+/* ---------- masthead ---------- */
+.masthead { padding-top: calc(var(--space-sm) + env(safe-area-inset-top)); }
+.mast-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); }
+.wordmark {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--size-screen-title);
+  line-height: var(--lh-title);
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+.ctls { display: flex; align-items: center; gap: var(--space-xs); }
+.ctl {
+  font-family: var(--font-serif);
+  font-size: var(--size-body);          /* >=16px: no iOS focus zoom */
+  font-weight: 500;
+  min-height: var(--hit-target);
+  min-width: var(--hit-target);
+  padding: 0 var(--space-sm);
+  background: none;
+  color: var(--ink);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-surface);
+  cursor: pointer;
+}
+.ctl[aria-pressed="true"], .ctl:active { background: var(--ice); }
+.mast-rule { height: 2px; background: var(--ink); border: 0; margin: var(--space-xs) 0 0; }
+
+.paths {
+  display: flex; gap: var(--space-xs);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.paths::-webkit-scrollbar { display: none; }
+.paths a {
+  flex: 0 0 auto;
+  display: flex; align-items: center;
+  min-height: var(--hit-target);
+  padding: 0 var(--space-sm);
+  font-family: var(--font-serif);
+  font-size: var(--size-body);          /* control: >=16px */
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--steel-text);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.paths a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+.paths a:active { color: var(--ink); }
+
+/* ---------- alert (tier-3 ink + hairline tint; never a filled banner) ---------- */
+.alert {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--hairline-strong);
+  border-left: 3px solid var(--tier-3);
+  border-radius: var(--radius-surface);
+  padding: var(--space-xs) var(--space-sm);
+  margin: var(--space-sm) 0 0;
+}
+.alert .overline { color: var(--tier-3); }
+.alert p { margin: 0; font-size: var(--size-caption); line-height: 1.5; }
+
+/* ---------- lede ---------- */
+.lede { margin-top: var(--space-sm); }
+.current {
+  background: var(--ice);
+  border-radius: var(--radius-surface);
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+}
+.current .overline { color: var(--slate); }
+.wbgt-line { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: wrap; }
+.wbgt-line .g-big { width: 34px; height: 34px; color: var(--slate); flex: 0 0 auto; }
+.wbgt-num {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: calc(var(--size-display) * 1.45);
+  line-height: 1.05;
+  color: var(--tier-3);
+}
+.wbgt-num sup { font-size: var(--size-card-title); font-weight: 300; }
+.wbgt-phrase { font-family: var(--font-serif); font-weight: 300; font-size: var(--size-card-title); line-height: var(--lh-title); }
+.metric-strip {
+  margin: var(--space-xs) 0 0;
+  font-size: var(--size-caption);
+  line-height: 1.55;
+  color: var(--slate);
+}
+.window-line { padding: var(--space-sm) 0; border-bottom: 1px solid var(--hairline); }
+.window-line p { margin: 0; font-size: var(--size-list); }
+.window-line .lead { font-weight: 500; }
+.window-line .sub { color: var(--secondary); font-size: var(--size-caption); line-height: 1.5; margin-top: 2px; }
+
+/* ---------- Fig. 1 ---------- */
+.fig-sec { margin-top: var(--space-md); }
+.fig-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm); }
+.fig-no {
+  font-family: var(--font-serif); font-weight: 500; font-size: var(--size-label);
+  letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--ink);
+}
+.fig-title { font-style: italic; font-weight: 400; font-size: var(--size-list); color: var(--ink); }
+.fig-head .note { font-size: var(--size-caption); color: var(--secondary); white-space: nowrap; }
+.fig-scroll {
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-surface);
+  background: var(--card);
+  margin-top: var(--space-xs);
+}
+.fig-scroll svg { display: block; }
+.fig-legend {
+  margin: var(--space-xs) 0 0;
+  font-size: var(--size-caption);
+  color: var(--secondary);
+  line-height: 1.6;
+}
+.fig-legend .sw { font-weight: 600; letter-spacing: -0.05em; }
+.fig-cap {
+  margin: var(--space-xs) 0 0;
+  font-style: italic;
+  font-size: var(--size-caption);
+  line-height: 1.6;
+  color: var(--slate);
+}
+.fig-cap .fig-no { font-style: normal; }
+
+/* fig svg — strokes, hatches, text */
+.pd  { stroke: var(--tier-4); stroke-width: 0.6; opacity: 0.45; }
+.pa  { stroke: var(--tier-1); stroke-width: 0.5; opacity: 0.45; }
+.lx-grid   { stroke: var(--hairline); stroke-width: 1; }
+.lx-grid90 { stroke: var(--tier-4); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.6; }
+.lx-ax   { stroke: var(--hairline-strong); stroke-width: 1; }
+.lx-tick { stroke: var(--hairline-strong); stroke-width: 1; }
+.lx-mid  { stroke: var(--ink); stroke-width: 1; }
+.lx-day  { stroke: var(--hairline-strong); stroke-width: 1; }
+.lx-sun  { stroke: var(--tier-1); stroke-width: 1; fill: none; stroke-dasharray: 1.5 3; opacity: 0.75; }
+.sun-g   { color: var(--tier-1); }
+.bolt-g  { color: var(--tier-4); }
+.lx-rain { stroke: var(--steel-text); stroke-width: 0.9; opacity: 0.7; }
+.lx-lead { stroke: var(--tier-4); stroke-width: 0.75; stroke-dasharray: 2 3; opacity: 0.7; }
+.lx-brk  { fill: none; stroke-width: 1; }
+.b3  { stroke: var(--tier-3); } .b4 { stroke: var(--tier-4); } .bst { stroke: var(--steel-text); }
+.cw0 { stroke: var(--tier-0); } .cw1 { stroke: var(--tier-1); } .cw2 { stroke: var(--tier-2); }
+.cw3 { stroke: var(--tier-3); } .cw4 { stroke: var(--tier-4); }
+.cw0, .cw1, .cw2, .cw3, .cw4 { fill: none; stroke-width: 1.25; stroke-linejoin: round; stroke-linecap: round; }
+.fd0 { fill: var(--tier-0); } .fd1 { fill: var(--tier-1); } .fd2 { fill: var(--tier-2); }
+.fd3 { fill: var(--tier-3); } .fd4 { fill: var(--tier-4); }
+.f0 { fill: var(--tier-0); } .f1 { fill: var(--tier-1); } .f2 { fill: var(--tier-2); }
+.f3 { fill: var(--tier-3); } .f4 { fill: var(--tier-4); } .fst { fill: var(--steel-text); }
+.fx-hr  { font-size: 10px; fill: var(--secondary); }
+.fx-ax  { font-size: 9.5px; fill: var(--secondary); }
+.fx-day { font-size: 9.5px; font-weight: 500; letter-spacing: 0.14em; fill: var(--ink); }
+.fx-ann { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; }
+.fx-win { font-size: 11.5px; font-style: italic; }
+.fx-uv  { font-size: 9.5px; font-style: italic; fill: var(--tier-1); }
+.fx-sun { font-size: 9px; font-style: italic; fill: var(--tier-1); }
+.fx-pt  { font-size: 10px; font-weight: 500; paint-order: stroke; stroke: var(--card); stroke-width: 3px; stroke-linejoin: round; }
+
+/* ---------- hourly ledger (agate) ---------- */
+.hours-sec { margin-top: var(--space-lg); }
+.hours-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: var(--space-xs); }
+.hours {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 720px;
+  font-size: var(--size-caption);
+  line-height: 1.35;
+}
+.hours th, .hours td {
+  padding: 3px var(--space-sm);
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--hairline);
+  font-weight: 400;
+}
+.hours thead th {
+  font-size: var(--size-label);
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-bottom: 5px;
+}
+.hours .t {
+  position: sticky; left: 0; z-index: 1;
+  background: var(--paper);
+  text-align: left;
+  border-right: 1px solid var(--hairline);
+}
+.hours th.t { min-width: 92px; }
+.hours .sp { padding-left: 2px; padding-right: 2px; }
+.sl { display: block; color: var(--secondary); }
+.sl polyline { fill: none; stroke: currentColor; stroke-width: 1; opacity: 0.75; }
+.ft0 { fill: var(--tier-0); } .ft1 { fill: var(--tier-1); } .ft2 { fill: var(--tier-2); }
+.ft3 { fill: var(--tier-3); } .ft4 { fill: var(--tier-4); }
+.hours .reads { text-align: left; font-size: var(--size-caption); color: var(--slate); }
+.hours .vt { font-style: italic; color: var(--tier-4); }
+tr.veto .g { color: var(--tier-4); }
+tr.day th.t, tr.day td {
+  font-size: var(--size-label);
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--ink);
+  text-align: left;
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-top: var(--space-sm);
+  white-space: normal;
+}
+tr.day .dsun { color: var(--secondary); margin-left: var(--space-md); letter-spacing: 0.08em; white-space: nowrap; }
+tr.day .g { width: 15px; height: 15px; vertical-align: -3px; margin-right: 2px; }
+tr.condense td, tr.condense th.t { color: var(--secondary); }
+tr.condense .reads em { font-style: italic; }
+.hours .t .g { margin-right: 6px; }
+
+/* ---------- explainers ---------- */
+.explainers { margin-top: var(--space-lg); border-bottom: 1px solid var(--hairline); }
+.explainers details { border-top: 1px solid var(--hairline); }
+.explainers summary {
+  display: flex; align-items: center; gap: var(--space-sm);
+  min-height: var(--hit-target);
+  font-family: var(--font-serif);
+  font-size: var(--size-body);          /* control: >=16px */
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+}
+.explainers summary .g { flex: 0 0 auto; }
+.explainers summary::-webkit-details-marker { display: none; }
+.explainers summary::after { content: "+"; color: var(--secondary); margin-left: auto; font-weight: 400; }
+.explainers details[open] summary::after { content: "\2212"; }
+.explainers summary:active { color: var(--steel-text); }
+.explainers p { margin: 0 0 var(--space-md); font-size: var(--size-list); color: var(--slate); }
+.explainers .src {
+  font-size: var(--size-caption); color: var(--secondary);
+  font-style: italic;
+}
+
+/* ---------- route aside / clothing ---------- */
+.route {
+  margin: var(--space-lg) 0 0;
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--hairline-strong);
+  font-style: italic;
+  color: var(--slate);
+  font-size: var(--size-list);
+}
+.route .overline { display: block; font-style: normal; margin-bottom: 2px; }
+.clothing { margin-top: var(--space-md); font-size: var(--size-list); }
+.clothing .overline { margin-right: var(--space-sm); }
+
+/* ---------- footer ---------- */
+.foot {
+  margin-top: var(--space-xl);
+  padding: var(--space-md) 0 calc(var(--space-xl) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--hairline-strong);
+}
+.foot p { margin: 0 0 var(--space-xs); font-size: var(--size-caption); font-style: italic; color: var(--secondary); line-height: 1.6; }
+
+/* ---------- narrow phones: keep the masthead overline to one line ---------- */
+@media (max-width: 480px) {
+  .masthead .overline, .current .overline { font-size: 10px; letter-spacing: 0.11em; white-space: nowrap; }
+}
+
+/* ---------- desktop (1280) ---------- */
+@media (min-width: 960px) {
+  .wordmark { font-size: var(--size-display); }
+  .lede {
+    display: grid;
+    grid-template-columns: 11fr 9fr;
+    gap: var(--space-lg);
+    align-items: start;
+  }
+  .window-line { border-bottom: 0; border-left: 1px solid var(--hairline); padding: var(--space-sm) 0 var(--space-sm) var(--space-lg); }
+  .explainers { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--space-xxl); border-bottom: 0; }
+  .explainers details:nth-last-child(-n+2) { border-bottom: 1px solid var(--hairline); }
+}
+</style>
+</head>
+<body>
+
+<svg class="defs" aria-hidden="true" focusable="false">
+<defs>
+<pattern id="hatchFine" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+  <line x1="0" y1="0" x2="0" y2="3" stroke="currentColor" stroke-width="0.5" opacity="0.35"/>
+</pattern>
+<symbol id="g-sun" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1"/>
+  <circle cx="12" cy="12" r="3.1" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <line x1="18.40" y1="12.00" x2="21.40" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="16.53" x2="18.65" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="18.40" x2="12.00" y2="21.40" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="16.53" x2="5.35" y2="18.65" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="5.60" y1="12.00" x2="2.60" y2="12.00" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="7.47" y1="7.47" x2="5.35" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="12.00" y1="5.60" x2="12.00" y2="2.60" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="16.53" y1="7.47" x2="18.65" y2="5.35" stroke="currentColor" stroke-width="1" opacity="0.9"/><line x1="17.91" y1="14.45" x2="19.30" y2="15.02" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="14.45" y1="17.91" x2="15.02" y2="19.30" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="9.55" y1="17.91" x2="8.98" y2="19.30" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="6.09" y1="14.45" x2="4.70" y2="15.02" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="6.09" y1="9.55" x2="4.70" y2="8.98" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="9.55" y1="6.09" x2="8.98" y2="4.70" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="14.45" y1="6.09" x2="15.02" y2="4.70" stroke="currentColor" stroke-width="0.7" opacity="0.5"/><line x1="17.91" y1="9.55" x2="19.30" y2="8.98" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+</symbol>
+<symbol id="g-moon" viewBox="0 0 24 24">
+  <path d="M12 5.4 A6.6 6.6 0 1 0 12 18.6 A8.6 8.6 0 0 1 12 5.4 Z" fill="url(#hatchFine)"
+        stroke="currentColor" stroke-width="1"/>
+  <line x1="17.6" y1="6.2" x2="17.6" y2="8.6" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+  <line x1="16.4" y1="7.4" x2="18.8" y2="7.4" stroke="currentColor" stroke-width="0.7" opacity="0.6"/>
+  <line x1="19.8" y1="12.4" x2="19.8" y2="14.2" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <line x1="18.9" y1="13.3" x2="20.7" y2="13.3" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+</symbol>
+<symbol id="g-gibbous" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="6.4" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M12 5.6 A6.4 6.4 0 0 0 12 18.4 A11.5 11.5 0 0 1 12 5.6 Z" fill="url(#hatchFine)"
+        stroke="currentColor" stroke-width="0.6" opacity="0.8"/>
+</symbol>
+<symbol id="g-cloud" viewBox="0 0 24 24">
+  <path d="M7.1 9.9 a4.7 4.7 0 0 1 8.6 -1.1" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.45"/>
+  <path d="M5.6 16.5 a3.1 3.1 0 0 1 0.9 -6.05 4.7 4.7 0 0 1 9.1 -1.1 3.5 3.5 0 0 1 3.2 5.5"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.4" y1="16.5" x2="19.6" y2="16.5" stroke="currentColor" stroke-width="1"/>
+  <line x1="6.6" y1="14.4" x2="16.2" y2="14.4" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+</symbol>
+<symbol id="g-rain" viewBox="0 0 24 24">
+  <path d="M5.8 13.4 a2.9 2.9 0 0 1 0.85 -5.7 4.4 4.4 0 0 1 8.5 -1.0 3.3 3.3 0 0 1 3.0 5.2"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.7" y1="13.4" x2="18.9" y2="13.4" stroke="currentColor" stroke-width="1"/>
+  <line x1="8.4" y1="15.6" x2="7.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.8"/>
+  <line x1="12.4" y1="15.6" x2="11.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.55"/>
+  <line x1="16.4" y1="15.6" x2="15.0" y2="19.4" stroke="currentColor" stroke-width="0.8" opacity="0.8"/>
+</symbol>
+<symbol id="g-storm" viewBox="0 0 24 24">
+  <path d="M5.8 11.4 a2.9 2.9 0 0 1 0.85 -5.7 4.4 4.4 0 0 1 8.5 -1.0 3.3 3.3 0 0 1 3.0 5.2"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="4.7" y1="11.4" x2="18.9" y2="11.4" stroke="currentColor" stroke-width="1"/>
+  <polygon points="13.2,12.6 9.2,17.6 11.9,17.6 9.9,22.2 15.6,16.4 12.9,16.4 15.3,12.6"
+        fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round"/>
+</symbol>
+<symbol id="g-bolt" viewBox="0 0 14 18">
+  <polygon points="8,0.8 3.4,7.6 6.3,7.6 4.2,15.4 11,7.0 8.0,7.0 10.7,0.8"
+        fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round"/>
+</symbol>
+<symbol id="g-sunrise" viewBox="0 0 24 24">
+  <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1"/>
+  <path d="M7.6 14 a4.4 4.4 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M9.4 14 a2.6 2.6 0 0 1 5.2 0" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.45"/>
+  <line x1="6.80" y1="11.00" x2="4.38" y2="9.60" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="9.00" y1="8.80" x2="7.60" y2="6.38" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="12.00" y1="8.00" x2="12.00" y2="5.20" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="15.00" y1="8.80" x2="16.40" y2="6.38" stroke="currentColor" stroke-width="0.8" opacity="0.75"/><line x1="17.20" y1="11.00" x2="19.62" y2="9.60" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <line x1="6.2" y1="17.2" x2="17.8" y2="17.2" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+  <line x1="8.4" y1="19.6" x2="15.6" y2="19.6" stroke="currentColor" stroke-width="0.6" opacity="0.3"/>
+</symbol>
+<symbol id="g-horizon" viewBox="0 0 24 24">
+  <line x1="3" y1="14" x2="21" y2="14" stroke="currentColor" stroke-width="1"/>
+  <path d="M8.2 14 a3.8 3.8 0 0 1 7.6 0" fill="none" stroke="currentColor" stroke-width="1"/>
+  <line x1="12" y1="9.4" x2="12" y2="7.2" stroke="currentColor" stroke-width="0.8" opacity="0.75"/>
+  <line x1="8.6" y1="10.6" x2="7.2" y2="9.0" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
+  <line x1="15.4" y1="10.6" x2="16.8" y2="9.0" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
+</symbol>
+<symbol id="g-therm" viewBox="0 0 24 24">
+  <path d="M10.6 4.6 a1.4 1.4 0 0 1 2.8 0 V 14.9 a3.5 3.5 0 1 1 -2.8 0 Z"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <circle cx="12" cy="18.1" r="2.1" fill="url(#hatchFine)" stroke="currentColor" stroke-width="0.7"/>
+  <line x1="12" y1="9.2" x2="12" y2="16.2" stroke="currentColor" stroke-width="1.2" opacity="0.55"/>
+  <line x1="14.6" y1="6.4" x2="16.6" y2="6.4" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+  <line x1="14.6" y1="9.2" x2="16.2" y2="9.2" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+  <line x1="14.6" y1="12.0" x2="16.6" y2="12.0" stroke="currentColor" stroke-width="0.7" opacity="0.7"/>
+</symbol>
+<symbol id="g-drop" viewBox="0 0 24 24">
+  <path d="M12 4.2 C 9.6 8.2 7.3 11.2 7.3 14.1 a4.7 4.7 0 0 0 9.4 0 C 16.7 11.2 14.4 8.2 12 4.2 Z"
+        fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M9.5 14.4 a2.6 2.6 0 0 0 1.7 2.5" fill="none" stroke="currentColor" stroke-width="0.7" opacity="0.55"/>
+  <path d="M12 8.2 C 10.9 10 9.9 11.6 9.9 13" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.35"/>
+</symbol>
+<symbol id="g-wind" viewBox="0 0 24 24">
+  <path d="M3.5 9 h9.6 a2.1 2.1 0 1 0 -2.1 -2.1" fill="none" stroke="currentColor" stroke-width="1"/>
+  <path d="M3.5 13 h13.8 a2.3 2.3 0 1 1 -2.3 2.3" fill="none" stroke="currentColor" stroke-width="1" opacity="0.8"/>
+  <path d="M3.5 17 h7.6 a1.7 1.7 0 1 0 -1.7 -1.7" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+</symbol>
+<symbol id="g-haze" viewBox="0 0 24 24">
+  <path d="M4 8 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.9"/>
+  <path d="M4 11.4 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.55"/>
+  <path d="M4 14.8 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.75"/>
+  <path d="M4 18.2 q4 -1.6 8 0 t8 0" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
+</symbol>
+</defs>
+</svg>
+
+<header class="wrap masthead">
+  <span class="overline"><svg class="g" style="width:14px;height:14px;vertical-align:-2px" aria-hidden="true"><use href="#g-horizon"/></svg> NYC running conditions &middot; 48-hour outlook</span>
+  <div class="mast-row">
+    <h1 class="wordmark">when to run</h1>
+    <div class="ctls" role="group" aria-label="Units and theme">
+      <button class="ctl" type="button" aria-pressed="true">&deg;F</button>
+      <button class="ctl" type="button" aria-pressed="false">&deg;C</button>
+      <button class="ctl" type="button" id="themeBtn" title="Theme (mockup demo)">Auto</button>
+    </div>
+  </div>
+  <hr class="mast-rule">
+  <nav class="paths" aria-label="Running paths">
+    <a href="#" aria-current="page">Central Park</a>
+    <a href="#">Hudson Greenway</a>
+    <a href="#">East River</a>
+    <a href="#">Brooklyn</a>
+    <a href="#">Van Cortlandt</a>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <aside class="alert" role="status">
+    <span class="overline">Heat Advisory</span>
+    <p>until 8 PM EDT Tuesday &mdash; advisory-level: caution, not a stop order.</p>
+  </aside>
+
+  <div class="lede">
+    <section class="current" aria-label="Current conditions">
+      <span class="overline">Now &middot; Central Park &middot; Tue Jul 28 &middot; 2:30 PM ET</span>
+      <div class="wbgt-line">
+        <svg class="g-big" aria-hidden="true"><use href="#g-therm"/></svg>
+        <span class="wbgt-num">87<sup>&deg;F</sup></span>
+        <span class="wbgt-phrase">High heat stress <span class="overline" style="letter-spacing:var(--ls-smallcaps)">WBGT</span></span>
+      </div>
+      <p class="metric-strip">dew <span class="tt3">73&deg;</span> oppressive &middot; UV <span class="tt3">9</span> very high<br>AQI <span class="tt1">62</span> moderate (PM2.5) &middot; wind <span class="st">S 6 g 12</span></p>
+    </section>
+
+    <section class="window-line" aria-label="Next best window">
+      <p class="lead"><span class="overline">Next best</span>&ensp;Wed 5&ndash;8 AM &mdash; WBGT <span class="tt1">76&deg;</span> elevated &middot; dew <span class="tt2">70&deg;</span> very humid &middot; UV <span class="tt0">0&ndash;2</span> low &middot; AQI <span class="tt0">48</span> good.</p>
+      <p class="sub">Tonight 7&ndash;8 PM is out &mdash; thunderstorms likely (<span class="tt4">60%</span>). Today&rsquo;s remaining daylight runs WBGT <span class="tt3">85&deg;+</span>.</p>
+    </section>
+  </div>
+
+  <section class="fig-sec" aria-label="Figure 1: the next 48 hours">
+    <div class="fig-head">
+      <h2><span class="fig-no">Fig. 1</span>&ensp;<span class="fig-title">The next 48 hours.</span></h2>
+      <span class="note">3 PM Tue &rarr; 2 PM Thu</span>
+    </div>
+    <div class="fig-scroll" tabindex="0">
+<svg width="1400" height="268" viewBox="0 0 1400 268" role="img" aria-labelledby="figtitle figdesc">
+<title id="figtitle">Figure 1: WBGT for the next 48 hours with daylight, rain, thunder, windows and vetoes on one time axis</title>
+<desc id="figdesc">Line chart of wet-bulb globe temperature colored by heat band, with hatched veto zone above 90 degrees, daylight hatching with sun arcs, rain and thunder marks along the base, and bracketed run windows.</desc>
+<defs>
+<pattern id="hatchDanger" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pd" x1="0" y1="0" x2="0" y2="6"/></pattern>
+<pattern id="hatchDay" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pa" x1="0" y1="0" x2="0" y2="7"/></pattern>
+<pattern id="hatchDayDense" width="3.5" height="3.5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="pa" x1="0" y1="0" x2="0" y2="3.5"/></pattern>
+<clipPath id="chartclip"><rect x="35" y="60" width="1319" height="174"/></clipPath>
+</defs>
+<rect x="36.0" y="64" width="147.0" height="168" fill="url(#hatchDay)"/>
+<rect x="453.2" y="64" width="401.2" height="168" fill="url(#hatchDay)"/>
+<rect x="1125.8" y="64" width="226.2" height="168" fill="url(#hatchDay)"/>
+<rect x="36.0" y="64" width="42.0" height="168" fill="url(#hatchDayDense)"/>
+<rect x="526.0" y="64" width="224.0" height="168" fill="url(#hatchDayDense)"/>
+<rect x="1198.0" y="64" width="154.0" height="168" fill="url(#hatchDayDense)"/>
+<rect x="36" y="64" width="1316" height="21" fill="url(#hatchDanger)"/>
+<text class="fx-ann f4" x="1346" y="78" text-anchor="end">ABOVE 90&#176; WBGT &#8212; VETO</text>
+<line class="lx-grid90" x1="36" y1="85" x2="1352" y2="85"/>
+<text class="fx-ax" x="30" y="88" text-anchor="end">90&#176;</text>
+<line class="lx-grid" x1="36" y1="120" x2="1352" y2="120"/>
+<text class="fx-ax" x="30" y="123" text-anchor="end">85&#176;</text>
+<line class="lx-grid" x1="36" y1="155" x2="1352" y2="155"/>
+<text class="fx-ax" x="30" y="158" text-anchor="end">80&#176;</text>
+<line class="lx-grid" x1="36" y1="190" x2="1352" y2="190"/>
+<text class="fx-ax" x="30" y="193" text-anchor="end">75&#176;</text>
+<line class="lx-grid" x1="36" y1="225" x2="1352" y2="225"/>
+<text class="fx-ax" x="30" y="228" text-anchor="end">70&#176;</text>
+<g clip-path="url(#chartclip)">
+<path class="lx-sun" d="M -219.4 232 Q -18.2 -80 183.0 232"/>
+<path class="lx-sun" d="M 453.2 232 Q 653.8 -80 854.4 232"/>
+<path class="lx-sun" d="M 1125.8 232 Q 1325.7 -80 1525.6 232"/>
+<use href="#g-sun" x="645" y="67" width="18" height="18" class="sun-g"/>
+<use href="#g-sun" x="1317" y="67" width="18" height="18" class="sun-g"/>
+</g>
+<text class="fx-uv" x="585" y="105" text-anchor="middle">midday UV 8&#8211;10</text>
+<line class="lx-day" x1="288" y1="64" x2="288" y2="232"/>
+<line class="lx-day" x1="960" y1="64" x2="960" y2="232"/>
+<line class="lx-ax" x1="36" y1="232" x2="1352" y2="232"/>
+<line class="lx-tick" x1="36" y1="232" x2="36" y2="239"/>
+<text class="fx-hr" x="36" y="248" text-anchor="middle">3P</text>
+<line class="lx-tick" x1="64" y1="232" x2="64" y2="236"/>
+<line class="lx-tick" x1="92" y1="232" x2="92" y2="236"/>
+<line class="lx-tick" x1="120" y1="232" x2="120" y2="239"/>
+<text class="fx-hr" x="120" y="248" text-anchor="middle">6P</text>
+<line class="lx-tick" x1="148" y1="232" x2="148" y2="236"/>
+<line class="lx-tick" x1="176" y1="232" x2="176" y2="236"/>
+<line class="lx-tick" x1="204" y1="232" x2="204" y2="239"/>
+<text class="fx-hr" x="204" y="248" text-anchor="middle">9P</text>
+<line class="lx-tick" x1="232" y1="232" x2="232" y2="236"/>
+<line class="lx-tick" x1="260" y1="232" x2="260" y2="236"/>
+<line class="lx-mid" x1="288" y1="232" x2="288" y2="244"/>
+<text class="fx-hr" x="288" y="248" text-anchor="middle">12A</text>
+<line class="lx-tick" x1="316" y1="232" x2="316" y2="236"/>
+<line class="lx-tick" x1="344" y1="232" x2="344" y2="236"/>
+<line class="lx-tick" x1="372" y1="232" x2="372" y2="239"/>
+<text class="fx-hr" x="372" y="248" text-anchor="middle">3A</text>
+<line class="lx-tick" x1="400" y1="232" x2="400" y2="236"/>
+<line class="lx-tick" x1="428" y1="232" x2="428" y2="236"/>
+<line class="lx-tick" x1="456" y1="232" x2="456" y2="239"/>
+<text class="fx-hr" x="456" y="248" text-anchor="middle">6A</text>
+<line class="lx-tick" x1="484" y1="232" x2="484" y2="236"/>
+<line class="lx-tick" x1="512" y1="232" x2="512" y2="236"/>
+<line class="lx-tick" x1="540" y1="232" x2="540" y2="239"/>
+<text class="fx-hr" x="540" y="248" text-anchor="middle">9A</text>
+<line class="lx-tick" x1="568" y1="232" x2="568" y2="236"/>
+<line class="lx-tick" x1="596" y1="232" x2="596" y2="236"/>
+<line class="lx-tick" x1="624" y1="232" x2="624" y2="239"/>
+<text class="fx-hr" x="624" y="248" text-anchor="middle">12P</text>
+<line class="lx-tick" x1="652" y1="232" x2="652" y2="236"/>
+<line class="lx-tick" x1="680" y1="232" x2="680" y2="236"/>
+<line class="lx-tick" x1="708" y1="232" x2="708" y2="239"/>
+<text class="fx-hr" x="708" y="248" text-anchor="middle">3P</text>
+<line class="lx-tick" x1="736" y1="232" x2="736" y2="236"/>
+<line class="lx-tick" x1="764" y1="232" x2="764" y2="236"/>
+<line class="lx-tick" x1="792" y1="232" x2="792" y2="239"/>
+<text class="fx-hr" x="792" y="248" text-anchor="middle">6P</text>
+<line class="lx-tick" x1="820" y1="232" x2="820" y2="236"/>
+<line class="lx-tick" x1="848" y1="232" x2="848" y2="236"/>
+<line class="lx-tick" x1="876" y1="232" x2="876" y2="239"/>
+<text class="fx-hr" x="876" y="248" text-anchor="middle">9P</text>
+<line class="lx-tick" x1="904" y1="232" x2="904" y2="236"/>
+<line class="lx-tick" x1="932" y1="232" x2="932" y2="236"/>
+<line class="lx-mid" x1="960" y1="232" x2="960" y2="244"/>
+<text class="fx-hr" x="960" y="248" text-anchor="middle">12A</text>
+<line class="lx-tick" x1="988" y1="232" x2="988" y2="236"/>
+<line class="lx-tick" x1="1016" y1="232" x2="1016" y2="236"/>
+<line class="lx-tick" x1="1044" y1="232" x2="1044" y2="239"/>
+<text class="fx-hr" x="1044" y="248" text-anchor="middle">3A</text>
+<line class="lx-tick" x1="1072" y1="232" x2="1072" y2="236"/>
+<line class="lx-tick" x1="1100" y1="232" x2="1100" y2="236"/>
+<line class="lx-tick" x1="1128" y1="232" x2="1128" y2="239"/>
+<text class="fx-hr" x="1128" y="248" text-anchor="middle">6A</text>
+<line class="lx-tick" x1="1156" y1="232" x2="1156" y2="236"/>
+<line class="lx-tick" x1="1184" y1="232" x2="1184" y2="236"/>
+<line class="lx-tick" x1="1212" y1="232" x2="1212" y2="239"/>
+<text class="fx-hr" x="1212" y="248" text-anchor="middle">9A</text>
+<line class="lx-tick" x1="1240" y1="232" x2="1240" y2="236"/>
+<line class="lx-tick" x1="1268" y1="232" x2="1268" y2="236"/>
+<line class="lx-tick" x1="1296" y1="232" x2="1296" y2="239"/>
+<text class="fx-hr" x="1296" y="248" text-anchor="middle">12P</text>
+<line class="lx-tick" x1="1324" y1="232" x2="1324" y2="236"/>
+<line class="lx-tick" x1="1352" y1="232" x2="1352" y2="236"/>
+<text class="fx-day" x="36" y="261">TUE JUL 28</text>
+<text class="fx-day" x="293" y="261">WED JUL 29</text>
+<text class="fx-day" x="965" y="261">THU JUL 30</text>
+<use href="#g-horizon" x="175" y="222.6" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="183" y="261" text-anchor="middle">sets 8:15</text>
+<use href="#g-horizon" x="445" y="222.6" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="453" y="261" text-anchor="middle">rises 5:54</text>
+<use href="#g-horizon" x="846" y="222.6" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="854" y="261" text-anchor="middle">sets 8:14</text>
+<use href="#g-horizon" x="1118" y="222.6" width="16" height="16" class="sun-g"/>
+<text class="fx-sun" x="1126" y="261" text-anchor="middle">rises 5:55</text>
+<line class="lx-rain" x1="92.0" y1="231" x2="89.4" y2="226.2"/>
+<line class="lx-rain" x1="117.8" y1="231" x2="115.2" y2="224.6"/>
+<line class="lx-rain" x1="122.2" y1="231" x2="119.7" y2="224.6"/>
+<line class="lx-rain" x1="139.0" y1="231" x2="136.4" y2="217.4"/>
+<line class="lx-rain" x1="143.5" y1="231" x2="140.9" y2="217.4"/>
+<line class="lx-rain" x1="148.0" y1="231" x2="145.4" y2="217.4"/>
+<line class="lx-rain" x1="152.5" y1="231" x2="149.9" y2="217.4"/>
+<line class="lx-rain" x1="157.0" y1="231" x2="154.4" y2="217.4"/>
+<line class="lx-rain" x1="169.2" y1="231" x2="166.7" y2="219.8"/>
+<line class="lx-rain" x1="173.8" y1="231" x2="171.2" y2="219.8"/>
+<line class="lx-rain" x1="178.2" y1="231" x2="175.7" y2="219.8"/>
+<line class="lx-rain" x1="182.8" y1="231" x2="180.2" y2="219.8"/>
+<line class="lx-rain" x1="201.8" y1="231" x2="199.2" y2="223.0"/>
+<line class="lx-rain" x1="206.2" y1="231" x2="203.7" y2="223.0"/>
+<line class="lx-rain" x1="229.8" y1="231" x2="227.2" y2="224.6"/>
+<line class="lx-rain" x1="234.2" y1="231" x2="231.7" y2="224.6"/>
+<line class="lx-rain" x1="260.0" y1="231" x2="257.4" y2="225.4"/>
+<line class="lx-rain" x1="288.0" y1="231" x2="285.4" y2="226.2"/>
+<line class="lx-rain" x1="316.0" y1="231" x2="313.4" y2="226.2"/>
+<line class="lx-rain" x1="344.0" y1="231" x2="341.4" y2="226.2"/>
+<line class="lx-rain" x1="540.0" y1="231" x2="537.4" y2="226.2"/>
+<line class="lx-rain" x1="568.0" y1="231" x2="565.4" y2="225.4"/>
+<line class="lx-rain" x1="596.0" y1="231" x2="593.4" y2="225.4"/>
+<line class="lx-rain" x1="621.8" y1="231" x2="619.1" y2="224.6"/>
+<line class="lx-rain" x1="626.2" y1="231" x2="623.6" y2="224.6"/>
+<line class="lx-rain" x1="649.8" y1="231" x2="647.1" y2="224.6"/>
+<line class="lx-rain" x1="654.2" y1="231" x2="651.6" y2="224.6"/>
+<line class="lx-rain" x1="677.8" y1="231" x2="675.1" y2="224.6"/>
+<line class="lx-rain" x1="682.2" y1="231" x2="679.6" y2="224.6"/>
+<line class="lx-rain" x1="705.8" y1="231" x2="703.1" y2="224.6"/>
+<line class="lx-rain" x1="710.2" y1="231" x2="707.6" y2="224.6"/>
+<line class="lx-rain" x1="736.0" y1="231" x2="733.4" y2="225.4"/>
+<line class="lx-rain" x1="764.0" y1="231" x2="761.4" y2="225.4"/>
+<line class="lx-rain" x1="789.8" y1="231" x2="787.1" y2="224.6"/>
+<line class="lx-rain" x1="794.2" y1="231" x2="791.6" y2="224.6"/>
+<line class="lx-rain" x1="817.8" y1="231" x2="815.1" y2="224.6"/>
+<line class="lx-rain" x1="822.2" y1="231" x2="819.6" y2="224.6"/>
+<line class="lx-rain" x1="848.0" y1="231" x2="845.4" y2="225.4"/>
+<line class="lx-rain" x1="876.0" y1="231" x2="873.4" y2="226.2"/>
+<line class="lx-rain" x1="904.0" y1="231" x2="901.4" y2="226.2"/>
+<line class="lx-rain" x1="932.0" y1="231" x2="929.4" y2="226.2"/>
+<line class="lx-rain" x1="1184.0" y1="231" x2="1181.4" y2="226.2"/>
+<line class="lx-rain" x1="1212.0" y1="231" x2="1209.4" y2="226.2"/>
+<line class="lx-rain" x1="1240.0" y1="231" x2="1237.4" y2="225.4"/>
+<line class="lx-rain" x1="1265.8" y1="231" x2="1263.2" y2="224.6"/>
+<line class="lx-rain" x1="1270.2" y1="231" x2="1267.7" y2="224.6"/>
+<line class="lx-rain" x1="1293.8" y1="231" x2="1291.2" y2="224.6"/>
+<line class="lx-rain" x1="1298.2" y1="231" x2="1295.7" y2="224.6"/>
+<line class="lx-rain" x1="1321.8" y1="231" x2="1319.2" y2="224.6"/>
+<line class="lx-rain" x1="1326.2" y1="231" x2="1323.7" y2="224.6"/>
+<line class="lx-rain" x1="1349.8" y1="231" x2="1347.2" y2="224.6"/>
+<line class="lx-rain" x1="1354.2" y1="231" x2="1351.7" y2="224.6"/>
+<use href="#g-bolt" x="142" y="205" width="12" height="15.4" class="bolt-g"/>
+<use href="#g-bolt" x="170" y="205" width="12" height="15.4" class="bolt-g"/>
+<text class="fx-pt f4" x="139" y="214" text-anchor="end">60%</text>
+<text class="fx-pt f4" x="185" y="214" text-anchor="start">45%</text>
+<polyline class="cw4" points="36,99.0 64,99.0 92,106.0"/>
+<polyline class="cw3" points="92,106.0 120,120.0 148,141.0"/>
+<polyline class="cw2" points="148,141.0 176,162.0"/>
+<polyline class="cw1" points="176,162.0 204,176.0 232,183.0 260,190.0"/>
+<polyline class="cw0" points="260,190.0 288,190.0 316,197.0 344,197.0 372,197.0 400,197.0 428,197.0 456,197.0"/>
+<polyline class="cw1" points="456,197.0 484,183.0 512,169.0"/>
+<polyline class="cw2" points="512,169.0 540,148.0 568,127.0"/>
+<polyline class="cw3" points="568,127.0 596,113.0"/>
+<polyline class="cw4" points="596,113.0 624,99.0 652,92.0 680,92.0 708,92.0 736,99.0 764,113.0"/>
+<polyline class="cw3" points="764,113.0 792,134.0"/>
+<polyline class="cw2" points="792,134.0 820,155.0 848,169.0"/>
+<polyline class="cw1" points="848,169.0 876,183.0 904,190.0"/>
+<polyline class="cw0" points="904,190.0 932,197.0 960,197.0 988,204.0 1016,204.0 1044,204.0 1072,211.0 1100,211.0 1128,204.0 1156,190.0"/>
+<polyline class="cw1" points="1156,190.0 1184,176.0"/>
+<polyline class="cw2" points="1184,176.0 1212,155.0 1240,134.0"/>
+<polyline class="cw3" points="1240,134.0 1268,120.0 1296,106.0"/>
+<polyline class="cw4" points="1296,106.0 1324,99.0 1352,99.0"/>
+<circle class="fd4" cx="36" cy="99.0" r="1.8"/>
+<text class="fx-pt f4" x="36" y="93" text-anchor="start">88&#176;</text>
+<circle class="fd0" cx="372" cy="197.0" r="1.8"/>
+<text class="fx-pt f0" x="372" y="210" text-anchor="middle">74&#176;</text>
+<circle class="fd4" cx="652" cy="92.0" r="1.8"/>
+<text class="fx-pt f4" x="652" y="86" text-anchor="middle">89&#176;</text>
+<circle class="fd0" cx="1100" cy="211.0" r="1.8"/>
+<text class="fx-pt f0" x="1100" y="224" text-anchor="middle">72&#176;</text>
+<circle class="fd4" cx="1352" cy="99.0" r="1.8"/>
+<text class="fx-pt f4" x="1352" y="93" text-anchor="end">88&#176;</text>
+<text class="fx-ann f3" x="36" y="14">HEAT ADVISORY &#8212; UNTIL 8 PM</text>
+<path class="lx-brk b3" d="M 36 24 V 20 H 176 V 24"/>
+<text class="fx-ann f4" x="134" y="38">&#10005; VETOED &#8212; THUNDER</text>
+<path class="lx-brk b4" d="M 134 44 V 48 M 134 44 H 190 M 190 44 V 48"/>
+<line class="lx-lead" x1="162" y1="49" x2="162" y2="196"/>
+<circle class="fd4" cx="162" cy="198" r="1.4"/>
+<text class="fx-win fst" x="428" y="39">best &#8212; Wed 5 to 8 AM</text>
+<path class="lx-brk bst" d="M 428 44 V 48 M 428 44 H 512 M 512 44 V 48"/>
+<text class="fx-win fst" x="1100" y="39">fair again &#8212; Thu 5 to 8 AM</text>
+<path class="lx-brk bst" d="M 1100 44 V 48 M 1100 44 H 1184 M 1184 44 V 48"/>
+</svg>
+    </div>
+    <p class="fig-legend">WBGT line takes its band&rsquo;s ink: <span class="sw tt0">&#9473;</span> low &middot; <span class="sw tt1">&#9473;</span> elevated &middot; <span class="sw tt2">&#9473;</span> moderate &middot; <span class="sw tt3">&#9473;</span> high &middot; <span class="sw tt4">&#9473;</span> extreme caution &middot; scroll &rarr;</p>
+    <p class="fig-cap"><span class="fig-no">Fig. 1.</span> Wet-bulb globe temperature, hour by hour, on one time axis. The hatched ceiling is the 90&deg; veto zone; the ochre wash marks daylight &mdash; densest where UV runs very high &mdash; under the sun&rsquo;s dotted arc. Fine strokes along the base count the chance of rain; a thunderbolt strikes any hour vetoed for lightning, with the reason led off the chart above. Brackets name the windows worth lacing up for.</p>
+  </section>
+
+  <section class="hours-sec" aria-label="Hourly ledger">
+    <h2 class="overline">Hourly ledger &middot; 48 h</h2>
+    <div class="hours-scroll" tabindex="0">
+      <table class="hours">
+        <caption class="sr">Hour-by-hour conditions for the next 48 hours at Central Park</caption>
+        <thead>
+          <tr><th class="t" scope="col">Time</th><th scope="col">WBGT</th><th class="sp" scope="col"><span class="sr">WBGT trend</span>&plusmn;3&nbsp;h</th><th scope="col" style="text-align:left">Reads</th><th scope="col">Dew</th><th class="sp" scope="col"><span class="sr">Dew trend</span>&plusmn;3&nbsp;h</th><th scope="col">UV</th><th scope="col">AQI</th><th scope="col">Wind</th><th scope="col">Rain</th></tr>
+        </thead>
+        <tbody>
+<tr class="day"><th class="t" scope="row">TUE</th><td colspan="9"><span class="dnm">Tuesday July 28 &middot; today</span><span class="dsun"><svg class="g" aria-hidden="true"><use href="#g-horizon"/></svg>rises 5:53 &middot; sets 8:15 &nbsp;<svg class="g" aria-hidden="true"><use href="#g-gibbous"/></svg>waxing gibbous</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>3 PM</th><td class="n"><span class="tt4">88&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,4.1 10,4.1 18,4.1 26,4.1 34,4.1 42,4.8 50,6.1"/><circle class="ft4" cx="26" cy="4.1" r="1.8"/></svg></td><td class="reads">extreme caution</td><td class="n"><span class="tt3">73&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,5.3 10,5.3 18,5.3 26,5.3 34,5.3 42,5.3 50,5.3"/><circle class="ft3" cx="26" cy="5.3" r="1.8"/></svg></td><td class="n"><span class="tt3">8</span></td><td class="n"><span class="tt1">62</span></td><td class="n"><span class="st">S 6</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>4 PM</th><td class="n"><span class="tt4">88&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,4.1 10,4.1 18,4.1 26,4.1 34,4.8 42,6.1 50,8.0"/><circle class="ft4" cx="26" cy="4.1" r="1.8"/></svg></td><td class="reads">extreme caution</td><td class="n"><span class="tt3">73&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,5.3 10,5.3 18,5.3 26,5.3 34,5.3 42,5.3 50,3.5"/><circle class="ft3" cx="26" cy="5.3" r="1.8"/></svg></td><td class="n"><span class="tt2">6</span></td><td class="n"><span class="tt1">63</span></td><td class="n"><span class="st">S 7</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>5 PM</th><td class="n"><span class="tt3">87&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,4.1 10,4.1 18,4.1 26,4.8 34,6.1 42,8.0 50,10.0"/><circle class="ft3" cx="26" cy="4.8" r="1.8"/></svg></td><td class="reads">high heat stress</td><td class="n"><span class="tt3">73&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,5.3 10,5.3 18,5.3 26,5.3 34,5.3 42,3.5 50,3.5"/><circle class="ft3" cx="26" cy="5.3" r="1.8"/></svg></td><td class="n"><span class="tt1">4</span></td><td class="n"><span class="tt1">63</span></td><td class="n"><span class="st">S 7</span></td><td class="n"><span class="st">5%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-cloud"/></svg>6 PM</th><td class="n"><span class="tt3">85&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,4.1 10,4.1 18,4.8 26,6.1 34,8.0 42,10.0 50,11.3"/><circle class="ft3" cx="26" cy="6.1" r="1.8"/></svg></td><td class="reads">high heat stress</td><td class="n"><span class="tt3">73&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,5.3 10,5.3 18,5.3 26,5.3 34,3.5 42,3.5 50,3.5"/><circle class="ft3" cx="26" cy="5.3" r="1.8"/></svg></td><td class="n"><span class="tt0">2</span></td><td class="n"><span class="tt1">61</span></td><td class="n"><span class="st">S 8</span></td><td class="n"><span class="st">15%</span></td></tr>
+<tr class="veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>7 PM</th><td class="n"><span class="tt2">82&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,4.1 10,4.8 18,6.1 26,8.0 34,10.0 42,11.3 50,11.9"/><circle class="ft2" cx="26" cy="8.0" r="1.8"/></svg></td><td class="reads"><span class="vt">&#10005; vetoed &#8212; thunderstorms likely (<span class="tt4">60%</span>)</span></td><td class="n"><span class="tt3">74&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,5.3 10,5.3 18,5.3 26,3.5 34,3.5 42,3.5 50,5.3"/><circle class="ft3" cx="26" cy="3.5" r="1.8"/></svg></td><td class="n"><span class="tt0">1</span></td><td class="n"><span class="tt1">58</span></td><td class="n"><span class="st">S 10 g22</span></td><td class="n"><span class="tt4">60%</span></td></tr>
+<tr class="veto"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>8 PM</th><td class="n"><span class="tt1">79&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,4.8 10,6.1 18,8.0 26,10.0 34,11.3 42,11.9 50,12.6"/><circle class="ft1" cx="26" cy="10.0" r="1.8"/></svg></td><td class="reads"><span class="vt">&#10005; vetoed &#8212; thunderstorms possible (<span class="tt4">45%</span>)</span></td><td class="n"><span class="tt3">74&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,5.3 10,5.3 18,3.5 26,3.5 34,3.5 42,5.3 50,5.3"/><circle class="ft3" cx="26" cy="3.5" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt1">55</span></td><td class="n"><span class="st">SW 12 g24</span></td><td class="n"><span class="tt4">45%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-rain"/></svg>9 PM</th><td class="n"><span class="tt1">77&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,6.1 10,8.0 18,10.0 26,11.3 34,11.9 42,12.6 50,12.6"/><circle class="ft1" cx="26" cy="11.3" r="1.8"/></svg></td><td class="reads">elevated</td><td class="n"><span class="tt3">74&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,5.3 10,3.5 18,3.5 26,3.5 34,5.3 42,5.3 50,7.2"/><circle class="ft3" cx="26" cy="3.5" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt1">54</span></td><td class="n"><span class="st">SW 8</span></td><td class="n"><span class="st">25%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-cloud"/></svg>10 PM</th><td class="n"><span class="tt1">76&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,8.0 10,10.0 18,11.3 26,11.9 34,12.6 42,12.6 50,13.2"/><circle class="ft1" cx="26" cy="11.9" r="1.8"/></svg></td><td class="reads">elevated</td><td class="n"><span class="tt3">73&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,3.5 10,3.5 18,3.5 26,5.3 34,5.3 42,7.2 50,7.2"/><circle class="ft3" cx="26" cy="5.3" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt1">52</span></td><td class="n"><span class="st">SW 7</span></td><td class="n"><span class="st">15%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>11 PM</th><td class="n"><span class="tt0">75&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,10.0 10,11.3 18,11.9 26,12.6 34,12.6 42,13.2 50,13.2"/><circle class="ft0" cx="26" cy="12.6" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt3">73&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,3.5 10,3.5 18,5.3 26,5.3 34,7.2 42,7.2 50,9.0"/><circle class="ft3" cx="26" cy="5.3" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt1">51</span></td><td class="n"><span class="st">SW 6</span></td><td class="n"><span class="st">10%</span></td></tr>
+<tr class="day"><th class="t" scope="row">WED</th><td colspan="9"><span class="dnm">Wednesday July 29</span><span class="dsun"><svg class="g" aria-hidden="true"><use href="#g-horizon"/></svg>rises 5:54 &middot; sets 8:14 &nbsp;<svg class="g" aria-hidden="true"><use href="#g-gibbous"/></svg>nearly full</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>12 AM</th><td class="n"><span class="tt0">75&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,11.3 10,11.9 18,12.6 26,12.6 34,13.2 42,13.2 50,13.2"/><circle class="ft0" cx="26" cy="12.6" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt3">72&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,3.5 10,5.3 18,5.3 26,7.2 34,7.2 42,9.0 50,9.0"/><circle class="ft3" cx="26" cy="7.2" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt0">50</span></td><td class="n"><span class="st">SW 5</span></td><td class="n"><span class="st">5%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>1 AM</th><td class="n"><span class="tt0">74&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,11.9 10,12.6 18,12.6 26,13.2 34,13.2 42,13.2 50,13.2"/><circle class="ft0" cx="26" cy="13.2" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt3">72&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,5.3 10,5.3 18,7.2 26,7.2 34,9.0 42,9.0 50,10.8"/><circle class="ft3" cx="26" cy="7.2" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt0">49</span></td><td class="n"><span class="st">SW 5</span></td><td class="n"><span class="st">5%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>2 AM</th><td class="n"><span class="tt0">74&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,12.6 10,12.6 18,13.2 26,13.2 34,13.2 42,13.2 50,13.2"/><circle class="ft0" cx="26" cy="13.2" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt3">71&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,5.3 10,7.2 18,7.2 26,9.0 34,9.0 42,10.8 50,10.8"/><circle class="ft3" cx="26" cy="9.0" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt0">49</span></td><td class="n"><span class="st">SW 4</span></td><td class="n"><span class="st">5%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>3 AM</th><td class="n"><span class="tt0">74&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,12.6 10,13.2 18,13.2 26,13.2 34,13.2 42,13.2 50,13.2"/><circle class="ft0" cx="26" cy="13.2" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt3">71&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,7.2 10,7.2 18,9.0 26,9.0 34,10.8 42,10.8 50,10.8"/><circle class="ft3" cx="26" cy="9.0" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt0">48</span></td><td class="n"><span class="st">SW 4</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>4 AM</th><td class="n"><span class="tt0">74&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,13.2 10,13.2 18,13.2 26,13.2 34,13.2 42,13.2 50,11.9"/><circle class="ft0" cx="26" cy="13.2" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt2">70&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,7.2 10,9.0 18,9.0 26,10.8 34,10.8 42,10.8 50,10.8"/><circle class="ft2" cx="26" cy="10.8" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt0">48</span></td><td class="n"><span class="st">W 4</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>5 AM</th><td class="n"><span class="tt0">74&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,13.2 10,13.2 18,13.2 26,13.2 34,13.2 42,11.9 50,10.6"/><circle class="ft0" cx="26" cy="13.2" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt2">70&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,9.0 10,9.0 18,10.8 26,10.8 34,10.8 42,10.8 50,10.8"/><circle class="ft2" cx="26" cy="10.8" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt0">48</span></td><td class="n"><span class="st">W 4</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sunrise"/></svg>6 AM</th><td class="n"><span class="tt0">74&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,13.2 10,13.2 18,13.2 26,13.2 34,11.9 42,10.6 50,8.7"/><circle class="ft0" cx="26" cy="13.2" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt2">70&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,9.0 10,10.8 18,10.8 26,10.8 34,10.8 42,10.8 50,10.8"/><circle class="ft2" cx="26" cy="10.8" r="1.8"/></svg></td><td class="n"><span class="tt0">1</span></td><td class="n"><span class="tt0">48</span></td><td class="n"><span class="st">W 4</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>7 AM</th><td class="n"><span class="tt1">76&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,13.2 10,13.2 18,13.2 26,11.9 34,10.6 42,8.7 50,6.7"/><circle class="ft1" cx="26" cy="11.9" r="1.8"/></svg></td><td class="reads">elevated</td><td class="n"><span class="tt2">70&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,10.8 10,10.8 18,10.8 26,10.8 34,10.8 42,10.8 50,9.0"/><circle class="ft2" cx="26" cy="10.8" r="1.8"/></svg></td><td class="n"><span class="tt0">2</span></td><td class="n"><span class="tt0">50</span></td><td class="n"><span class="st">W 5</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>8 AM</th><td class="n"><span class="tt1">78&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,13.2 10,13.2 18,11.9 26,10.6 34,8.7 42,6.7 50,5.4"/><circle class="ft1" cx="26" cy="10.6" r="1.8"/></svg></td><td class="reads">elevated</td><td class="n"><span class="tt2">70&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,10.8 10,10.8 18,10.8 26,10.8 34,10.8 42,9.0 50,9.0"/><circle class="ft2" cx="26" cy="10.8" r="1.8"/></svg></td><td class="n"><span class="tt1">4</span></td><td class="n"><span class="tt1">52</span></td><td class="n"><span class="st">W 6</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>9 AM</th><td class="n"><span class="tt2">81&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,13.2 10,11.9 18,10.6 26,8.7 34,6.7 42,5.4 50,4.1"/><circle class="ft2" cx="26" cy="8.7" r="1.8"/></svg></td><td class="reads">moderate heat stress</td><td class="n"><span class="tt2">70&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,10.8 10,10.8 18,10.8 26,10.8 34,9.0 42,9.0 50,9.0"/><circle class="ft2" cx="26" cy="10.8" r="1.8"/></svg></td><td class="n"><span class="tt2">6</span></td><td class="n"><span class="tt1">54</span></td><td class="n"><span class="st">SW 7</span></td><td class="n"><span class="st">5%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>10 AM</th><td class="n"><span class="tt2">84&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,11.9 10,10.6 18,8.7 26,6.7 34,5.4 42,4.1 50,3.5"/><circle class="ft2" cx="26" cy="6.7" r="1.8"/></svg></td><td class="reads">moderate heat stress</td><td class="n"><span class="tt3">71&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,10.8 10,10.8 18,10.8 26,9.0 34,9.0 42,9.0 50,9.0"/><circle class="ft3" cx="26" cy="9.0" r="1.8"/></svg></td><td class="n"><span class="tt3">8</span></td><td class="n"><span class="tt1">56</span></td><td class="n"><span class="st">SW 8</span></td><td class="n"><span class="st">10%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>11 AM</th><td class="n"><span class="tt3">86&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,10.6 10,8.7 18,6.7 26,5.4 34,4.1 42,3.5 50,3.5"/><circle class="ft3" cx="26" cy="5.4" r="1.8"/></svg></td><td class="reads">high heat stress</td><td class="n"><span class="tt3">71&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,10.8 10,10.8 18,9.0 26,9.0 34,9.0 42,9.0 50,7.2"/><circle class="ft3" cx="26" cy="9.0" r="1.8"/></svg></td><td class="n"><span class="tt3">9</span></td><td class="n"><span class="tt1">58</span></td><td class="n"><span class="st">S 8</span></td><td class="n"><span class="st">10%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>12 PM</th><td class="n"><span class="tt4">88&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,8.7 10,6.7 18,5.4 26,4.1 34,3.5 42,3.5 50,3.5"/><circle class="ft4" cx="26" cy="4.1" r="1.8"/></svg></td><td class="reads">extreme caution</td><td class="n"><span class="tt3">71&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,10.8 10,9.0 18,9.0 26,9.0 34,9.0 42,7.2 50,7.2"/><circle class="ft3" cx="26" cy="9.0" r="1.8"/></svg></td><td class="n"><span class="tt3">10</span></td><td class="n"><span class="tt1">60</span></td><td class="n"><span class="st">S 9</span></td><td class="n"><span class="st">15%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>1 PM</th><td class="n"><span class="tt4">89&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,6.7 10,5.4 18,4.1 26,3.5 34,3.5 42,3.5 50,4.1"/><circle class="ft4" cx="26" cy="3.5" r="1.8"/></svg></td><td class="reads">extreme caution</td><td class="n"><span class="tt3">71&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,9.0 10,9.0 18,9.0 26,9.0 34,7.2 42,7.2 50,7.2"/><circle class="ft3" cx="26" cy="9.0" r="1.8"/></svg></td><td class="n"><span class="tt3">10</span></td><td class="n"><span class="tt1">61</span></td><td class="n"><span class="st">S 9</span></td><td class="n"><span class="st">15%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>2 PM</th><td class="n"><span class="tt4">89&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,5.4 10,4.1 18,3.5 26,3.5 34,3.5 42,4.1 50,5.4"/><circle class="ft4" cx="26" cy="3.5" r="1.8"/></svg></td><td class="reads">extreme caution</td><td class="n"><span class="tt3">72&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,9.0 10,9.0 18,9.0 26,7.2 34,7.2 42,7.2 50,7.2"/><circle class="ft3" cx="26" cy="7.2" r="1.8"/></svg></td><td class="n"><span class="tt3">9</span></td><td class="n"><span class="tt1">62</span></td><td class="n"><span class="st">S 9</span></td><td class="n"><span class="st">15%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>3 PM</th><td class="n"><span class="tt4">89&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,4.1 10,3.5 18,3.5 26,3.5 34,4.1 42,5.4 50,7.4"/><circle class="ft4" cx="26" cy="3.5" r="1.8"/></svg></td><td class="reads">extreme caution</td><td class="n"><span class="tt3">72&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,9.0 10,9.0 18,7.2 26,7.2 34,7.2 42,7.2 50,7.2"/><circle class="ft3" cx="26" cy="7.2" r="1.8"/></svg></td><td class="n"><span class="tt3">8</span></td><td class="n"><span class="tt1">62</span></td><td class="n"><span class="st">S 9</span></td><td class="n"><span class="st">15%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>4 PM</th><td class="n"><span class="tt4">88&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,3.5 10,3.5 18,3.5 26,4.1 34,5.4 42,7.4 50,9.3"/><circle class="ft4" cx="26" cy="4.1" r="1.8"/></svg></td><td class="reads">extreme caution</td><td class="n"><span class="tt3">72&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,9.0 10,7.2 18,7.2 26,7.2 34,7.2 42,7.2 50,9.0"/><circle class="ft3" cx="26" cy="7.2" r="1.8"/></svg></td><td class="n"><span class="tt2">6</span></td><td class="n"><span class="tt1">61</span></td><td class="n"><span class="st">S 8</span></td><td class="n"><span class="st">10%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>5 PM</th><td class="n"><span class="tt3">86&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,3.5 10,3.5 18,4.1 26,5.4 34,7.4 42,9.3 50,10.6"/><circle class="ft3" cx="26" cy="5.4" r="1.8"/></svg></td><td class="reads">high heat stress</td><td class="n"><span class="tt3">72&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,7.2 10,7.2 18,7.2 26,7.2 34,7.2 42,9.0 50,9.0"/><circle class="ft3" cx="26" cy="7.2" r="1.8"/></svg></td><td class="n"><span class="tt1">4</span></td><td class="n"><span class="tt1">60</span></td><td class="n"><span class="st">S 8</span></td><td class="n"><span class="st">10%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-cloud"/></svg>6 PM</th><td class="n"><span class="tt2">83&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,3.5 10,4.1 18,5.4 26,7.4 34,9.3 42,10.6 50,11.9"/><circle class="ft2" cx="26" cy="7.4" r="1.8"/></svg></td><td class="reads">moderate heat stress</td><td class="n"><span class="tt3">72&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,7.2 10,7.2 18,7.2 26,7.2 34,9.0 42,9.0 50,10.8"/><circle class="ft3" cx="26" cy="7.2" r="1.8"/></svg></td><td class="n"><span class="tt0">2</span></td><td class="n"><span class="tt1">58</span></td><td class="n"><span class="st">S 7</span></td><td class="n"><span class="st">15%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-cloud"/></svg>7 PM</th><td class="n"><span class="tt2">80&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,4.1 10,5.4 18,7.4 26,9.3 34,10.6 42,11.9 50,12.6"/><circle class="ft2" cx="26" cy="9.3" r="1.8"/></svg></td><td class="reads">moderate heat stress</td><td class="n"><span class="tt3">71&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,7.2 10,7.2 18,7.2 26,9.0 34,9.0 42,10.8 50,10.8"/><circle class="ft3" cx="26" cy="9.0" r="1.8"/></svg></td><td class="n"><span class="tt0">1</span></td><td class="n"><span class="tt1">55</span></td><td class="n"><span class="st">S 7</span></td><td class="n"><span class="st">15%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>8 PM</th><td class="n"><span class="tt1">78&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,5.4 10,7.4 18,9.3 26,10.6 34,11.9 42,12.6 50,13.2"/><circle class="ft1" cx="26" cy="10.6" r="1.8"/></svg></td><td class="reads">elevated</td><td class="n"><span class="tt3">71&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,7.2 10,7.2 18,9.0 26,9.0 34,10.8 42,10.8 50,10.8"/><circle class="ft3" cx="26" cy="9.0" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt1">54</span></td><td class="n"><span class="st">S 6</span></td><td class="n"><span class="st">10%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>9 PM</th><td class="n"><span class="tt1">76&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,7.4 10,9.3 18,10.6 26,11.9 34,12.6 42,13.2 50,13.2"/><circle class="ft1" cx="26" cy="11.9" r="1.8"/></svg></td><td class="reads">elevated</td><td class="n"><span class="tt2">70&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,7.2 10,9.0 18,9.0 26,10.8 34,10.8 42,10.8 50,12.7"/><circle class="ft2" cx="26" cy="10.8" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt1">53</span></td><td class="n"><span class="st">S 5</span></td><td class="n"><span class="st">5%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>10 PM</th><td class="n"><span class="tt0">75&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,9.3 10,10.6 18,11.9 26,12.6 34,13.2 42,13.2 50,13.9"/><circle class="ft0" cx="26" cy="12.6" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt2">70&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,9.0 10,9.0 18,10.8 26,10.8 34,10.8 42,12.7 50,12.7"/><circle class="ft2" cx="26" cy="10.8" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt1">52</span></td><td class="n"><span class="st">S 5</span></td><td class="n"><span class="st">5%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>11 PM</th><td class="n"><span class="tt0">74&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,10.6 10,11.9 18,12.6 26,13.2 34,13.2 42,13.9 50,13.9"/><circle class="ft0" cx="26" cy="13.2" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt2">70&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,9.0 10,10.8 18,10.8 26,10.8 34,12.7 42,12.7 50,12.7"/><circle class="ft2" cx="26" cy="10.8" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt1">51</span></td><td class="n"><span class="st">S 4</span></td><td class="n"><span class="st">5%</span></td></tr>
+<tr class="day"><th class="t" scope="row">THU</th><td colspan="9"><span class="dnm">Thursday July 30</span><span class="dsun"><svg class="g" aria-hidden="true"><use href="#g-horizon"/></svg>rises 5:55 &middot; sets 8:13 &nbsp;<svg class="g" aria-hidden="true"><use href="#g-gibbous"/></svg>full moon</span></td></tr>
+<tr class="condense"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>12&ndash;4 AM</th><td class="n"><span class="tt0">72&ndash;74&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,13.2 10,13.2 18,13.9 26,13.9 34,13.9 42,14.5 50,14.5"/><circle class="ft0" cx="26" cy="13.9" r="1.8"/></svg></td><td class="reads"><em>low &mdash; quiet overnight</em></td><td class="n"><span class="tt2">68&ndash;69&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,10.8 10,12.7 18,12.7 26,12.7 34,14.5 42,14.5 50,14.5"/><circle class="ft2" cx="26" cy="12.7" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt1">49&ndash;51</span></td><td class="n"><span class="st">SW 4</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-moon"/></svg>5 AM</th><td class="n"><span class="tt0">72&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,13.9 10,13.9 18,14.5 26,14.5 34,13.9 42,12.6 50,11.3"/><circle class="ft0" cx="26" cy="14.5" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt2">68&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,12.7 10,14.5 18,14.5 26,14.5 34,14.5 42,14.5 50,12.7"/><circle class="ft2" cx="26" cy="14.5" r="1.8"/></svg></td><td class="n"><span class="tt0">0</span></td><td class="n"><span class="tt0">49</span></td><td class="n"><span class="st">SW 4</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sunrise"/></svg>6 AM</th><td class="n"><span class="tt0">73&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,13.9 10,14.5 18,14.5 26,13.9 34,12.6 42,11.3 50,9.3"/><circle class="ft0" cx="26" cy="13.9" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt2">68&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,14.5 10,14.5 18,14.5 26,14.5 34,14.5 42,12.7 50,12.7"/><circle class="ft2" cx="26" cy="14.5" r="1.8"/></svg></td><td class="n"><span class="tt0">1</span></td><td class="n"><span class="tt0">50</span></td><td class="n"><span class="st">SW 5</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>7 AM</th><td class="n"><span class="tt0">75&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,14.5 10,14.5 18,13.9 26,12.6 34,11.3 42,9.3 50,7.4"/><circle class="ft0" cx="26" cy="12.6" r="1.8"/></svg></td><td class="reads">low</td><td class="n"><span class="tt2">68&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,14.5 10,14.5 18,14.5 26,14.5 34,12.7 42,12.7 50,12.7"/><circle class="ft2" cx="26" cy="14.5" r="1.8"/></svg></td><td class="n"><span class="tt0">2</span></td><td class="n"><span class="tt1">51</span></td><td class="n"><span class="st">SW 5</span></td><td class="n"><span class="st">0%</span></td></tr>
+<tr><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>8 AM</th><td class="n"><span class="tt1">77&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,14.5 10,13.9 18,12.6 26,11.3 34,9.3 42,7.4 50,6.1"/><circle class="ft1" cx="26" cy="11.3" r="1.8"/></svg></td><td class="reads">elevated</td><td class="n"><span class="tt2">69&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,14.5 10,14.5 18,14.5 26,12.7 34,12.7 42,12.7 50,10.8"/><circle class="ft2" cx="26" cy="12.7" r="1.8"/></svg></td><td class="n"><span class="tt1">4</span></td><td class="n"><span class="tt1">53</span></td><td class="n"><span class="st">SW 6</span></td><td class="n"><span class="st">5%</span></td></tr>
+<tr class="condense"><th class="t" scope="row"><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>9 AM&ndash;2 PM</th><td class="n"><span class="tt4">80&#8594;88&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,9.3 10,7.4 18,6.1 26,4.8 34,4.1 42,4.1 50,4.1"/><circle class="ft4" cx="26" cy="4.8" r="1.8"/></svg></td><td class="reads"><em>climbing &mdash; moderate by 9, high by 11, extreme caution by 1 PM</em></td><td class="n"><span class="tt3">69&ndash;71&#176;</span></td><td class="sp"><svg class="sl" viewBox="0 0 52 18" width="52" height="18" aria-hidden="true"><polyline points="2,12.7 10,12.7 18,10.8 26,10.8 34,9.0 42,9.0 50,9.0"/><circle class="ft3" cx="26" cy="10.8" r="1.8"/></svg></td><td class="n"><span class="tt3">6&#8594;10</span></td><td class="n"><span class="tt1">53&#8594;61</span></td><td class="n"><span class="st">SW 7</span></td><td class="n"><span class="st">&le;15%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="explainers" aria-label="What each metric means">
+    <h2 class="sr">What each metric means</h2>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-therm"/></svg>WBGT &mdash; heat stress</summary>
+      <p>Wet-bulb globe temperature folds air temperature, humidity, sun load, and wind into one heat-stress number &mdash; the standard used for athletics. It omits your fitness, acclimatization, and pace. Words follow the National Weather Service bands: low, elevated, moderate, high heat stress, extreme caution, extreme (a veto at <span class="tt4">90&deg;F</span>+).</p>
+      <p class="src">source: NWS gridpoint forecast (forecast value, not estimated)</p>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-drop"/></svg>Dew point &mdash; humidity</summary>
+      <p>The absolute moisture in the air, which sets how well sweat can evaporate. Below <span class="tt0">55&deg;F</span> is comfortable; at <span class="tt3">70&deg;F</span>+ evaporation stalls and heart rate drifts up at any pace. It omits temperature itself &mdash; that is what WBGT is for.</p>
+      <p class="src">source: NWS gridpoint forecast</p>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-sun"/></svg>UV index</summary>
+      <p>The EPA scale for sunburn speed on exposed skin &mdash; at UV <span class="tt3">9</span>, damage begins in about 15 minutes. It says nothing about heat: dawn hours can be brutal for WBGT yet UV <span class="tt0">0</span>. Shade, cover, and sunscreen change your exposure, not the index.</p>
+      <p class="src">source: Open-Meteo model (forecast)</p>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-haze"/></svg>AQI &mdash; air quality</summary>
+      <p>The EPA Air Quality Index, taken from the worst nearby monitor and its dominant pollutant &mdash; a protective reading, not an average. Moderate (<span class="tt1">51&ndash;100</span>) is fine for most runners; unusually sensitive people may shorten hard sessions. <span class="tt4">201</span>+ vetoes the hour.</p>
+      <p class="src">now: AirNow monitor (measured) &middot; hourly forecast: CAMS model (modeled)</p>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-wind"/></svg>Wind &amp; gusts</summary>
+      <p>Sustained speed plus gusts. In heat, wind helps &mdash; it moves saturated air off your skin. Today&rsquo;s <span class="st">S 6</span> is too little to matter. It omits direction changes along a loop; see the route note for exposure.</p>
+      <p class="src">source: NWS gridpoint forecast</p>
+    </details>
+    <details>
+      <summary><svg class="g" aria-hidden="true"><use href="#g-storm"/></svg>Rain &amp; thunder</summary>
+      <p>Chance of measurable precipitation for the hour. Rain alone rarely cancels a run; lightning always does &mdash; any hour with thunder probability at <span class="tt4">30%</span> or more is struck from the ledger with the reason named, never averaged away.</p>
+      <p class="src">source: NWS gridpoint forecast (probabilityOfThunder, weather layer)</p>
+    </details>
+  </section>
+
+  <aside class="route">
+    <span class="overline">Route context &middot; Central Park</span>
+    Good tree shade on the loop&rsquo;s east and north sides; the reservoir path is exposed. Hills concentrate at the north end. Drains well after rain &mdash; tomorrow&rsquo;s 5 AM window will be dry underfoot.
+  </aside>
+
+  <p class="clothing"><span class="overline">Clothing</span>Now: the lightest kit you own, a brimmed hat, and water every 15 minutes. For the Wed 5 AM window: singlet and shorts &mdash; at dew point <span class="tt2">70&deg;</span> it will still feel like the upper 80s.</p>
+
+</main>
+
+<footer class="wrap foot">
+  <p>forecast &amp; alerts: National Weather Service, gridpoint OKX 34,45 &middot; forecast fetched 2:21 PM ET &middot; alerts fetched 2:29 PM ET</p>
+  <p>air quality now: EPA AirNow, worst nearby monitor (measured) &middot; fetched 2:05 PM ET &middot; UV + hourly AQI: Open-Meteo (modeled, CAMS) &middot; fetched 2:10 PM ET</p>
+  <p>no composite score is computed &mdash; read the words. &middot; mockup ledger-v2c-figure-ledger &middot; whentorun</p>
+</footer>
+
+<script>
+/* mockup-only theme demo: cycles System -> Light -> Dark */
+(function () {
+  var btn = document.getElementById('themeBtn');
+  var states = ['', 'light', 'dark'], names = ['Auto', 'Light', 'Dark'], i = 0;
+  btn.addEventListener('click', function () {
+    i = (i + 1) % 3;
+    if (states[i]) { document.documentElement.setAttribute('data-theme', states[i]); }
+    else { document.documentElement.removeAttribute('data-theme'); }
+    btn.textContent = names[i];
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -186,6 +186,19 @@ for (const variant of variants) {
       expect(ok, 'data-metric="rh" with a % value, next to dew point').toBe(true);
     });
 
+    test('sunrise and sunset marked in ledger graphic and table', async ({ page }) => {
+      const r = await page.evaluate(() => {
+        const sunGlyphs = document.querySelectorAll('[data-glyph="sunrise"], [data-glyph="sunset"]');
+        // At least one pair in the graphic; table rows/dividers marked too.
+        const tableMarks = document.querySelectorAll(
+          'table [data-sun], table .sunrise, table .sunset, [data-sun-row]',
+        );
+        return { glyphs: sunGlyphs.length, tableMarks: tableMarks.length };
+      });
+      expect(r.glyphs, 'sunrise/sunset glyphs in the ledger graphic').toBeGreaterThanOrEqual(2);
+      expect(r.tableMarks, 'sunrise/sunset markers in the table view').toBeGreaterThanOrEqual(2);
+    });
+
     test('compass rose shows wind direction in the current panel', async ({ page }) => {
       const ok = await page.evaluate(() => {
         const rose = document.querySelector('svg[data-glyph="compass"], [data-glyph="compass"] svg');

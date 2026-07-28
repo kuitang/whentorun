@@ -44,10 +44,11 @@ func TestWeatherParsesFixture(t *testing.T) {
 	defer srv.Close()
 	c := newTestClient(srv.URL, srv.URL)
 
-	hours, err := c.Weather(context.Background(), 40.78, -73.97)
+	data, err := c.Weather(context.Background(), 40.78, -73.97)
 	if err != nil {
 		t.Fatalf("Weather: %v", err)
 	}
+	hours := data.Hours
 	if len(hours) != 72 {
 		t.Fatalf("got %d hours, want 72", len(hours))
 	}
@@ -61,6 +62,7 @@ func TestWeatherParsesFixture(t *testing.T) {
 		"timezone":         "America/New_York",
 		"forecast_days":    "3",
 		"hourly":           hourlyWeatherVars,
+		"daily":            dailyWeatherVars,
 	}
 	for k, want := range wantParams {
 		if got := q.Get(k); got != want {
@@ -76,14 +78,14 @@ func TestWeatherParsesFixture(t *testing.T) {
 		{0, WeatherHour{
 			Time:  time.Date(2026, 7, 27, 0, 0, 0, 0, ny),
 			TempF: fp(71.8), RelHumidity: fp(67), DewPointF: fp(60.2),
-			WindMPH: fp(4.3), GustMPH: fp(14.5), UVIndex: fp(0),
+			WindMPH: fp(4.3), GustMPH: fp(14.5), WindDirDeg: fp(189), UVIndex: fp(0),
 			ShortwaveWm2: fp(0), DirectWm2: fp(0), DiffuseWm2: fp(0),
 			PoP: fp(1), CloudCoverPct: fp(27),
 		}},
 		{13, WeatherHour{
 			Time:  time.Date(2026, 7, 27, 13, 0, 0, 0, ny),
 			TempF: fp(83.6), RelHumidity: fp(55), DewPointF: fp(65.7),
-			WindMPH: fp(1.1), GustMPH: fp(3.6), UVIndex: fp(7.3),
+			WindMPH: fp(1.1), GustMPH: fp(3.6), WindDirDeg: fp(127), UVIndex: fp(7.3),
 			ShortwaveWm2: fp(264), DirectWm2: fp(0), DiffuseWm2: fp(264),
 			PoP: fp(5), CloudCoverPct: fp(44),
 		}},
@@ -102,6 +104,7 @@ func TestWeatherParsesFixture(t *testing.T) {
 			{"DewPointF", got.DewPointF, tc.want.DewPointF},
 			{"WindMPH", got.WindMPH, tc.want.WindMPH},
 			{"GustMPH", got.GustMPH, tc.want.GustMPH},
+			{"WindDirDeg", got.WindDirDeg, tc.want.WindDirDeg},
 			{"UVIndex", got.UVIndex, tc.want.UVIndex},
 			{"ShortwaveWm2", got.ShortwaveWm2, tc.want.ShortwaveWm2},
 			{"DirectWm2", got.DirectWm2, tc.want.DirectWm2},
@@ -118,6 +121,25 @@ func TestWeatherParsesFixture(t *testing.T) {
 			case f.want != nil && *f.got != *f.want:
 				t.Errorf("hour %d %s = %v, want %v", tc.idx, f.name, *f.got, *f.want)
 			}
+		}
+	}
+
+	// Daily sunrise/sunset table, in the requested timezone.
+	if len(data.Days) != 3 {
+		t.Fatalf("got %d days, want 3", len(data.Days))
+	}
+	wantDays := []struct {
+		date, sunrise, sunset time.Time
+	}{
+		{time.Date(2026, 7, 27, 0, 0, 0, 0, ny), time.Date(2026, 7, 27, 5, 47, 0, 0, ny), time.Date(2026, 7, 27, 20, 16, 0, 0, ny)},
+		{time.Date(2026, 7, 28, 0, 0, 0, 0, ny), time.Date(2026, 7, 28, 5, 48, 0, 0, ny), time.Date(2026, 7, 28, 20, 15, 0, 0, ny)},
+		{time.Date(2026, 7, 29, 0, 0, 0, 0, ny), time.Date(2026, 7, 29, 5, 49, 0, 0, ny), time.Date(2026, 7, 29, 20, 14, 0, 0, ny)},
+	}
+	for i, want := range wantDays {
+		got := data.Days[i]
+		if !got.Date.Equal(want.date) || !got.Sunrise.Equal(want.sunrise) || !got.Sunset.Equal(want.sunset) {
+			t.Errorf("day %d = date %v sunrise %v sunset %v, want %v / %v / %v",
+				i, got.Date, got.Sunrise, got.Sunset, want.date, want.sunrise, want.sunset)
 		}
 	}
 }
@@ -167,9 +189,13 @@ func TestNullsBecomeNil(t *testing.T) {
 	defer srv.Close()
 	c := newTestClient(srv.URL, srv.URL)
 
-	wh, err := c.Weather(context.Background(), 40.78, -73.97)
+	wd, err := c.Weather(context.Background(), 40.78, -73.97)
 	if err != nil {
 		t.Fatalf("Weather: %v", err)
+	}
+	wh := wd.Hours
+	if len(wd.Days) != 0 {
+		t.Errorf("Days = %v, want empty (no daily block)", wd.Days)
 	}
 	if wh[0].TempF == nil || *wh[0].TempF != 71.8 {
 		t.Errorf("hour 0 TempF = %v, want 71.8", wh[0].TempF)

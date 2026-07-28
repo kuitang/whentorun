@@ -18,8 +18,11 @@ import (
 
 // hourlyWeatherVars are the hourly variables requested from the weather API.
 const hourlyWeatherVars = "temperature_2m,relative_humidity_2m,dew_point_2m," +
-	"wind_speed_10m,wind_gusts_10m,uv_index,shortwave_radiation," +
+	"wind_speed_10m,wind_gusts_10m,wind_direction_10m,uv_index,shortwave_radiation," +
 	"direct_radiation,diffuse_radiation,precipitation_probability,cloud_cover"
+
+// dailyWeatherVars are the daily variables requested from the weather API.
+const dailyWeatherVars = "sunrise,sunset"
 
 // Config holds the endpoints so they can be pointed at test servers.
 type Config struct {
@@ -68,12 +71,27 @@ type WeatherHour struct {
 	DewPointF     *float64
 	WindMPH       *float64
 	GustMPH       *float64
+	WindDirDeg    *float64 // meteorological degrees, direction wind comes FROM
 	UVIndex       *float64
 	ShortwaveWm2  *float64 // shortwave radiation, W/m²
 	DirectWm2     *float64
 	DiffuseWm2    *float64
 	PoP           *float64 // precipitation probability, %
 	CloudCoverPct *float64
+}
+
+// SunDay is one calendar day's sunrise and sunset (in Config.Timezone).
+type SunDay struct {
+	Date    time.Time // midnight starting the day, in Config.Timezone
+	Sunrise time.Time
+	Sunset  time.Time
+}
+
+// WeatherData is the weather API's parsed payload: hourly values plus the
+// daily sunrise/sunset table.
+type WeatherData struct {
+	Hours []WeatherHour
+	Days  []SunDay
 }
 
 // AirQualityHour is one hour of the air-quality API's us_aqi. AQI is nil
@@ -93,6 +111,7 @@ type weatherResp struct {
 		DewPoint    []*float64 `json:"dew_point_2m"`
 		WindSpeed   []*float64 `json:"wind_speed_10m"`
 		WindGusts   []*float64 `json:"wind_gusts_10m"`
+		WindDir     []*float64 `json:"wind_direction_10m"`
 		UVIndex     []*float64 `json:"uv_index"`
 		Shortwave   []*float64 `json:"shortwave_radiation"`
 		Direct      []*float64 `json:"direct_radiation"`
@@ -101,41 +120,50 @@ type weatherResp struct {
 		CloudCover  []*float64 `json:"cloud_cover"`
 		USAQI       []*float64 `json:"us_aqi"`
 	} `json:"hourly"`
+	Daily struct {
+		Time    []string `json:"time"`
+		Sunrise []string `json:"sunrise"`
+		Sunset  []string `json:"sunset"`
+	} `json:"daily"`
 }
 
-// Weather fetches the hourly weather forecast for a point, in °F and mph.
-func (c *Client) Weather(ctx context.Context, lat, lon float64) ([]WeatherHour, error) {
+// Weather fetches the hourly weather forecast for a point, in °F and mph,
+// plus the daily sunrise/sunset table.
+func (c *Client) Weather(ctx context.Context, lat, lon float64) (WeatherData, error) {
 	q := url.Values{
 		"latitude":         {fmt.Sprintf("%.4f", lat)},
 		"longitude":        {fmt.Sprintf("%.4f", lon)},
 		"hourly":           {hourlyWeatherVars},
+		"daily":            {dailyWeatherVars},
 		"temperature_unit": {"fahrenheit"},
 		"wind_speed_unit":  {"mph"},
 		"timezone":         {c.Config.Timezone},
 		"forecast_days":    {fmt.Sprintf("%d", c.forecastDays())},
 	}
+	var data WeatherData
 	var resp weatherResp
 	if err := c.getJSON(ctx, c.Config.WeatherURL, q, &resp); err != nil {
-		return nil, fmt.Errorf("openmeteo weather: %w", err)
+		return data, fmt.Errorf("openmeteo weather: %w", err)
 	}
 	loc, err := time.LoadLocation(c.Config.Timezone)
 	if err != nil {
-		return nil, fmt.Errorf("openmeteo weather: bad timezone %q: %w", c.Config.Timezone, err)
+		return data, fmt.Errorf("openmeteo weather: bad timezone %q: %w", c.Config.Timezone, err)
 	}
 	h := resp.Hourly
-	hours := make([]WeatherHour, 0, len(h.Time))
+	data.Hours = make([]WeatherHour, 0, len(h.Time))
 	for i, ts := range h.Time {
 		t, err := time.ParseInLocation("2006-01-02T15:04", ts, loc)
 		if err != nil {
-			return nil, fmt.Errorf("openmeteo weather: bad hourly time %q: %w", ts, err)
+			return data, fmt.Errorf("openmeteo weather: bad hourly time %q: %w", ts, err)
 		}
-		hours = append(hours, WeatherHour{
+		data.Hours = append(data.Hours, WeatherHour{
 			Time:          t,
 			TempF:         at(h.Temperature, i),
 			RelHumidity:   at(h.RelHumidity, i),
 			DewPointF:     at(h.DewPoint, i),
 			WindMPH:       at(h.WindSpeed, i),
 			GustMPH:       at(h.WindGusts, i),
+			WindDirDeg:    at(h.WindDir, i),
 			UVIndex:       at(h.UVIndex, i),
 			ShortwaveWm2:  at(h.Shortwave, i),
 			DirectWm2:     at(h.Direct, i),
@@ -144,7 +172,27 @@ func (c *Client) Weather(ctx context.Context, lat, lon float64) ([]WeatherHour, 
 			CloudCoverPct: at(h.CloudCover, i),
 		})
 	}
-	return hours, nil
+	d := resp.Daily
+	data.Days = make([]SunDay, 0, len(d.Time))
+	for i, ds := range d.Time {
+		day, err := time.ParseInLocation("2006-01-02", ds, loc)
+		if err != nil {
+			return data, fmt.Errorf("openmeteo weather: bad daily time %q: %w", ds, err)
+		}
+		sd := SunDay{Date: day}
+		if i < len(d.Sunrise) {
+			if sd.Sunrise, err = time.ParseInLocation("2006-01-02T15:04", d.Sunrise[i], loc); err != nil {
+				return data, fmt.Errorf("openmeteo weather: bad sunrise %q: %w", d.Sunrise[i], err)
+			}
+		}
+		if i < len(d.Sunset) {
+			if sd.Sunset, err = time.ParseInLocation("2006-01-02T15:04", d.Sunset[i], loc); err != nil {
+				return data, fmt.Errorf("openmeteo weather: bad sunset %q: %w", d.Sunset[i], err)
+			}
+		}
+		data.Days = append(data.Days, sd)
+	}
+	return data, nil
 }
 
 // AirQuality fetches hourly modeled US AQI (CAMS) for a point.

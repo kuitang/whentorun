@@ -7,9 +7,10 @@
 //
 //	WBGT              NWS wetBulbGlobeTemperature → wbgt.EstimateF from
 //	                  Open-Meteo inputs (tagged Estimated) → invalid
-//	temp/dew/wind/gust/PoP/sky  NWS → Open-Meteo
+//	temp/dew/wind/gust/wind dir/RH/PoP/sky  NWS → Open-Meteo
 //	apparent/wind chill/thunder prob/ice  NWS only (Open-Meteo has no equivalent)
 //	UV                Open-Meteo only
+//	sunrise/sunset    Open-Meteo daily table only
 //	AQI current hour  AirNow max-pollutant (monitored) → Open-Meteo us_aqi (Modeled)
 //	AQI other hours   Open-Meteo us_aqi, tagged Modeled
 //	alerts            NWS only; a stale-expired alert feed sets AlertFeedDown
@@ -60,7 +61,7 @@ type Sources struct {
 	Grid      Input[*nws.Gridpoint]             // NWS gridpoint for the path's cell
 	Alerts    Input[[]domain.Alert]             // NWS active alerts for the path's zone
 	AirNowObs Input[[]airnow.ObservationRecord] // AirNow current observations (city-wide)
-	OMWeather Input[[]openmeteo.WeatherHour]    // Open-Meteo weather for the path
+	OMWeather Input[openmeteo.WeatherData]      // Open-Meteo weather for the path
 	OMAir     Input[[]openmeteo.AirQualityHour] // Open-Meteo hourly us_aqi (CAMS)
 }
 
@@ -71,6 +72,12 @@ type SourceStatus struct {
 	FetchedAt time.Time `json:"fetched_at"`
 }
 
+// SunTimes is one calendar day's sunrise and sunset (America/New_York).
+type SunTimes struct {
+	Sunrise time.Time
+	Sunset  time.Time
+}
+
 // Result is the merged view for one path.
 type Result struct {
 	Hours  []domain.Hour  // Horizon hours starting at now truncated to the hour
@@ -78,7 +85,11 @@ type Result struct {
 	// AlertFeedDown is true when the alert feed is unavailable. The UI must
 	// then show "alert feed unavailable" — never an implicit all-clear.
 	AlertFeedDown bool
-	Freshness     map[string]SourceStatus // keyed by the Src* constants
+	// Sun holds sunrise/sunset for each calendar day the Horizon window
+	// touches, in order (Open-Meteo daily table; empty when unavailable).
+	Sun       []SunTimes
+	SunSource domain.SourceTag        // provenance for Sun
+	Freshness map[string]SourceStatus // keyed by the Src* constants
 }
 
 // nyLoc is the display timezone; falls back to UTC if tzdata is missing.
@@ -113,7 +124,7 @@ func Merge(path domain.Path, now time.Time, src Sources) Result {
 	res.Freshness[SrcNWSGrid] = status(src.Grid, gridOK)
 
 	omwOK := src.OMWeather.OK
-	omWeather := indexWeather(src.OMWeather.Data)
+	omWeather := indexWeather(src.OMWeather.Data.Hours)
 	res.Freshness[SrcOMWeather] = status(src.OMWeather, omwOK)
 
 	omaOK := src.OMAir.OK
@@ -156,6 +167,8 @@ func Merge(path domain.Path, now time.Time, src Sources) Result {
 		h.DewPointF = pick(gridOK, nh.DewPointF, nwsTag, owFound, ow.DewPointF, omwTag)
 		h.WindMPH = pick(gridOK, nh.WindMPH, nwsTag, owFound, ow.WindMPH, omwTag)
 		h.GustMPH = pick(gridOK, nh.GustMPH, nwsTag, owFound, ow.GustMPH, omwTag)
+		h.WindDirDeg = pick(gridOK, nh.WindDirDeg, nwsTag, owFound, ow.WindDirDeg, omwTag)
+		h.RH = pick(gridOK, nh.RH, nwsTag, owFound, ow.RelHumidity, omwTag)
 		h.PoP = pick(gridOK, nh.PoP, nwsTag, owFound, ow.PoP, omwTag)
 		h.SkyCover = pick(gridOK, nh.SkyCover, nwsTag, owFound, ow.CloudCoverPct, omwTag)
 
@@ -199,6 +212,19 @@ func Merge(path domain.Path, now time.Time, src Sources) Result {
 				h.AQI = domain.Val(*aq.AQI, omaTag)
 			}
 		}
+	}
+
+	// Sunrise/sunset: Open-Meteo daily table, filtered to the calendar days
+	// the Horizon window touches.
+	if omwOK {
+		end := start.Add(Horizon * time.Hour)
+		for _, d := range src.OMWeather.Data.Days {
+			dayStart := d.Date
+			if dayStart.Before(end) && start.Before(dayStart.Add(24*time.Hour)) {
+				res.Sun = append(res.Sun, SunTimes{Sunrise: d.Sunrise, Sunset: d.Sunset})
+			}
+		}
+		res.SunSource = omwTag
 	}
 
 	// Alerts: NWS only. A down feed must surface as down, never as "no alerts".

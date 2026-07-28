@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>when to run — Central Park · ledger-v2a etched panel</title>
+<link rel="stylesheet" href="../static/css/tokens.css">
+<style>
+/* ============ ledger-v2a — ETCHED PANEL ============
+   c-ledger refined: all-Spectral typography, tier-ink numerals,
+   engraved-almanac vector art, hourly ledger as a stacked
+   composite figure on one shared 48 h time axis. */
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+}
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 var(--space-md); }
+a { color: var(--steel-text); }
+h2 { margin: 0; }
+svg { display: block; }
+.num, .n { font-variant-numeric: tabular-nums; }
+
+/* labels: Spectral 500 uppercase, tracked — no sans anywhere */
+.overline {
+  font-family: var(--font-serif);
+  font-size: var(--size-label);
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* tier inks — numerals only; the word beside them stays ink/slate */
+.c0 { color: var(--tier-0); }
+.c1 { color: var(--tier-1); }
+.c2 { color: var(--tier-2); }
+.c3 { color: var(--tier-3); }
+.c4 { color: var(--tier-4); }
+.cw { color: var(--steel-text); }   /* wind / PoP numerals */
+
+/* ---------- masthead ---------- */
+.masthead { padding-top: calc(var(--space-sm) + env(safe-area-inset-top)); }
+.mast-over { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.mast-over .g-orn { color: var(--tier-1); flex: 0 0 auto; }
+.mast-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); }
+.wordmark {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--size-screen-title);
+  line-height: var(--lh-title);
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+.ctls { display: flex; align-items: center; gap: var(--space-xs); }
+.ctl {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: var(--size-body);          /* >=16px: no iOS focus zoom */
+  font-variant-numeric: tabular-nums;
+  min-height: var(--hit-target);
+  min-width: var(--hit-target);
+  padding: 0 var(--space-sm);
+  background: none;
+  color: var(--ink);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-surface);
+  cursor: pointer;
+}
+.ctl[aria-pressed="true"] { background: var(--ice); border-color: var(--hairline-strong); }
+.ctl:active { background: var(--ice); }
+.mast-rule { height: 2px; background: var(--ink); border: 0; margin: var(--space-xs) 0 0; }
+
+.paths {
+  display: flex; gap: var(--space-xs);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.paths::-webkit-scrollbar { display: none; }
+.paths a {
+  flex: 0 0 auto;
+  display: flex; align-items: center;
+  min-height: var(--hit-target);
+  padding: 0 var(--space-sm);
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: var(--size-body);          /* control: >=16px */
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--steel-text);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.paths a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+.paths a:active { color: var(--ink); }
+
+/* ---------- alert banner — tier-3 ink + hairline tint, never a filled band ---------- */
+.alert {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--hairline-strong);
+  border-left: 3px solid var(--tier-3);
+  border-radius: var(--radius-surface);
+  padding: var(--space-xs) var(--space-sm);
+  margin: var(--space-sm) 0 0;
+}
+.alert .overline { color: var(--tier-3); }
+.alert .g-a { color: var(--tier-3); flex: 0 0 auto; }
+.alert p { margin: 0; font-size: var(--size-caption); line-height: 1.5; }
+
+/* ---------- lede: current + next-best ---------- */
+.lede { margin-top: var(--space-sm); }
+.current {
+  background: var(--ice);
+  border-radius: var(--radius-surface);
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "over over" "main art" "strip strip";
+  column-gap: var(--space-sm);
+}
+.current .overline { grid-area: over; color: var(--slate); }
+.cur-main { grid-area: main; }
+.cur-art { grid-area: art; align-self: center; color: var(--slate); }
+.wbgt-line { display: flex; align-items: baseline; gap: var(--space-sm); flex-wrap: wrap; }
+.wbgt-num {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  font-size: calc(var(--size-display) * 1.5);
+  line-height: 1.1;
+  color: var(--tier-3);                 /* high heat stress — word carries meaning beside it */
+}
+.wbgt-num sup { font-size: var(--size-card-title); font-weight: 300; }
+.wbgt-phrase { font-family: var(--font-serif); font-weight: 300; font-size: var(--size-card-title); line-height: var(--lh-title); color: var(--ink); }
+.wbgt-phrase .overline { letter-spacing: var(--ls-smallcaps); }
+.mono-strip {
+  grid-area: strip;
+  margin: var(--space-xs) 0 0;
+  font-family: var(--font-serif);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--size-caption);
+  line-height: 1.6;
+  color: var(--slate);
+}
+.mono-strip .n { font-weight: 500; }
+.window-line { padding: var(--space-sm) 0; border-bottom: 1px solid var(--hairline); }
+.window-line p { margin: 0; font-size: var(--size-list); }
+.window-line .lead { font-weight: 500; }
+.window-line .g-w { color: var(--steel-text); vertical-align: -3px; margin-right: 2px; }
+.window-line .n { font-weight: 500; }
+.window-line .sub { color: var(--secondary); font-size: var(--size-caption); line-height: 1.5; margin-top: 2px; font-weight: 400; }
+
+/* ---------- etched panel (hourly ledger figure) ---------- */
+.hours-sec { margin-top: var(--space-md); }
+.fig-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm); }
+.fig-head .overline { white-space: nowrap; }
+.fig-head .note { font-family: var(--font-serif); font-variant-numeric: tabular-nums; font-size: var(--size-caption); color: var(--secondary); white-space: nowrap; }
+.fig-scroll {
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-surface);
+  background: var(--card);
+  margin-top: var(--space-xs);
+}
+.fig-legend {
+  margin: var(--space-xs) 0 0;
+  font-family: var(--font-serif);
+  font-size: var(--size-caption);
+  color: var(--secondary);
+  font-style: italic;
+}
+
+/* figure text — all Spectral, engraved register */
+.fx-lane { font-family: var(--font-serif); font-size: 9.5px; font-weight: 500; letter-spacing: 0.14em; fill: var(--secondary); }
+.fx-day  { font-family: var(--font-serif); font-size: 9.5px; font-weight: 500; letter-spacing: 0.14em; fill: var(--ink); }
+.fx-hr   { font-family: var(--font-serif); font-size: 10.5px; fill: var(--secondary); font-variant-numeric: tabular-nums; }
+.fx-num  { font-family: var(--font-serif); font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.fx-word { font-family: var(--font-serif); font-size: 10px; font-style: italic; fill: var(--slate); }
+.fx-note { font-family: var(--font-serif); font-size: 9px; font-style: italic; fill: var(--secondary); }
+.fx-brk  { font-family: var(--font-serif); font-size: 9.5px; font-weight: 500; letter-spacing: 0.1em; }
+.fx-thr  { font-family: var(--font-serif); font-size: 8.5px; fill: var(--secondary); font-variant-numeric: tabular-nums; }
+.halo { paint-order: stroke; stroke: var(--card); stroke-width: 3px; stroke-linejoin: round; }
+.ft0 { fill: var(--tier-0); } .ft1 { fill: var(--tier-1); } .ft2 { fill: var(--tier-2); }
+.ft3 { fill: var(--tier-3); } .ft4 { fill: var(--tier-4); } .fst { fill: var(--steel-text); }
+.fx-ax   { stroke: var(--hairline-strong); }
+.fx-tick { stroke: var(--hairline-strong); }
+.fx-grid { stroke: var(--hairline); }
+.fx-dayrule { stroke: var(--hairline-strong); }
+.fx-sep  { stroke: var(--hairline); }
+
+/* ---------- agate table ---------- */
+.agate-head { margin-top: var(--space-md); }
+.hours-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: var(--space-xs); }
+.hours {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 680px;
+  font-family: var(--font-serif);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--size-caption);
+  line-height: 1.4;
+}
+.hours th, .hours td {
+  padding: var(--space-xs) var(--space-sm);
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--hairline);
+}
+.hours td.n { font-weight: 500; }
+.hours thead th {
+  font-family: var(--font-serif);
+  font-size: var(--size-label);
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--secondary);
+  border-bottom: 1px solid var(--hairline-strong);
+}
+.hours .t {
+  position: sticky; left: 0; z-index: 1;
+  background: var(--paper);
+  text-align: left;
+  font-weight: 400;
+  border-left: 3px solid transparent;   /* tier tick — now in true tier ink */
+  border-right: 1px solid var(--hairline);
+}
+.hours .reads { text-align: left; }
+.hours td.reads {
+  font-family: var(--font-serif);
+  font-size: var(--size-caption);
+  color: var(--slate);
+}
+tr.tw0 .t { border-left-color: var(--tier-0); }
+tr.tw1 .t { border-left-color: var(--tier-1); }
+tr.tw2 .t { border-left-color: var(--tier-2); }
+tr.tw3 .t { border-left-color: var(--tier-3); }
+tr.tw4 .t { border-left-color: var(--tier-4); }
+tr.veto .reads { font-style: italic; color: var(--tier-4); }
+tr.day td, tr.day .t {
+  font-family: var(--font-serif);
+  font-size: var(--size-label);
+  font-weight: 500;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--ink);
+  text-align: left;
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-top: var(--space-sm);
+}
+tr.condense .reads { font-style: italic; color: var(--secondary); }
+
+/* ---------- explainers ---------- */
+.explainers { margin-top: var(--space-lg); border-bottom: 1px solid var(--hairline); }
+.explainers details { border-top: 1px solid var(--hairline); }
+.explainers summary {
+  display: flex; align-items: center; gap: var(--space-sm);
+  min-height: var(--hit-target);
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: var(--size-body);          /* control: >=16px */
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+}
+.explainers summary .g-e { color: var(--slate); flex: 0 0 auto; }
+.explainers summary .lab { flex: 1 1 auto; }
+.explainers summary::-webkit-details-marker { display: none; }
+.explainers summary::after { content: "+"; color: var(--secondary); font-family: var(--font-serif); }
+.explainers details[open] summary::after { content: "\2212"; }
+.explainers summary:active { color: var(--steel-text); }
+.explainers p { margin: 0 0 var(--space-md); font-size: var(--size-list); color: var(--slate); }
+.explainers .src { font-size: var(--size-caption); font-style: italic; color: var(--secondary); }
+
+/* ---------- route aside / clothing ---------- */
+.route {
+  margin: var(--space-lg) 0 0;
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--hairline-strong);
+  font-style: italic;
+  color: var(--slate);
+  font-size: var(--size-list);
+}
+.route .overline { display: block; font-style: normal; margin-bottom: 2px; }
+.clothing { margin-top: var(--space-md); font-size: var(--size-list); }
+.clothing .overline { margin-right: var(--space-sm); }
+
+/* ---------- footer ---------- */
+.foot {
+  margin-top: var(--space-xl);
+  padding: var(--space-md) 0 calc(var(--space-xl) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--hairline-strong);
+}
+.foot p { margin: 0 0 var(--space-xs); font-size: var(--size-caption); font-variant-numeric: tabular-nums; color: var(--secondary); line-height: 1.6; }
+
+/* ---------- desktop adaptation ---------- */
+@media (min-width: 960px) {
+  .wordmark { font-size: var(--size-display); }
+  .lede {
+    display: grid;
+    grid-template-columns: 11fr 9fr;
+    gap: var(--space-lg);
+    align-items: start;
+  }
+  .window-line { border-bottom: 0; border-left: 1px solid var(--hairline); padding: var(--space-sm) 0 var(--space-sm) var(--space-lg); }
+  .explainers { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--space-xxl); border-bottom: 0; }
+  .explainers details:nth-last-child(-n+2) { border-bottom: 1px solid var(--hairline); }
+}
+@media (max-width: 460px) {
+  .wbgt-num { font-size: 44px; }
+  .cur-art { width: 66px; height: 58px; }
+  .m-hide { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==== engraved-almanac glyph library: hairline strokes, hatch fills only ==== -->
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+    <!-- hatch patterns: fine 45-degree hairlines; the only fills allowed -->
+    <pattern id="ph-area" width="4.5" height="4.5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="4.5" stroke="var(--ink)" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+    <pattern id="ph-night" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="3" stroke="var(--ink)" stroke-width="0.45" opacity="0.2"/>
+    </pattern>
+    <pattern id="ph-ink" width="2.6" height="2.6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="2.6" stroke="currentColor" stroke-width="0.5" opacity="0.5"/>
+    </pattern>
+    <pattern id="ph-steel" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(135)">
+      <line x1="0" y1="0" x2="0" y2="3" stroke="var(--steel-text)" stroke-width="0.55" opacity="0.5"/>
+    </pattern>
+    <pattern id="ph-t3" width="2.4" height="2.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="2.4" stroke="var(--tier-3)" stroke-width="0.6" opacity="0.65"/>
+    </pattern>
+    <pattern id="ph-x4" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="var(--tier-4)" stroke-width="0.5" opacity="0.4"/>
+      <line x1="0" y1="3" x2="6" y2="3" stroke="var(--tier-4)" stroke-width="0.5" opacity="0.4"/>
+    </pattern>
+
+    <!-- sun: double-ring disc, engraved shading, alternating long/short rays -->
+    <symbol id="g-sun" viewBox="0 0 36 36">
+      <g fill="none" stroke="currentColor" stroke-linecap="round">
+        <circle cx="18" cy="18" r="6" stroke-width="0.9"/>
+        <circle cx="18" cy="18" r="3.7" stroke-width="0.55" opacity="0.45"/>
+        <path d="M14.4 20.6 h7.2 M15.3 22.2 h5.4" stroke-width="0.5" opacity="0.35"/>
+        <g stroke-width="0.9" opacity="0.9">
+          <line x1="18" y1="9.6" x2="18" y2="5.4"/>
+          <line x1="18" y1="9.6" x2="18" y2="5.4" transform="rotate(45 18 18)"/>
+          <line x1="18" y1="9.6" x2="18" y2="5.4" transform="rotate(90 18 18)"/>
+          <line x1="18" y1="9.6" x2="18" y2="5.4" transform="rotate(135 18 18)"/>
+          <line x1="18" y1="9.6" x2="18" y2="5.4" transform="rotate(180 18 18)"/>
+          <line x1="18" y1="9.6" x2="18" y2="5.4" transform="rotate(225 18 18)"/>
+          <line x1="18" y1="9.6" x2="18" y2="5.4" transform="rotate(270 18 18)"/>
+          <line x1="18" y1="9.6" x2="18" y2="5.4" transform="rotate(315 18 18)"/>
+        </g>
+        <g stroke-width="0.7" opacity="0.5">
+          <line x1="18" y1="10.2" x2="18" y2="7.6" transform="rotate(22.5 18 18)"/>
+          <line x1="18" y1="10.2" x2="18" y2="7.6" transform="rotate(67.5 18 18)"/>
+          <line x1="18" y1="10.2" x2="18" y2="7.6" transform="rotate(112.5 18 18)"/>
+          <line x1="18" y1="10.2" x2="18" y2="7.6" transform="rotate(157.5 18 18)"/>
+          <line x1="18" y1="10.2" x2="18" y2="7.6" transform="rotate(202.5 18 18)"/>
+          <line x1="18" y1="10.2" x2="18" y2="7.6" transform="rotate(247.5 18 18)"/>
+          <line x1="18" y1="10.2" x2="18" y2="7.6" transform="rotate(292.5 18 18)"/>
+          <line x1="18" y1="10.2" x2="18" y2="7.6" transform="rotate(337.5 18 18)"/>
+        </g>
+      </g>
+    </symbol>
+
+    <!-- waning crescent, hatched, with two engraved stars -->
+    <symbol id="g-moon" viewBox="0 0 36 36">
+      <g stroke="currentColor" stroke-linecap="round">
+        <path d="M20.5 6.6 A12 12 0 1 0 20.5 29.4 A9.6 9.6 0 1 1 20.5 6.6 Z"
+              fill="url(#ph-ink)" stroke-width="0.9" stroke-linejoin="round"/>
+        <g stroke-width="0.6" opacity="0.6">
+          <path d="M27.5 9.4 v3.2 M25.9 11 h3.2"/>
+        </g>
+        <g stroke-width="0.5" opacity="0.4">
+          <path d="M30 19.6 v2.4 M28.8 20.8 h2.4"/>
+        </g>
+      </g>
+    </symbol>
+
+    <!-- layered cloud outlines, engraved back layer -->
+    <symbol id="g-cloud" viewBox="0 0 44 32">
+      <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 11.5 A8.5 8.5 0 0 1 29.5 8.5 A6 6 0 0 1 38 13.5" stroke-width="0.6" opacity="0.4"/>
+        <path d="M9 25 A5.6 5.6 0 0 1 10.2 14 A8.6 8.6 0 0 1 26.6 11.2 A6.4 6.4 0 0 1 35.4 16.4 A4.9 4.9 0 0 1 34.6 25 Z" stroke-width="0.9"/>
+        <path d="M13.5 17.5 a4.4 4.4 0 0 1 4.2-3.4" stroke-width="0.5" opacity="0.45"/>
+      </g>
+    </symbol>
+
+    <!-- thunderbolt, hatched -->
+    <symbol id="g-bolt" viewBox="0 0 24 32">
+      <path d="M13.5 2 L5.5 17 h4.6 L8 30 L18.8 12.4 h-5.2 L17.2 2 Z"
+            fill="url(#ph-ink)" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- wind streamlines with curled ends -->
+    <symbol id="g-wind" viewBox="0 0 44 28">
+      <g fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M4 9 H26 a4 4 0 1 0 -4 -6.2" stroke-width="0.9"/>
+        <path d="M2 15 H34 a3.4 3.4 0 1 1 -3.4 5.4" stroke-width="0.8" opacity="0.65"/>
+        <path d="M6 21 H20 a2.6 2.6 0 1 0 -2.6 -4" stroke-width="0.7" opacity="0.4"/>
+      </g>
+    </symbol>
+
+    <!-- thermometer: engraved scale ticks, hatched mercury -->
+    <symbol id="g-thermo" viewBox="0 0 20 36">
+      <g fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M7.6 24.6 V5.4 a2.4 2.4 0 0 1 4.8 0 V24.6" stroke-width="0.8"/>
+        <circle cx="10" cy="28.4" r="4.7" stroke-width="0.8"/>
+        <g stroke-width="0.5" opacity="0.55">
+          <path d="M13.6 8 h2.2 M13.6 12 h2.2 M13.6 16 h2.2 M13.6 20 h2.2"/>
+        </g>
+      </g>
+      <circle cx="10" cy="28.4" r="3" fill="url(#ph-t3)" stroke="none"/>
+      <rect x="9.1" y="13" width="1.8" height="13.5" fill="url(#ph-t3)" stroke="none"/>
+    </symbol>
+
+    <!-- dew droplet with inner meniscus -->
+    <symbol id="g-drop" viewBox="0 0 24 32">
+      <g stroke="currentColor" stroke-linecap="round">
+        <path d="M12 3 C 12 3 4.6 13.6 4.6 19.8 a7.4 7.4 0 0 0 14.8 0 C 19.4 13.6 12 3 12 3 Z"
+              fill="url(#ph-ink)" stroke-width="0.9" stroke-linejoin="round"/>
+        <path d="M8 20.4 a4.4 4.4 0 0 0 3 4.2" fill="none" stroke-width="0.6" opacity="0.6"/>
+      </g>
+    </symbol>
+
+    <!-- haze / air: drifting engraved waves -->
+    <symbol id="g-haze" viewBox="0 0 40 24">
+      <g fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M3 6 q5 -3.2 10 0 t10 0 t10 0" stroke-width="0.9"/>
+        <path d="M6 12 q5 -3.2 10 0 t10 0 t8 0" stroke-width="0.8" opacity="0.6"/>
+        <path d="M3 18 q5 -3.2 10 0 t10 0" stroke-width="0.7" opacity="0.38"/>
+      </g>
+    </symbol>
+
+    <!-- storm: cloud + bolt + rain hatching -->
+    <symbol id="g-storm" viewBox="0 0 44 40">
+      <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 22 A5.6 5.6 0 0 1 10.2 11 A8.6 8.6 0 0 1 26.6 8.2 A6.4 6.4 0 0 1 35.4 13.4 A4.9 4.9 0 0 1 34.6 22 Z" stroke-width="0.9"/>
+        <g stroke-width="0.7" opacity="0.6">
+          <path d="M12 26 l-2.4 6 M31 26 l-2.4 6 M35 25 l-1.8 4.5"/>
+        </g>
+      </g>
+      <path d="M22.5 23 L17.5 32 h3 L19 38.5 L26 27.5 h-3.2 L24.8 23 Z"
+            fill="url(#ph-ink)" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="wrap masthead">
+  <span class="overline mast-over">
+    <svg class="g-orn" width="16" height="16" aria-hidden="true"><use href="#g-sun" width="16" height="16"/></svg>
+    NYC running conditions<span class="m-hide"> &middot; 48-hour outlook</span>
+  </span>
+  <div class="mast-row">
+    <h1 class="wordmark">when to run</h1>
+    <div class="ctls" role="group" aria-label="Units and theme">
+      <button class="ctl" type="button" aria-pressed="true">&deg;F</button>
+      <button class="ctl" type="button" aria-pressed="false">&deg;C</button>
+      <button class="ctl" type="button" id="themeBtn" title="Theme (mockup demo)">Auto</button>
+    </div>
+  </div>
+  <hr class="mast-rule">
+  <nav class="paths" aria-label="Running paths">
+    <a href="#" aria-current="page">Central Park</a>
+    <a href="#">Hudson Greenway</a>
+    <a href="#">East River</a>
+    <a href="#">Brooklyn</a>
+    <a href="#">Van Cortlandt</a>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <aside class="alert" role="status">
+    <svg class="g-a" width="15" height="24" aria-hidden="true"><use href="#g-thermo" width="15" height="24"/></svg>
+    <span class="overline">Heat Advisory</span>
+    <p>until 8 PM EDT Tuesday &mdash; advisory-level: caution, not a stop order.</p>
+  </aside>
+
+  <div class="lede">
+    <section class="current" aria-label="Current conditions">
+      <span class="overline">Now &middot; Central Park &middot;<span class="m-hide"> Tue Jul 28 &middot;</span> 2:30 PM ET</span>
+      <div class="cur-main">
+        <div class="wbgt-line">
+          <span class="wbgt-num">87<sup>&deg;F</sup></span>
+          <span class="wbgt-phrase">High heat stress <span class="overline" style="letter-spacing:var(--ls-smallcaps)">WBGT</span></span>
+        </div>
+      </div>
+      <svg class="cur-art" width="84" height="70" viewBox="0 0 84 70" aria-hidden="true">
+        <use href="#g-sun" x="0" y="2" width="46" height="46" style="color:var(--tier-1)"/>
+        <g fill="none" stroke="var(--tier-3)" stroke-linecap="round">
+          <path d="M46 60 q3 -2.6 6 0 t6 0" stroke-width="0.8" opacity="0.55"/>
+          <path d="M49 65 q3 -2.6 6 0 t6 0" stroke-width="0.7" opacity="0.35"/>
+        </g>
+        <use href="#g-thermo" x="54" y="4" width="27" height="49"/>
+      </svg>
+      <p class="mono-strip">dew <span class="n c3">73&deg;</span> oppressive &middot; UV <span class="n c3">9</span> very high &middot; AQI <span class="n c1">62</span> moderate (PM2.5) &middot; wind S <span class="n cw">6</span> g <span class="n cw">12</span></p>
+    </section>
+
+    <section class="window-line" aria-label="Next best window">
+      <p class="lead"><svg class="g-w" width="18" height="18" aria-hidden="true"><use href="#g-moon" width="18" height="18"/></svg><span class="overline">Next best</span>&ensp;Wed 5&ndash;8 AM &mdash; WBGT <span class="n c1">76&deg;</span> elevated &middot; dew <span class="n c3">70&deg;</span> very humid &middot; UV <span class="n c0">0&ndash;2</span> &middot; AQI <span class="n c0">48</span> good.</p>
+      <p class="sub">Tonight 7&ndash;8 PM is out &mdash; thunderstorms likely (<span class="n c4">60%</span>). Today&rsquo;s remaining daylight runs WBGT <span class="n c3">85&deg;+</span>.</p>
+    </section>
+  </div>
+
+  <section class="hours-sec" aria-label="Hourly ledger">
+    <div class="fig-head">
+      <h2 class="overline">Hourly ledger &middot; 48 h</h2>
+      <span class="note">3 PM Tue &rarr; 2 PM Thu &middot; scroll &rarr;</span>
+    </div>
+    <div class="fig-scroll" tabindex="0">
+<svg width="1384" height="500" viewBox="0 0 1384 500" role="img" aria-labelledby="figtitle" style="font-variant-numeric:tabular-nums">
+<title id="figtitle">Etched hourly ledger: 48 hours of WBGT, dew point, sun and UV, rain chance, and air quality on one shared time axis, with best windows and vetoed hours marked</title>
+<rect x="406" y="88" width="84" height="376" fill="var(--ice)" opacity="0.65"/>
+<rect x="1078" y="88" width="84" height="376" fill="var(--ice)" opacity="0.65"/>
+<line class="fx-grid" x1="98" y1="88" x2="98" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="182" y1="88" x2="182" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="350" y1="88" x2="350" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="434" y1="88" x2="434" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="518" y1="88" x2="518" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="602" y1="88" x2="602" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="686" y1="88" x2="686" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="770" y1="88" x2="770" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="854" y1="88" x2="854" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="1022" y1="88" x2="1022" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="1106" y1="88" x2="1106" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="1190" y1="88" x2="1190" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-grid" x1="1274" y1="88" x2="1274" y2="464" stroke-width="0.5" opacity="0.7"/>
+<line class="fx-dayrule" x1="266" y1="62" x2="266" y2="474" stroke-width="1"/>
+<line class="fx-dayrule" x1="938" y1="62" x2="938" y2="474" stroke-width="1"/>
+<text class="fx-brk ft3" x="14" y="13">HEAT ADVISORY &#8594; 8 PM</text>
+<path d="M 14 23 V 18 H 154 V 23" fill="none" stroke="var(--tier-3)" stroke-width="1" opacity="0.85"/>
+<use href="#g-bolt" x="113" y="26" width="9" height="12" style="color:var(--tier-4)"/>
+<text class="fx-brk ft4" x="126" y="35">VETO &#183; T&#8209;STORMS 60%</text>
+<path d="M 126 45 V 40 H 182 V 45" fill="none" stroke="var(--tier-4)" stroke-width="1"/>
+<text class="fx-brk fst" x="406" y="35">BEST &#183; WED 5&#8211;8 AM</text>
+<path d="M 406 45 V 40 H 490 V 45" fill="none" stroke="var(--steel-text)" stroke-width="1"/>
+<text class="fx-brk fst" x="1078" y="35">GOOD &#183; THU 5&#8211;8 AM</text>
+<path d="M 1078 45 V 40 H 1162 V 45" fill="none" stroke="var(--steel-text)" stroke-width="1"/>
+<text class="fx-day" x="14" y="57">TUE JUL 28</text>
+<text class="fx-day" x="271" y="57">WED JUL 29</text>
+<text class="fx-day" x="943" y="57">THU JUL 30</text>
+<line class="fx-ax" x1="14" y1="62" x2="1330" y2="62" stroke-width="1"/>
+<line class="fx-tick" x1="14" y1="62" x2="14" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="42" y1="62" x2="42" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="70" y1="62" x2="70" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="98" y1="62" x2="98" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="126" y1="62" x2="126" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="154" y1="62" x2="154" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="182" y1="62" x2="182" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="210" y1="62" x2="210" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="238" y1="62" x2="238" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="266" y1="62" x2="266" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="294" y1="62" x2="294" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="322" y1="62" x2="322" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="350" y1="62" x2="350" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="378" y1="62" x2="378" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="406" y1="62" x2="406" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="434" y1="62" x2="434" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="462" y1="62" x2="462" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="490" y1="62" x2="490" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="518" y1="62" x2="518" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="546" y1="62" x2="546" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="574" y1="62" x2="574" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="602" y1="62" x2="602" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="630" y1="62" x2="630" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="658" y1="62" x2="658" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="686" y1="62" x2="686" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="714" y1="62" x2="714" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="742" y1="62" x2="742" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="770" y1="62" x2="770" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="798" y1="62" x2="798" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="826" y1="62" x2="826" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="854" y1="62" x2="854" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="882" y1="62" x2="882" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="910" y1="62" x2="910" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="938" y1="62" x2="938" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="966" y1="62" x2="966" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="994" y1="62" x2="994" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="1022" y1="62" x2="1022" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="1050" y1="62" x2="1050" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="1078" y1="62" x2="1078" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="1106" y1="62" x2="1106" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="1134" y1="62" x2="1134" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="1162" y1="62" x2="1162" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="1190" y1="62" x2="1190" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="1218" y1="62" x2="1218" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="1246" y1="62" x2="1246" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="1274" y1="62" x2="1274" y2="69" stroke-width="1"/>
+<line class="fx-tick" x1="1302" y1="62" x2="1302" y2="66" stroke-width="1"/>
+<line class="fx-tick" x1="1330" y1="62" x2="1330" y2="66" stroke-width="1"/>
+<text class="fx-hr" x="14" y="81" text-anchor="start">3P</text>
+<text class="fx-hr" x="98" y="81" text-anchor="middle">6P</text>
+<text class="fx-hr" x="182" y="81" text-anchor="middle">9P</text>
+<text class="fx-hr" x="266" y="81" text-anchor="middle">12A</text>
+<text class="fx-hr" x="350" y="81" text-anchor="middle">3A</text>
+<text class="fx-hr" x="434" y="81" text-anchor="middle">6A</text>
+<text class="fx-hr" x="518" y="81" text-anchor="middle">9A</text>
+<text class="fx-hr" x="602" y="81" text-anchor="middle">12P</text>
+<text class="fx-hr" x="686" y="81" text-anchor="middle">3P</text>
+<text class="fx-hr" x="770" y="81" text-anchor="middle">6P</text>
+<text class="fx-hr" x="854" y="81" text-anchor="middle">9P</text>
+<text class="fx-hr" x="938" y="81" text-anchor="middle">12A</text>
+<text class="fx-hr" x="1022" y="81" text-anchor="middle">3A</text>
+<text class="fx-hr" x="1106" y="81" text-anchor="middle">6A</text>
+<text class="fx-hr" x="1190" y="81" text-anchor="middle">9A</text>
+<text class="fx-hr" x="1274" y="81" text-anchor="middle">12P</text>
+<text class="fx-lane halo" x="16" y="99">WBGT &#176;F</text>
+<line x1="14" y1="105.1" x2="1330" y2="105.1" stroke="var(--tier-4)" stroke-width="0.5" stroke-dasharray="2 3" opacity="0.5"/>
+<text class="fx-thr ft4" x="1334" y="107.6" opacity="0.85">90&#176; veto</text>
+<line x1="14" y1="150.5" x2="1330" y2="150.5" stroke="var(--hairline-strong)" stroke-width="0.5" stroke-dasharray="2 3"/>
+<text class="fx-thr" x="1334" y="153">80&#176;</text>
+<path d="M 14 114.2 L 42 114.2 L 70 118.7 L 98 127.8 L 126 141.5 L 154 155.1 L 182 164.2 L 210 168.7 L 238 173.3 L 266 173.3 L 294 177.8 L 322 177.8 L 350 177.8 L 378 177.8 L 406 177.8 L 434 177.8 L 462 168.7 L 490 159.6 L 518 146 L 546 132.4 L 574 123.3 L 602 114.2 L 630 109.6 L 658 109.6 L 686 109.6 L 714 114.2 L 742 123.3 L 770 136.9 L 798 150.5 L 826 159.6 L 854 168.7 L 882 173.3 L 910 177.8 L 938 177.8 L 966 182.4 L 994 182.4 L 1022 186.9 L 1050 186.9 L 1078 186.9 L 1106 182.4 L 1134 173.3 L 1162 164.2 L 1190 150.5 L 1218 141.5 L 1246 132.4 L 1274 123.3 L 1302 114.2 L 1330 114.2 L 1330 196 L 14 196 Z" fill="url(#ph-area)" stroke="none"/>
+<line class="fx-sep" x1="14" y1="196" x2="1330" y2="196" stroke-width="1"/>
+<polyline points="14,114.2 42,114.2 70,118.7" fill="none" stroke="var(--tier-4)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="70,118.7 98,127.8 126,141.5" fill="none" stroke="var(--tier-3)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="126,141.5 154,155.1" fill="none" stroke="var(--tier-2)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="154,155.1 182,164.2 210,168.7 238,173.3" fill="none" stroke="var(--tier-1)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="238,173.3 266,173.3 294,177.8 322,177.8 350,177.8 378,177.8 406,177.8 434,177.8" fill="none" stroke="var(--tier-0)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="434,177.8 462,168.7 490,159.6" fill="none" stroke="var(--tier-1)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="490,159.6 518,146 546,132.4" fill="none" stroke="var(--tier-2)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="546,132.4 574,123.3" fill="none" stroke="var(--tier-3)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="574,123.3 602,114.2 630,109.6 658,109.6 686,109.6 714,114.2 742,123.3" fill="none" stroke="var(--tier-4)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="742,123.3 770,136.9" fill="none" stroke="var(--tier-3)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="770,136.9 798,150.5 826,159.6" fill="none" stroke="var(--tier-2)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="826,159.6 854,168.7 882,173.3" fill="none" stroke="var(--tier-1)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="882,173.3 910,177.8 938,177.8 966,182.4 994,182.4 1022,186.9 1050,186.9 1078,186.9 1106,182.4 1134,173.3" fill="none" stroke="var(--tier-0)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1134,173.3 1162,164.2" fill="none" stroke="var(--tier-1)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1162,164.2 1190,150.5 1218,141.5 1246,132.4" fill="none" stroke="var(--tier-2)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1246,132.4 1274,123.3" fill="none" stroke="var(--tier-3)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1274,123.3 1302,114.2 1330,114.2" fill="none" stroke="var(--tier-4)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text class="fx-num halo ft4" x="14" y="107.2" text-anchor="start">88&#176;<tspan class="fx-word" dx="4">extreme caution</tspan></text>
+<circle cx="14" cy="114.2" r="1.6" fill="var(--tier-4)"/>
+<text class="fx-num halo ft0" x="406" y="192.8" text-anchor="start">74&#176;<tspan class="fx-word" dx="4">low</tspan></text>
+<circle cx="406" cy="177.8" r="1.6" fill="var(--tier-0)"/>
+<text class="fx-num halo ft4" x="658" y="102.6" text-anchor="middle">89&#176;<tspan class="fx-word" dx="4">extreme caution</tspan></text>
+<circle cx="658" cy="109.6" r="1.6" fill="var(--tier-4)"/>
+<text class="fx-num halo ft0" x="1022" y="201.9" text-anchor="middle">72&#176;<tspan class="fx-word" dx="4">low</tspan></text>
+<circle cx="1022" cy="186.9" r="1.6" fill="var(--tier-0)"/>
+<text class="fx-num halo ft4" x="1330" y="107.2" text-anchor="end">88&#176;<tspan class="fx-word" dx="4"></tspan></text>
+<circle cx="1330" cy="114.2" r="1.6" fill="var(--tier-4)"/>
+<text class="fx-word halo" x="1306" y="107.2" text-anchor="end">extreme caution</text>
+<text class="fx-lane halo" x="16" y="208">DEW POINT &#176;F</text>
+<line x1="14" y1="244.8" x2="1330" y2="244.8" stroke="var(--hairline-strong)" stroke-width="0.5" stroke-dasharray="2 3"/>
+<text class="fx-thr" x="1334" y="247.3">70&#176;</text>
+<polyline points="14,230.4 42,230.4 70,230.4 98,230.4 126,225.6 154,225.6 182,225.6 210,230.4 238,230.4 266,235.2 294,235.2 322,240 350,240 378,244.8 406,244.8 434,244.8 462,244.8 490,244.8 518,244.8 546,240 574,240 602,240 630,240 658,235.2 686,235.2 714,235.2 742,235.2 770,235.2 798,240 826,240 854,244.8 882,244.8 910,244.8 938,249.6 966,249.6 994,254.4 1022,254.4 1050,254.4 1078,254.4 1106,254.4 1134,254.4 1162,249.6 1190,249.6 1218,244.8 1246,244.8 1274,240 1302,240 1330,240" fill="none" stroke="var(--ink)" stroke-width="1" opacity="0.75" stroke-linecap="round" stroke-linejoin="round"/>
+<text class="fx-num halo ft3" x="14" y="224.4" text-anchor="start">73&#176;<tspan class="fx-word" dx="4">oppressive</tspan></text>
+<circle cx="14" cy="230.4" r="1.6" fill="var(--tier-3)"/>
+<text class="fx-num halo ft3" x="406" y="258.8" text-anchor="start">70&#176;<tspan class="fx-word" dx="4">very humid</tspan></text>
+<circle cx="406" cy="244.8" r="1.6" fill="var(--tier-3)"/>
+<text class="fx-num halo ft2" x="1022" y="267.4" text-anchor="middle">68&#176;<tspan class="fx-word" dx="4">muggy</tspan></text>
+<circle cx="1022" cy="254.4" r="1.6" fill="var(--tier-2)"/>
+<text class="fx-num halo ft3" x="1330" y="234" text-anchor="end">71&#176;<tspan class="fx-word" dx="4"></tspan></text>
+<circle cx="1330" cy="240" r="1.6" fill="var(--tier-3)"/>
+<line class="fx-sep" x1="14" y1="276" x2="1330" y2="276" stroke-width="1"/>
+<text class="fx-lane halo" x="16" y="281.5">SUN &amp; UV</text>
+<rect x="161" y="286" width="266.6" height="60" fill="url(#ph-night)"/>
+<rect x="832.4" y="286" width="267.4" height="60" fill="url(#ph-night)"/>
+<line x1="14" y1="346" x2="1330" y2="346" stroke="var(--hairline-strong)" stroke-width="1"/>
+<polyline points="14,300.6 21,301.8 28,303.2 35,304.6 42,306.2 49,307.9 56,309.7 63,311.6 70,313.6 77,315.7 84,317.9 91,320.2 98,322.6 105,325 112,327.5 119,330 126,332.6 133,335.3 140,337.9 147,340.6 154,343.3 161,346" fill="none" stroke="var(--tier-1)" stroke-width="1.1" stroke-linecap="round"/>
+<polyline points="427.6,346 434.6,343.3 441.6,340.6 448.6,337.9 455.6,335.2 462.6,332.6 469.6,330 476.6,327.4 483.6,325 490.6,322.5 497.6,320.2 504.6,317.9 511.6,315.7 518.6,313.6 525.6,311.5 532.6,309.6 539.6,307.8 546.6,306.1 553.6,304.5 560.6,303.1 567.6,301.8 574.6,300.6 581.6,299.5 588.6,298.6 595.6,297.8 602.6,297.1 609.6,296.6 616.6,296.3 623.6,296.1 630.6,296 637.6,296.1 644.6,296.3 651.6,296.7 658.6,297.2 665.6,297.9 672.6,298.7 679.6,299.7 686.6,300.7 693.6,302 700.6,303.3 707.6,304.8 714.6,306.4 721.6,308.1 728.6,309.9 735.6,311.9 742.6,313.9 749.6,316 756.6,318.2 763.6,320.5 770.6,322.9 777.6,325.3 784.6,327.8 791.6,330.4 798.6,333 805.6,335.6 812.6,338.3 819.6,341 826.6,343.7" fill="none" stroke="var(--tier-1)" stroke-width="1.1" stroke-linecap="round"/>
+<polyline points="1099.8,346 1106.8,343.3 1113.8,340.6 1120.8,337.9 1127.8,335.2 1134.8,332.6 1141.8,329.9 1148.8,327.4 1155.8,324.9 1162.8,322.5 1169.8,320.1 1176.8,317.8 1183.8,315.6 1190.8,313.5 1197.8,311.5 1204.8,309.5 1211.8,307.7 1218.8,306 1225.8,304.5 1232.8,303 1239.8,301.7 1246.8,300.5 1253.8,299.4 1260.8,298.5 1267.8,297.7 1274.8,297.1 1281.8,296.6 1288.8,296.3 1295.8,296.1 1302.8,296 1309.8,296.1 1316.8,296.3 1323.8,296.7" fill="none" stroke="var(--tier-1)" stroke-width="1.1" stroke-linecap="round"/>
+<use href="#g-sun" x="619" y="285" width="22" height="22" style="color:var(--tier-1)"/>
+<use href="#g-moon" x="284" y="303" width="20" height="20" style="color:var(--slate)"/>
+<use href="#g-moon" x="956" y="303" width="20" height="20" style="color:var(--slate)"/>
+<text class="fx-note halo" x="164" y="342">sets 8:15</text>
+<text class="fx-note halo" x="430.6" y="342">rises 5:46</text>
+<text class="fx-note halo" x="835.4" y="342">sets 8:14</text>
+<text class="fx-note halo" x="1102.8" y="342">rises 5:47</text>
+<text class="fx-num halo ft3" x="30" y="308" text-anchor="start">UV 8<tspan class="fx-word" dx="4">very high</tspan></text>
+<text class="fx-num halo ft3" x="646" y="298" text-anchor="start">UV 10<tspan class="fx-word" dx="4">very high</tspan></text>
+<text class="fx-num halo ft3" x="1302" y="306" text-anchor="middle">UV 10</text>
+<line class="fx-sep" x1="14" y1="360" x2="1330" y2="360" stroke-width="1"/>
+<text class="fx-lane halo" x="16" y="365.5">RAIN CHANCE %</text>
+<line x1="14" y1="420" x2="1330" y2="420" stroke="var(--hairline-strong)" stroke-width="1"/>
+<rect x="61" y="417.5" width="18" height="2.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="89" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="117" y="390" width="18" height="30" fill="url(#ph-steel)" stroke="var(--tier-4)" stroke-width="0.75" opacity="1"/>
+<rect x="145" y="397.5" width="18" height="22.5" fill="url(#ph-steel)" stroke="var(--tier-4)" stroke-width="0.75" opacity="1"/>
+<rect x="173" y="407.5" width="18" height="12.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="201" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="229" y="415" width="18" height="5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="257" y="417.5" width="18" height="2.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="285" y="417.5" width="18" height="2.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="313" y="417.5" width="18" height="2.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="509" y="417.5" width="18" height="2.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="537" y="415" width="18" height="5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="565" y="415" width="18" height="5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="593" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="621" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="649" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="677" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="705" y="415" width="18" height="5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="733" y="415" width="18" height="5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="761" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="789" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="817" y="415" width="18" height="5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="845" y="417.5" width="18" height="2.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="873" y="417.5" width="18" height="2.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="901" y="417.5" width="18" height="2.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="1153" y="417.5" width="18" height="2.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="1181" y="415" width="18" height="5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="1209" y="415" width="18" height="5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="1237" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="1265" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="1293" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<rect x="1321" y="412.5" width="18" height="7.5" fill="url(#ph-steel)" stroke="var(--steel-text)" stroke-width="0.75" opacity="0.9"/>
+<use href="#g-storm" x="146" y="368" width="22" height="20" style="color:var(--tier-4)"/>
+<text class="fx-num halo ft4" x="114" y="388" text-anchor="end">60%</text>
+<text class="fx-num halo ft4" x="170" y="416" text-anchor="start">45%</text>
+<text class="fx-word halo" x="222" y="394">t&#8209;storms clear by 9 PM</text>
+<line class="fx-sep" x1="14" y1="428" x2="1330" y2="428" stroke-width="1"/>
+<text class="fx-lane halo" x="16" y="433.5">AIR QUALITY</text>
+<line x1="14" y1="464" x2="1330" y2="464" stroke="var(--hairline-strong)" stroke-width="1"/>
+<line x1="14" y1="464" x2="14" y2="449" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="42" y1="464" x2="42" y2="448.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="70" y1="464" x2="70" y2="448.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="98" y1="464" x2="98" y2="449.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="126" y1="464" x2="126" y2="451" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="154" y1="464" x2="154" y2="452.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="182" y1="464" x2="182" y2="453" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="210" y1="464" x2="210" y2="454" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="238" y1="464" x2="238" y2="454.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="266" y1="464" x2="266" y2="455" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="294" y1="464" x2="294" y2="455.5" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="322" y1="464" x2="322" y2="455.5" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="350" y1="464" x2="350" y2="456" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="378" y1="464" x2="378" y2="456" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="406" y1="464" x2="406" y2="456" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="434" y1="464" x2="434" y2="456" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="462" y1="464" x2="462" y2="455" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="490" y1="464" x2="490" y2="454" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="518" y1="464" x2="518" y2="453" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="546" y1="464" x2="546" y2="452" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="574" y1="464" x2="574" y2="451" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="602" y1="464" x2="602" y2="450" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="630" y1="464" x2="630" y2="449.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="658" y1="464" x2="658" y2="449" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="686" y1="464" x2="686" y2="449" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="714" y1="464" x2="714" y2="449.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="742" y1="464" x2="742" y2="450" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="770" y1="464" x2="770" y2="451" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="798" y1="464" x2="798" y2="452.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="826" y1="464" x2="826" y2="453" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="854" y1="464" x2="854" y2="453.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="882" y1="464" x2="882" y2="454" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="910" y1="464" x2="910" y2="454.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="938" y1="464" x2="938" y2="454.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="966" y1="464" x2="966" y2="455" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="994" y1="464" x2="994" y2="455" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="1022" y1="464" x2="1022" y2="455.5" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="1050" y1="464" x2="1050" y2="455.5" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="1078" y1="464" x2="1078" y2="455.5" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="1106" y1="464" x2="1106" y2="455" stroke="var(--tier-0)" stroke-width="1.25"/>
+<line x1="1134" y1="464" x2="1134" y2="454.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="1162" y1="464" x2="1162" y2="453.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="1190" y1="464" x2="1190" y2="453.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="1218" y1="464" x2="1218" y2="452.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="1246" y1="464" x2="1246" y2="451.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="1274" y1="464" x2="1274" y2="451" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="1302" y1="464" x2="1302" y2="450" stroke="var(--tier-1)" stroke-width="1.25"/>
+<line x1="1330" y1="464" x2="1330" y2="449.5" stroke="var(--tier-1)" stroke-width="1.25"/>
+<text class="fx-num halo ft1" x="22" y="446" text-anchor="start">62<tspan class="fx-word" dx="3">moderate</tspan></text>
+<text class="fx-num halo ft0" x="411" y="454" text-anchor="start">48<tspan class="fx-word" dx="3">good</tspan></text>
+<text class="fx-num halo ft1" x="658" y="450" text-anchor="middle">62</text>
+<text class="fx-num halo ft1" x="1330" y="450" text-anchor="end">61</text>
+<rect x="126" y="88" width="56" height="376" fill="url(#ph-x4)"/>
+<line x1="126" y1="88" x2="126" y2="464" stroke="var(--tier-4)" stroke-width="0.75" opacity="0.55"/>
+<line x1="182" y1="88" x2="182" y2="464" stroke="var(--tier-4)" stroke-width="0.75" opacity="0.55"/>
+<line class="fx-ax" x1="14" y1="474" x2="1330" y2="474" stroke-width="1"/>
+<line class="fx-tick" x1="14" y1="474" x2="14" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="98" y1="474" x2="98" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="182" y1="474" x2="182" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="266" y1="474" x2="266" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="350" y1="474" x2="350" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="434" y1="474" x2="434" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="518" y1="474" x2="518" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="602" y1="474" x2="602" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="686" y1="474" x2="686" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="770" y1="474" x2="770" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="854" y1="474" x2="854" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="938" y1="474" x2="938" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="1022" y1="474" x2="1022" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="1106" y1="474" x2="1106" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="1190" y1="474" x2="1190" y2="478" stroke-width="1"/>
+<line class="fx-tick" x1="1274" y1="474" x2="1274" y2="478" stroke-width="1"/>
+<text class="fx-hr" x="14" y="491" text-anchor="start">3P</text>
+<text class="fx-hr" x="98" y="491" text-anchor="middle">6P</text>
+<text class="fx-hr" x="182" y="491" text-anchor="middle">9P</text>
+<text class="fx-hr" x="266" y="491" text-anchor="middle">12A</text>
+<text class="fx-hr" x="350" y="491" text-anchor="middle">3A</text>
+<text class="fx-hr" x="434" y="491" text-anchor="middle">6A</text>
+<text class="fx-hr" x="518" y="491" text-anchor="middle">9A</text>
+<text class="fx-hr" x="602" y="491" text-anchor="middle">12P</text>
+<text class="fx-hr" x="686" y="491" text-anchor="middle">3P</text>
+<text class="fx-hr" x="770" y="491" text-anchor="middle">6P</text>
+<text class="fx-hr" x="854" y="491" text-anchor="middle">9P</text>
+<text class="fx-hr" x="938" y="491" text-anchor="middle">12A</text>
+<text class="fx-hr" x="1022" y="491" text-anchor="middle">3A</text>
+<text class="fx-hr" x="1106" y="491" text-anchor="middle">6A</text>
+<text class="fx-hr" x="1190" y="491" text-anchor="middle">9A</text>
+<text class="fx-hr" x="1274" y="491" text-anchor="middle">12P</text>
+</svg>
+    </div>
+    <p class="fig-legend">One shared clock, five lanes: WBGT curve inked by heat-stress band &middot; dew point &middot; sun path with UV (night hatched) &middot; rain-chance bars &middot; air-quality ticks. Ice bands mark runnable windows; cross-hatch marks vetoed hours.</p>
+
+    <h3 class="overline agate-head">Agate &middot; exact readings</h3>
+    <div class="hours-scroll" tabindex="0">
+      <table class="hours">
+        <caption class="sr">Hour-by-hour conditions for the next 48 hours at Central Park</caption>
+        <thead>
+          <tr><th class="t" scope="col">Time</th><th scope="col">WBGT</th><th class="reads" scope="col">Reads</th><th scope="col">Dew&nbsp;pt</th><th scope="col">UV</th><th scope="col">AQI</th><th scope="col">Wind</th><th scope="col">Rain</th></tr>
+        </thead>
+        <tbody>
+          <tr class="day"><td class="t">TUE</td><td colspan="7">Tuesday July 28 &middot; today</td></tr>
+          <tr class="tw4"><td class="t">3 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">73&deg;</td><td class="n c3">8</td><td class="n c1">62</td><td class="n cw">S 6</td><td class="n cw">0%</td></tr>
+          <tr class="tw4"><td class="t">4 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">73&deg;</td><td class="n c2">6</td><td class="n c1">63</td><td class="n cw">S 7</td><td class="n cw">0%</td></tr>
+          <tr class="tw3"><td class="t">5 PM</td><td class="n c3">87&deg;</td><td class="reads">high heat stress</td><td class="n c3">73&deg;</td><td class="n c1">4</td><td class="n c1">63</td><td class="n cw">S 7</td><td class="n cw">5%</td></tr>
+          <tr class="tw3"><td class="t">6 PM</td><td class="n c3">85&deg;</td><td class="reads">high heat stress</td><td class="n c3">73&deg;</td><td class="n c0">2</td><td class="n c1">61</td><td class="n cw">S 8</td><td class="n cw">15%</td></tr>
+          <tr class="tw2 veto"><td class="t">7 PM</td><td class="n c2">82&deg;</td><td class="reads">&#10005; vetoed &mdash; thunderstorms likely (60%)</td><td class="n c3">74&deg;</td><td class="n c0">1</td><td class="n c1">58</td><td class="n cw">S 10 g22</td><td class="n c4">60%</td></tr>
+          <tr class="tw1 veto"><td class="t">8 PM</td><td class="n c1">79&deg;</td><td class="reads">&#10005; vetoed &mdash; thunderstorms possible (45%)</td><td class="n c3">74&deg;</td><td class="n c0">0</td><td class="n c1">55</td><td class="n cw">SW 12 g24</td><td class="n c4">45%</td></tr>
+          <tr class="tw1"><td class="t">9 PM</td><td class="n c1">77&deg;</td><td class="reads">elevated</td><td class="n c3">74&deg;</td><td class="n c0">0</td><td class="n c1">54</td><td class="n cw">SW 8</td><td class="n cw">25%</td></tr>
+          <tr class="tw1"><td class="t">10 PM</td><td class="n c1">76&deg;</td><td class="reads">elevated</td><td class="n c3">73&deg;</td><td class="n c0">0</td><td class="n c1">52</td><td class="n cw">SW 7</td><td class="n cw">15%</td></tr>
+          <tr class="tw0"><td class="t">11 PM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c3">73&deg;</td><td class="n c0">0</td><td class="n c1">51</td><td class="n cw">SW 6</td><td class="n cw">10%</td></tr>
+          <tr class="day"><td class="t">WED</td><td colspan="7">Wednesday July 29</td></tr>
+          <tr class="tw0"><td class="t">12 AM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c3">72&deg;</td><td class="n c0">0</td><td class="n c0">50</td><td class="n cw">SW 5</td><td class="n cw">5%</td></tr>
+          <tr class="tw0"><td class="t">1 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">72&deg;</td><td class="n c0">0</td><td class="n c0">49</td><td class="n cw">SW 5</td><td class="n cw">5%</td></tr>
+          <tr class="tw0"><td class="t">2 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">71&deg;</td><td class="n c0">0</td><td class="n c0">49</td><td class="n cw">SW 4</td><td class="n cw">5%</td></tr>
+          <tr class="tw0"><td class="t">3 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">71&deg;</td><td class="n c0">0</td><td class="n c0">48</td><td class="n cw">SW 4</td><td class="n cw">0%</td></tr>
+          <tr class="tw0"><td class="t">4 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n c0">0</td><td class="n c0">48</td><td class="n cw">W 4</td><td class="n cw">0%</td></tr>
+          <tr class="tw0"><td class="t">5 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n c0">0</td><td class="n c0">48</td><td class="n cw">W 4</td><td class="n cw">0%</td></tr>
+          <tr class="tw0"><td class="t">6 AM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n c0">1</td><td class="n c0">48</td><td class="n cw">W 4</td><td class="n cw">0%</td></tr>
+          <tr class="tw1"><td class="t">7 AM</td><td class="n c1">76&deg;</td><td class="reads">elevated</td><td class="n c3">70&deg;</td><td class="n c0">2</td><td class="n c0">50</td><td class="n cw">W 5</td><td class="n cw">0%</td></tr>
+          <tr class="tw1"><td class="t">8 AM</td><td class="n c1">78&deg;</td><td class="reads">elevated</td><td class="n c3">70&deg;</td><td class="n c1">4</td><td class="n c1">52</td><td class="n cw">W 6</td><td class="n cw">0%</td></tr>
+          <tr class="tw2"><td class="t">9 AM</td><td class="n c2">81&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">70&deg;</td><td class="n c2">6</td><td class="n c1">54</td><td class="n cw">SW 7</td><td class="n cw">5%</td></tr>
+          <tr class="tw2"><td class="t">10 AM</td><td class="n c2">84&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">71&deg;</td><td class="n c3">8</td><td class="n c1">56</td><td class="n cw">SW 8</td><td class="n cw">10%</td></tr>
+          <tr class="tw3"><td class="t">11 AM</td><td class="n c3">86&deg;</td><td class="reads">high heat stress</td><td class="n c3">71&deg;</td><td class="n c3">9</td><td class="n c1">58</td><td class="n cw">S 8</td><td class="n cw">10%</td></tr>
+          <tr class="tw4"><td class="t">12 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">71&deg;</td><td class="n c3">10</td><td class="n c1">60</td><td class="n cw">S 9</td><td class="n cw">15%</td></tr>
+          <tr class="tw4"><td class="t">1 PM</td><td class="n c4">89&deg;</td><td class="reads">extreme caution</td><td class="n c3">71&deg;</td><td class="n c3">10</td><td class="n c1">61</td><td class="n cw">S 9</td><td class="n cw">15%</td></tr>
+          <tr class="tw4"><td class="t">2 PM</td><td class="n c4">89&deg;</td><td class="reads">extreme caution</td><td class="n c3">72&deg;</td><td class="n c3">9</td><td class="n c1">62</td><td class="n cw">S 9</td><td class="n cw">15%</td></tr>
+          <tr class="tw4"><td class="t">3 PM</td><td class="n c4">89&deg;</td><td class="reads">extreme caution</td><td class="n c3">72&deg;</td><td class="n c3">8</td><td class="n c1">62</td><td class="n cw">S 9</td><td class="n cw">15%</td></tr>
+          <tr class="tw4"><td class="t">4 PM</td><td class="n c4">88&deg;</td><td class="reads">extreme caution</td><td class="n c3">72&deg;</td><td class="n c2">6</td><td class="n c1">61</td><td class="n cw">S 8</td><td class="n cw">10%</td></tr>
+          <tr class="tw3"><td class="t">5 PM</td><td class="n c3">86&deg;</td><td class="reads">high heat stress</td><td class="n c3">72&deg;</td><td class="n c1">4</td><td class="n c1">60</td><td class="n cw">S 8</td><td class="n cw">10%</td></tr>
+          <tr class="tw2"><td class="t">6 PM</td><td class="n c2">83&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">72&deg;</td><td class="n c0">2</td><td class="n c1">58</td><td class="n cw">S 7</td><td class="n cw">15%</td></tr>
+          <tr class="tw2"><td class="t">7 PM</td><td class="n c2">80&deg;</td><td class="reads">moderate heat stress</td><td class="n c3">71&deg;</td><td class="n c0">1</td><td class="n c1">55</td><td class="n cw">S 7</td><td class="n cw">15%</td></tr>
+          <tr class="tw1"><td class="t">8 PM</td><td class="n c1">78&deg;</td><td class="reads">elevated</td><td class="n c3">71&deg;</td><td class="n c0">0</td><td class="n c1">54</td><td class="n cw">S 6</td><td class="n cw">10%</td></tr>
+          <tr class="tw1"><td class="t">9 PM</td><td class="n c1">76&deg;</td><td class="reads">elevated</td><td class="n c3">70&deg;</td><td class="n c0">0</td><td class="n c1">53</td><td class="n cw">S 5</td><td class="n cw">5%</td></tr>
+          <tr class="tw0"><td class="t">10 PM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n c0">0</td><td class="n c1">52</td><td class="n cw">S 5</td><td class="n cw">5%</td></tr>
+          <tr class="tw0"><td class="t">11 PM</td><td class="n c0">74&deg;</td><td class="reads">low</td><td class="n c3">70&deg;</td><td class="n c0">0</td><td class="n c1">51</td><td class="n cw">S 4</td><td class="n cw">5%</td></tr>
+          <tr class="day"><td class="t">THU</td><td colspan="7">Thursday July 30</td></tr>
+          <tr class="condense tw0"><td class="t">12&ndash;4 AM</td><td class="n c0">72&ndash;74&deg;</td><td class="reads">low &mdash; quiet overnight</td><td class="n c2">68&ndash;69&deg;</td><td class="n c0">0</td><td class="n c1">49&ndash;51</td><td class="n cw">SW 4</td><td class="n cw">0%</td></tr>
+          <tr class="tw0"><td class="t">5 AM</td><td class="n c0">72&deg;</td><td class="reads">low</td><td class="n c2">68&deg;</td><td class="n c0">0</td><td class="n c0">49</td><td class="n cw">SW 4</td><td class="n cw">0%</td></tr>
+          <tr class="tw0"><td class="t">6 AM</td><td class="n c0">73&deg;</td><td class="reads">low</td><td class="n c2">68&deg;</td><td class="n c0">1</td><td class="n c0">50</td><td class="n cw">SW 5</td><td class="n cw">0%</td></tr>
+          <tr class="tw0"><td class="t">7 AM</td><td class="n c0">75&deg;</td><td class="reads">low</td><td class="n c2">68&deg;</td><td class="n c0">2</td><td class="n c1">51</td><td class="n cw">SW 5</td><td class="n cw">0%</td></tr>
+          <tr class="tw1"><td class="t">8 AM</td><td class="n c1">77&deg;</td><td class="reads">elevated</td><td class="n c2">69&deg;</td><td class="n c1">4</td><td class="n c1">53</td><td class="n cw">SW 6</td><td class="n cw">5%</td></tr>
+          <tr class="condense tw4"><td class="t">9 AM&ndash;2 PM</td><td class="n c4">80&#8594;88&deg;</td><td class="reads">climbing &mdash; moderate by 9, high by 11, extreme caution by 1 PM</td><td class="n c3">69&ndash;71&deg;</td><td class="n c3">4&#8594;10</td><td class="n c1">53&ndash;61</td><td class="n cw">SW 7</td><td class="n cw">&le;15%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="explainers" aria-label="What each metric means">
+    <h2 class="sr">What each metric means</h2>
+    <details>
+      <summary><svg class="g-e" width="14" height="24" aria-hidden="true"><use href="#g-thermo" width="14" height="24"/></svg><span class="lab">WBGT &mdash; heat stress</span></summary>
+      <p>Wet-bulb globe temperature folds air temperature, humidity, sun load, and wind into one heat-stress number &mdash; the standard used for athletics. It omits your fitness, acclimatization, and pace. Words follow the National Weather Service bands: low, elevated, moderate, high heat stress, extreme caution, extreme (a veto at 90&deg;F+).</p>
+      <p class="src">source: NWS gridpoint forecast (forecast value, not estimated)</p>
+    </details>
+    <details>
+      <summary><svg class="g-e" width="17" height="22" aria-hidden="true"><use href="#g-drop" width="17" height="22"/></svg><span class="lab">Dew point &mdash; humidity</span></summary>
+      <p>The absolute moisture in the air, which sets how well sweat can evaporate. Below 55&deg;F is comfortable; at 70&deg;F+ evaporation stalls and heart rate drifts up at any pace. It omits temperature itself &mdash; that is what WBGT is for.</p>
+      <p class="src">source: NWS gridpoint forecast</p>
+    </details>
+    <details>
+      <summary><svg class="g-e" width="22" height="22" aria-hidden="true"><use href="#g-sun" width="22" height="22"/></svg><span class="lab">UV index</span></summary>
+      <p>The EPA scale for sunburn speed on exposed skin &mdash; at UV 9, damage begins in about 15 minutes. It says nothing about heat: dawn hours can be brutal for WBGT yet UV 0. Shade, cover, and sunscreen change your exposure, not the index.</p>
+      <p class="src">source: Open-Meteo model (forecast)</p>
+    </details>
+    <details>
+      <summary><svg class="g-e" width="24" height="15" aria-hidden="true"><use href="#g-haze" width="24" height="15"/></svg><span class="lab">AQI &mdash; air quality</span></summary>
+      <p>The EPA Air Quality Index, taken from the worst nearby monitor and its dominant pollutant &mdash; a protective reading, not an average. Moderate (51&ndash;100) is fine for most runners; unusually sensitive people may shorten hard sessions. 201+ vetoes the hour.</p>
+      <p class="src">now: AirNow monitor (measured) &middot; hourly forecast: CAMS model (modeled)</p>
+    </details>
+    <details>
+      <summary><svg class="g-e" width="24" height="16" aria-hidden="true"><use href="#g-wind" width="24" height="16"/></svg><span class="lab">Wind &amp; gusts</span></summary>
+      <p>Sustained speed plus gusts. In heat, wind helps &mdash; it moves saturated air off your skin. Today&rsquo;s S 6 is too little to matter. It omits direction changes along a loop; see the route note for exposure.</p>
+      <p class="src">source: NWS gridpoint forecast</p>
+    </details>
+    <details>
+      <summary><svg class="g-e" width="24" height="22" aria-hidden="true"><use href="#g-storm" width="24" height="22"/></svg><span class="lab">Rain &amp; thunder</span></summary>
+      <p>Chance of measurable precipitation for the hour. Rain alone rarely cancels a run; lightning always does &mdash; any hour with thunder probability at 30% or more is struck from the ledger with the reason named, never averaged away.</p>
+      <p class="src">source: NWS gridpoint forecast (probabilityOfThunder, weather layer)</p>
+    </details>
+  </section>
+
+  <aside class="route">
+    <span class="overline">Route context &middot; Central Park</span>
+    Good tree shade on the loop&rsquo;s east and north sides; the reservoir path is exposed. Hills concentrate at the north end. Drains well after rain &mdash; tomorrow&rsquo;s 5 AM window will be dry underfoot.
+  </aside>
+
+  <p class="clothing"><span class="overline">Clothing</span>Now: the lightest kit you own, a brimmed hat, and water every 15 minutes. For the Wed 5 AM window: singlet and shorts &mdash; at dew point <span class="n c3">70&deg;</span> it will still feel like the upper 80s.</p>
+
+</main>
+
+<footer class="wrap foot">
+  <p>forecast &amp; alerts: National Weather Service, gridpoint OKX 34,45 &middot; forecast fetched 2:21 PM ET &middot; alerts fetched 2:29 PM ET</p>
+  <p>air quality now: EPA AirNow, worst nearby monitor (measured) &middot; fetched 2:05 PM ET &middot; UV + hourly AQI: Open-Meteo (modeled, CAMS) &middot; fetched 2:10 PM ET</p>
+  <p>no composite score is computed &mdash; read the words. &middot; mockup ledger-v2a etched panel &middot; whentorun</p>
+</footer>
+
+<script>
+/* mockup-only theme demo: cycles System -> Light -> Dark */
+(function () {
+  var btn = document.getElementById('themeBtn');
+  var states = ['', 'light', 'dark'], names = ['Auto', 'Light', 'Dark'], i = 0;
+  btn.addEventListener('click', function () {
+    i = (i + 1) % 3;
+    if (states[i]) { document.documentElement.setAttribute('data-theme', states[i]); }
+    else { document.documentElement.removeAttribute('data-theme'); }
+    btn.textContent = names[i];
+  });
+})();
+</script>
+
+</body>
+</html>

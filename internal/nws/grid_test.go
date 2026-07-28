@@ -113,6 +113,14 @@ func TestExpandHandComputed(t *testing.T) {
 		WindGust: GridLayer{UOM: "wmoUnit:mph", Values: []GridValue{
 			{ValidTime: "2026-07-28T00:00:00+00:00/PT4H", Value: fptr(25)},
 		}},
+		// Degrees pass through unchanged.
+		WindDirection: GridLayer{UOM: "wmoUnit:degree_(angle)", Values: []GridValue{
+			{ValidTime: "2026-07-28T00:00:00+00:00/PT2H", Value: fptr(170)},
+			{ValidTime: "2026-07-28T02:00:00+00:00/PT1H", Value: fptr(350)},
+		}},
+		RelativeHumidity: GridLayer{UOM: "wmoUnit:percent", Values: []GridValue{
+			{ValidTime: "2026-07-28T00:00:00+00:00/PT3H", Value: fptr(67)},
+		}},
 		PoP: GridLayer{UOM: "wmoUnit:percent", Values: []GridValue{
 			{ValidTime: "2026-07-28T00:00:00+00:00/PT4H", Value: fptr(30)},
 		}},
@@ -178,6 +186,19 @@ func TestExpandHandComputed(t *testing.T) {
 	// Wind conversions.
 	approx(t, "h0 WindMPH", f.Hours[0].WindMPH, 10)
 	approx(t, "h0 GustMPH", f.Hours[0].GustMPH, 25)
+	// Wind direction passes through in degrees; no run covers hour 3.
+	approx(t, "h0 WindDirDeg", f.Hours[0].WindDirDeg, 170)
+	approx(t, "h1 WindDirDeg", f.Hours[1].WindDirDeg, 170)
+	approx(t, "h2 WindDirDeg", f.Hours[2].WindDirDeg, 350)
+	if f.Hours[3].WindDirDeg.Valid {
+		t.Errorf("h3 WindDirDeg: want invalid, got %v", f.Hours[3].WindDirDeg.Value)
+	}
+	// Relative humidity percent; no run covers hour 3.
+	approx(t, "h0 RH", f.Hours[0].RH, 67)
+	approx(t, "h2 RH", f.Hours[2].RH, 67)
+	if f.Hours[3].RH.Valid {
+		t.Errorf("h3 RH: want invalid, got %v", f.Hours[3].RH.Value)
+	}
 	// Percent layers.
 	approx(t, "h0 PoP", f.Hours[0].PoP, 30)
 	if f.Hours[0].ThunderProb.Valid {
@@ -270,11 +291,17 @@ func TestExpandFixture(t *testing.T) {
 	approx(t, "h0 SkyCover", f.Hours[0].SkyCover, 47)
 	approx(t, "h0 ThunderProb", f.Hours[0].ThunderProb, 0)
 	approx(t, "h0 IceAccumIn", f.Hours[0].IceAccumIn, 0)
+	approx(t, "h0 WindDirDeg", f.Hours[0].WindDirDeg, 170)
+	approx(t, "h0 RH", f.Hours[0].RH, 67)
 	// Hour 18: temp 25°C = 77°F, thunder probability 40%.
 	approx(t, "h18 TempF", f.Hours[18].TempF, 77)
 	approx(t, "h18 ThunderProb", f.Hours[18].ThunderProb, 40)
+	approx(t, "h18 WindDirDeg", f.Hours[18].WindDirDeg, 160)
+	approx(t, "h18 RH", f.Hours[18].RH, 79)
 	// Hour 47: temp 23.889°C = 75°F.
 	approx(t, "h47 TempF", f.Hours[47].TempF, 75)
+	approx(t, "h47 WindDirDeg", f.Hours[47].WindDirDeg, 340)
+	approx(t, "h47 RH", f.Hours[47].RH, 79)
 
 	// July: windChill layer is one long null run → invalid everywhere.
 	// Core layers have full 48 h coverage in the recorded window.
@@ -285,6 +312,10 @@ func TestExpandFixture(t *testing.T) {
 		if !h.TempF.Valid || !h.WBGTF.Valid || !h.DewPointF.Valid {
 			t.Errorf("h%d: temp/WBGT/dewpoint should all be valid (temp=%v wbgt=%v dew=%v)",
 				i, h.TempF.Valid, h.WBGTF.Valid, h.DewPointF.Valid)
+		}
+		if !h.WindDirDeg.Valid || !h.RH.Valid {
+			t.Errorf("h%d: windDir/RH should both be valid (dir=%v rh=%v)",
+				i, h.WindDirDeg.Valid, h.RH.Valid)
 		}
 		if h.WxFreezingRain {
 			t.Errorf("h%d: WxFreezingRain in July fixture", i)

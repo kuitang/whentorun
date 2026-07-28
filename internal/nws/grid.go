@@ -26,6 +26,8 @@ type GridProperties struct {
 	WBGT                 GridLayer    `json:"wetBulbGlobeTemperature"`
 	WindSpeed            GridLayer    `json:"windSpeed"`
 	WindGust             GridLayer    `json:"windGust"`
+	WindDirection        GridLayer    `json:"windDirection"`
+	RelativeHumidity     GridLayer    `json:"relativeHumidity"`
 	PoP                  GridLayer    `json:"probabilityOfPrecipitation"`
 	SkyCover             GridLayer    `json:"skyCover"`
 	WindChill            GridLayer    `json:"windChill"`
@@ -85,6 +87,8 @@ type HourValues struct {
 	WindChillF  Opt
 	WindMPH     Opt
 	GustMPH     Opt
+	WindDirDeg  Opt // meteorological degrees, direction wind comes FROM
+	RH          Opt // %
 	PoP         Opt // %
 	SkyCover    Opt // %
 	ThunderProb Opt // %
@@ -135,6 +139,8 @@ func (gp *Gridpoint) Expand(start time.Time, hours int) (*Forecast, error) {
 		{"windChill", p.WindChill, tempToF, func(h *HourValues, o Opt) { h.WindChillF = o }},
 		{"windSpeed", p.WindSpeed, speedToMPH, func(h *HourValues, o Opt) { h.WindMPH = o }},
 		{"windGust", p.WindGust, speedToMPH, func(h *HourValues, o Opt) { h.GustMPH = o }},
+		{"windDirection", p.WindDirection, passthrough, func(h *HourValues, o Opt) { h.WindDirDeg = o }},
+		{"relativeHumidity", p.RelativeHumidity, passthrough, func(h *HourValues, o Opt) { h.RH = o }},
 		{"probabilityOfPrecipitation", p.PoP, passthrough, func(h *HourValues, o Opt) { h.PoP = o }},
 		{"skyCover", p.SkyCover, passthrough, func(h *HourValues, o Opt) { h.SkyCover = o }},
 		{"probabilityOfThunder", p.ProbabilityOfThunder, passthrough, func(h *HourValues, o Opt) { h.ThunderProb = o }},

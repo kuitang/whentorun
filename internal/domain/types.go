@@ -4,7 +4,10 @@
 // converts for the °C toggle.
 package domain
 
-import "time"
+import (
+	"math"
+	"time"
+)
 
 // Origin identifies which upstream produced a value.
 type Origin string
@@ -47,6 +50,8 @@ type Hour struct {
 	WindChillF  Metric
 	WindMPH     Metric
 	GustMPH     Metric
+	WindDirDeg  Metric // meteorological degrees: direction the wind comes FROM
+	RH          Metric // relative humidity, %
 	PoP         Metric // probability of precipitation, %
 	SkyCover    Metric // %
 	UVIndex     Metric
@@ -59,6 +64,25 @@ type Hour struct {
 	// From the NWS weather layer for this hour.
 	WxThunder      bool
 	WxFreezingRain bool // freezing rain or sleet
+}
+
+// compassPoints are the 16-point compass names, clockwise from north.
+var compassPoints = [16]string{
+	"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+	"S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
+}
+
+// CompassPoint maps meteorological degrees (direction the wind comes FROM,
+// 0 = north, clockwise) to the nearest 16-point compass name. Out-of-range
+// inputs are normalized modulo 360.
+func CompassPoint(deg float64) string {
+	deg = math.Mod(deg, 360)
+	if deg < 0 {
+		deg += 360
+	}
+	// Each point spans 22.5°; +11.25 centers the sectors on the points.
+	i := int((deg+11.25)/22.5) % 16
+	return compassPoints[i]
 }
 
 // Alert is an active NWS alert for a path's zone.

@@ -82,7 +82,7 @@ func run() error {
 		Grid:      merge.Input[*nws.Gridpoint]{Data: grid, FetchedAt: fetched, OK: gridErr == nil},
 		Alerts:    merge.Input[[]domain.Alert]{Data: alerts, FetchedAt: fetched, OK: alertsErr == nil},
 		AirNowObs: merge.Input[[]airnow.ObservationRecord]{Data: obs, FetchedAt: fetched, OK: obsErr == nil},
-		OMWeather: merge.Input[[]openmeteo.WeatherHour]{Data: omw, FetchedAt: fetched, OK: omwErr == nil},
+		OMWeather: merge.Input[openmeteo.WeatherData]{Data: omw, FetchedAt: fetched, OK: omwErr == nil},
 		OMAir:     merge.Input[[]openmeteo.AirQualityHour]{Data: oma, FetchedAt: fetched, OK: omaErr == nil},
 	}
 
@@ -134,10 +134,24 @@ func print48h(path domain.Path, now time.Time, res merge.Result) {
 	}
 	fmt.Println()
 
+	fmt.Println("SUNRISE / SUNSET")
+	if len(res.Sun) == 0 {
+		fmt.Println("  unavailable")
+	} else {
+		for _, s := range res.Sun {
+			fmt.Printf("  %s  sunrise %s  sunset %s  (%s)\n",
+				s.Sunrise.In(nyLoc).Format("Mon 01-02"),
+				s.Sunrise.In(nyLoc).Format("15:04"),
+				s.Sunset.In(nyLoc).Format("15:04"),
+				srcLabel(res.SunSource))
+		}
+	}
+	fmt.Println()
+
 	fmt.Println("48-HOUR MERGED TABLE")
-	fmt.Printf("  %-15s %-11s %6s %6s %5s %-12s %10s %5s %7s  %s\n",
-		"hour", "wbgt", "temp", "dew", "uv", "aqi", "wind", "pop", "thunder", "vetoes")
-	fmt.Println("  " + strings.Repeat("-", 108))
+	fmt.Printf("  %-15s %-11s %6s %6s %4s %8s %5s %-12s %10s %5s %7s  %s\n",
+		"hour", "wbgt", "temp", "dew", "rh", "dir", "uv", "aqi", "wind", "pop", "thunder", "vetoes")
+	fmt.Println("  " + strings.Repeat("-", 122))
 	for _, h := range res.Hours {
 		wind := "—"
 		if h.WindMPH.Valid {
@@ -161,12 +175,18 @@ func print48h(path domain.Path, now time.Time, res merge.Result) {
 				aqi += "(" + h.AQIPollutant + ")"
 			}
 		}
+		dir := "—"
+		if h.WindDirDeg.Valid {
+			dir = fmt.Sprintf("%s/%.0f°", domain.CompassPoint(h.WindDirDeg.Value), h.WindDirDeg.Value)
+		}
 		vetoes := strings.Join(rank.HourVetoes(h, res.Alerts), "; ")
-		fmt.Printf("  %-15s %-11s %6s %6s %5s %-12s %10s %5s %7s  %s\n",
+		fmt.Printf("  %-15s %-11s %6s %6s %4s %8s %5s %-12s %10s %5s %7s  %s\n",
 			h.Time.Format("Mon 01-02 15:04"),
 			metricWithSrc(h.WBGTF, "°F"),
 			metric(h.TempF, "°F"),
 			metric(h.DewPointF, "°F"),
+			metric(h.RH, "%"),
+			dir,
 			metric(h.UVIndex, ""),
 			aqi,
 			wind,

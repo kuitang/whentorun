@@ -47,15 +47,17 @@ func syntheticGrid(start time.Time) *nws.Gridpoint {
 	p.Dewpoint = layer("wmoUnit:degC", 20)    // 68 °F
 	p.WBGT = layer("wmoUnit:degC", 27)        // 80.6 °F
 	p.ApparentTemperature = layer("wmoUnit:degC", 26)
-	p.WindSpeed = layer("wmoUnit:km_h-1", 16.09344) // 10 mph
-	p.WindGust = layer("wmoUnit:km_h-1", 32.18688)  // 20 mph
+	p.WindSpeed = layer("wmoUnit:km_h-1", 16.09344)        // 10 mph
+	p.WindGust = layer("wmoUnit:km_h-1", 32.18688)         // 20 mph
+	p.WindDirection = layer("wmoUnit:degree_(angle)", 170) // from the SSE
+	p.RelativeHumidity = layer("wmoUnit:percent", 72)
 	p.PoP = layer("wmoUnit:percent", 30)
 	p.SkyCover = layer("wmoUnit:percent", 55)
 	p.ProbabilityOfThunder = layer("wmoUnit:percent", 10)
 	return gp
 }
 
-func syntheticWeather(start time.Time, n int) []openmeteo.WeatherHour {
+func syntheticWeather(start time.Time, n int) openmeteo.WeatherData {
 	hours := make([]openmeteo.WeatherHour, n)
 	for i := range hours {
 		hours[i] = openmeteo.WeatherHour{
@@ -65,6 +67,7 @@ func syntheticWeather(start time.Time, n int) []openmeteo.WeatherHour {
 			DewPointF:     f(65),
 			WindMPH:       f(5),
 			GustMPH:       f(12),
+			WindDirDeg:    f(250),
 			UVIndex:       f(6),
 			ShortwaveWm2:  f(500),
 			DirectWm2:     f(300),
@@ -73,7 +76,19 @@ func syntheticWeather(start time.Time, n int) []openmeteo.WeatherHour {
 			CloudCoverPct: f(40),
 		}
 	}
-	return hours
+	// Daily sunrise/sunset: one day before the window plus every day it
+	// touches, so merge's day filtering is exercised.
+	first := time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, start.Location()).AddDate(0, 0, -1)
+	days := make([]openmeteo.SunDay, 0, 5)
+	for d := 0; d < 5; d++ {
+		day := first.AddDate(0, 0, d)
+		days = append(days, openmeteo.SunDay{
+			Date:    day,
+			Sunrise: day.Add(5*time.Hour + 48*time.Minute),
+			Sunset:  day.Add(20*time.Hour + 15*time.Minute),
+		})
+	}
+	return openmeteo.WeatherData{Hours: hours, Days: days}
 }
 
 func syntheticAir(start time.Time, n int) []openmeteo.AirQualityHour {
@@ -155,6 +170,8 @@ func TestMergeFallbackMatrix(t *testing.T) {
 				wantMetric(t, "DewPointF", h.DewPointF, 68, domain.OriginNWS, false, false)
 				wantMetric(t, "WindMPH", h.WindMPH, 10, domain.OriginNWS, false, false)
 				wantMetric(t, "GustMPH", h.GustMPH, 20, domain.OriginNWS, false, false)
+				wantMetric(t, "WindDirDeg", h.WindDirDeg, 170, domain.OriginNWS, false, false)
+				wantMetric(t, "RH", h.RH, 72, domain.OriginNWS, false, false)
 				wantMetric(t, "PoP", h.PoP, 30, domain.OriginNWS, false, false)
 				wantMetric(t, "SkyCover", h.SkyCover, 55, domain.OriginNWS, false, false)
 				wantMetric(t, "ApparentF", h.ApparentF, 78.8, domain.OriginNWS, false, false)
@@ -170,6 +187,22 @@ func TestMergeFallbackMatrix(t *testing.T) {
 				}
 				if len(r.Alerts) != 1 || r.Alerts[0].Event != "Flood Watch" {
 					t.Errorf("Alerts = %+v, want one Flood Watch", r.Alerts)
+				}
+				// Sun: only the 3 calendar days the 48 h window touches
+				// (07-28 .. 07-30), from Open-Meteo.
+				if len(r.Sun) != 3 {
+					t.Fatalf("Sun = %d days, want 3", len(r.Sun))
+				}
+				wantRise := time.Date(2026, 7, 28, 5, 48, 0, 0, nyLoc)
+				wantSet := time.Date(2026, 7, 28, 20, 15, 0, 0, nyLoc)
+				if !r.Sun[0].Sunrise.Equal(wantRise) || !r.Sun[0].Sunset.Equal(wantSet) {
+					t.Errorf("Sun[0] = %+v, want sunrise %v sunset %v", r.Sun[0], wantRise, wantSet)
+				}
+				if !r.Sun[2].Sunrise.Equal(wantRise.AddDate(0, 0, 2)) {
+					t.Errorf("Sun[2].Sunrise = %v, want %v", r.Sun[2].Sunrise, wantRise.AddDate(0, 0, 2))
+				}
+				if r.SunSource.Origin != domain.OriginOpenMeteo {
+					t.Errorf("SunSource.Origin = %s, want open-meteo", r.SunSource.Origin)
 				}
 				for src, st := range r.Freshness {
 					if !st.Available || st.Stale {
@@ -188,6 +221,8 @@ func TestMergeFallbackMatrix(t *testing.T) {
 				wantMetric(t, "DewPointF", h.DewPointF, 65, domain.OriginOpenMeteo, false, false)
 				wantMetric(t, "WindMPH", h.WindMPH, 5, domain.OriginOpenMeteo, false, false)
 				wantMetric(t, "GustMPH", h.GustMPH, 12, domain.OriginOpenMeteo, false, false)
+				wantMetric(t, "WindDirDeg", h.WindDirDeg, 250, domain.OriginOpenMeteo, false, false)
+				wantMetric(t, "RH", h.RH, 60, domain.OriginOpenMeteo, false, false)
 				wantMetric(t, "PoP", h.PoP, 20, domain.OriginOpenMeteo, false, false)
 				wantMetric(t, "SkyCover", h.SkyCover, 40, domain.OriginOpenMeteo, false, false)
 				if h.ApparentF.Valid || h.ThunderProb.Valid || h.WindChillF.Valid || h.IceAccumIn.Valid {
@@ -205,8 +240,13 @@ func TestMergeFallbackMatrix(t *testing.T) {
 				h := r.Hours[0]
 				wantMetric(t, "WBGTF", h.WBGTF, 80.6, domain.OriginNWS, false, false)
 				wantMetric(t, "TempF", h.TempF, 77, domain.OriginNWS, false, false)
+				wantMetric(t, "WindDirDeg", h.WindDirDeg, 170, domain.OriginNWS, false, false)
+				wantMetric(t, "RH", h.RH, 72, domain.OriginNWS, false, false)
 				if h.UVIndex.Valid {
 					t.Error("UVIndex valid with Open-Meteo weather down; UV is Open-Meteo only")
+				}
+				if len(r.Sun) != 0 {
+					t.Errorf("Sun = %+v, want empty with Open-Meteo weather down", r.Sun)
 				}
 				if st := r.Freshness[merge.SrcOMWeather]; st.Available {
 					t.Error("freshness[openmeteo-weather].Available = true, want false")
@@ -220,11 +260,15 @@ func TestMergeFallbackMatrix(t *testing.T) {
 				h := r.Hours[0]
 				for name, m := range map[string]domain.Metric{
 					"WBGTF": h.WBGTF, "TempF": h.TempF, "DewPointF": h.DewPointF,
-					"WindMPH": h.WindMPH, "UVIndex": h.UVIndex,
+					"WindMPH": h.WindMPH, "WindDirDeg": h.WindDirDeg, "RH": h.RH,
+					"UVIndex": h.UVIndex,
 				} {
 					if m.Valid {
 						t.Errorf("%s valid with both weather sources down", name)
 					}
+				}
+				if len(r.Sun) != 0 {
+					t.Errorf("Sun = %+v, want empty with both weather sources down", r.Sun)
 				}
 				// AQI still flows from AirNow + Open-Meteo air.
 				wantMetric(t, "AQI[0]", h.AQI, 66, domain.OriginAirNow, false, false)
@@ -531,9 +575,36 @@ func TestMergeOverRecordedFixtures(t *testing.T) {
 		}
 	}
 
+	// Wind direction and RH from the NWS grid (hand-computed from the
+	// fixture's RLE runs at 2026-07-28T00:00Z): from the south at 170°, 67%.
+	wantMetric(t, "WindDirDeg", h0.WindDirDeg, 170, domain.OriginNWS, false, false)
+	wantMetric(t, "RH", h0.RH, 67, domain.OriginNWS, false, false)
+	if got := domain.CompassPoint(h0.WindDirDeg.Value); got != "S" {
+		t.Errorf("CompassPoint(%v) = %q, want S", h0.WindDirDeg.Value, got)
+	}
+
 	// UV from Open-Meteo only.
 	if !h0.UVIndex.Valid || h0.UVIndex.Source.Origin != domain.OriginOpenMeteo {
 		t.Errorf("UVIndex = %+v, want valid from open-meteo", h0.UVIndex)
+	}
+
+	// Sunrise/sunset from the Open-Meteo daily table: the window (07-27
+	// 20:00 ET + 48 h) touches all three recorded days.
+	if len(r.Sun) != 3 {
+		t.Fatalf("Sun = %d days, want 3", len(r.Sun))
+	}
+	wantSun := []merge.SunTimes{
+		{Sunrise: time.Date(2026, 7, 27, 5, 47, 0, 0, nyLoc), Sunset: time.Date(2026, 7, 27, 20, 16, 0, 0, nyLoc)},
+		{Sunrise: time.Date(2026, 7, 28, 5, 48, 0, 0, nyLoc), Sunset: time.Date(2026, 7, 28, 20, 15, 0, 0, nyLoc)},
+		{Sunrise: time.Date(2026, 7, 29, 5, 49, 0, 0, nyLoc), Sunset: time.Date(2026, 7, 29, 20, 14, 0, 0, nyLoc)},
+	}
+	for i, want := range wantSun {
+		if !r.Sun[i].Sunrise.Equal(want.Sunrise) || !r.Sun[i].Sunset.Equal(want.Sunset) {
+			t.Errorf("Sun[%d] = %+v, want %+v", i, r.Sun[i], want)
+		}
+	}
+	if r.SunSource.Origin != domain.OriginOpenMeteo || r.SunSource.Stale {
+		t.Errorf("SunSource = %+v, want fresh open-meteo", r.SunSource)
 	}
 
 	// Current-hour AQI is the AirNow max-pollutant monitor reading
@@ -570,6 +641,10 @@ func TestMergeOverRecordedFixtures(t *testing.T) {
 		}
 		if !h.WBGTF.Valid {
 			t.Errorf("Hours[%d] (%v): WBGTF invalid over full fixtures", i, h.Time)
+		}
+		if !h.WindDirDeg.Valid || !h.RH.Valid {
+			t.Errorf("Hours[%d] (%v): wind dir/RH invalid over full fixtures (dir=%v rh=%v)",
+				i, h.Time, h.WindDirDeg.Valid, h.RH.Valid)
 		}
 	}
 }

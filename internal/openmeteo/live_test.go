@@ -18,18 +18,19 @@ func TestLive(t *testing.T) {
 	c := New(DefaultConfig(), nil)
 	lat, lon := 40.78, -73.97 // NYC
 
-	wh, err := c.Weather(ctx, lat, lon)
+	wd, err := c.Weather(ctx, lat, lon)
 	if err != nil {
 		t.Fatalf("Weather: %v", err)
 	}
+	wh := wd.Hours
 	if len(wh) < 48 {
 		t.Fatalf("Weather: %d hours, want >= 48", len(wh))
 	}
 	h := wh[13] // early afternoon of day 1: everything should be populated
 	for name, v := range map[string]*float64{
 		"TempF": h.TempF, "RelHumidity": h.RelHumidity, "DewPointF": h.DewPointF,
-		"WindMPH": h.WindMPH, "GustMPH": h.GustMPH, "UVIndex": h.UVIndex,
-		"ShortwaveWm2": h.ShortwaveWm2, "DirectWm2": h.DirectWm2,
+		"WindMPH": h.WindMPH, "GustMPH": h.GustMPH, "WindDirDeg": h.WindDirDeg,
+		"UVIndex": h.UVIndex, "ShortwaveWm2": h.ShortwaveWm2, "DirectWm2": h.DirectWm2,
 		"DiffuseWm2": h.DiffuseWm2, "PoP": h.PoP, "CloudCoverPct": h.CloudCoverPct,
 	} {
 		if v == nil {
@@ -38,6 +39,14 @@ func TestLive(t *testing.T) {
 	}
 	if h.TempF != nil && (*h.TempF < -30 || *h.TempF > 130) {
 		t.Errorf("hour 13 TempF = %v °F: implausible", *h.TempF)
+	}
+	if len(wd.Days) < 2 {
+		t.Errorf("Weather: %d sun days, want >= 2", len(wd.Days))
+	}
+	for i, d := range wd.Days {
+		if d.Sunrise.IsZero() || d.Sunset.IsZero() || !d.Sunrise.Before(d.Sunset) {
+			t.Errorf("day %d: sunrise %v / sunset %v implausible", i, d.Sunrise, d.Sunset)
+		}
 	}
 	t.Logf("live weather: %d hours; hour 13 %s temp=%v°F uv=%v", len(wh), h.Time.Format(time.RFC3339), *h.TempF, *h.UVIndex)
 
