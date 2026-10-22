@@ -1,5 +1,5 @@
 # Build
-FROM golang:1.26.10 AS build
+FROM golang:1.27.2 AS build
 WORKDIR /src
 # go.mod first for layer caching (no go.sum: stdlib-only module).
 COPY go.mod ./
